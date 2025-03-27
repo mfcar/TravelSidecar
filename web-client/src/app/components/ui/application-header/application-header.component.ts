@@ -216,7 +216,7 @@ export class ApplicationHeaderComponent implements OnDestroy {
       backdropClass: 'global-search-backdrop',
     });
 
-    dialogRef.closed.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {});
+    dialogRef.closed.pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   openMobileSidebar(): void {

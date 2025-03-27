@@ -341,11 +341,11 @@ export class CurrencyPriceInputComponent implements ControlValueAccessor, OnDest
     }
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: CurrencyPriceValue) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 

@@ -386,11 +386,11 @@ export class TagsSelectorInputComponent implements ControlValueAccessor, OnDestr
     }
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: string[]) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 

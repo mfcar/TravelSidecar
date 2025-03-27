@@ -40,6 +40,8 @@ import {
 } from 'rxjs';
 import { STANDARD_DROPDOWN_POSITIONS } from '../../../shared/constants/overlay-positions';
 
+type SelectableItem = Record<string, any>;
+
 @Component({
   selector: 'ts-generic-selector-input',
   imports: [
@@ -55,7 +57,7 @@ import { STANDARD_DROPDOWN_POSITIONS } from '../../../shared/constants/overlay-p
   styleUrl: './generic-selector-input.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GenericSelectorInputComponent<T extends Record<string, any>>
+export class GenericSelectorInputComponent<T extends SelectableItem = SelectableItem>
   implements ControlValueAccessor, OnDestroy
 {
   // Configuration inputs
@@ -88,14 +90,14 @@ export class GenericSelectorInputComponent<T extends Record<string, any>>
   // UI state
   protected isOpen = signal(false);
   protected isDisabled = signal(false);
-  protected selectedValues = signal<any[]>([]);
+  protected selectedValues = signal<unknown[]>([]);
   protected selectedItems = signal<T[]>([]);
   protected searchText = signal<string>('');
   protected activeItemIndex = signal<number>(-1);
   private refreshTrigger = new BehaviorSubject<boolean>(true);
   protected allItems$: Observable<T[]>;
   protected filteredItems$: Observable<T[]>;
-  private pendingSelection = new ReplaySubject<any[]>(1);
+  private pendingSelection = new ReplaySubject<unknown[]>(1);
 
   // References
   protected trigger = viewChild.required<ElementRef>('trigger');
@@ -115,7 +117,7 @@ export class GenericSelectorInputComponent<T extends Record<string, any>>
   protected searchId = `generic-search-${this.uniqueId}`;
 
   // ControlValueAccessor callbacks
-  protected onChange: (value: any) => void = () => {};
+  protected onChange: (value: unknown) => void = () => {};
   protected onTouched: () => void = () => {};
 
   // Position strategy
@@ -264,7 +266,7 @@ export class GenericSelectorInputComponent<T extends Record<string, any>>
     }
   }
 
-  isItemSelected(value: any): boolean {
+  isItemSelected(value: unknown): boolean {
     return this.selectedValues().includes(value);
   }
 
@@ -275,7 +277,7 @@ export class GenericSelectorInputComponent<T extends Record<string, any>>
     this.onChange(this.multiple() ? [] : null);
   }
 
-  removeItem(value: any, event: Event): void {
+  removeItem(value: unknown, event: Event): void {
     event.stopPropagation();
 
     if (this.multiple()) {
@@ -394,7 +396,7 @@ export class GenericSelectorInputComponent<T extends Record<string, any>>
     });
   }
 
-  writeValue(value: any): void {
+  writeValue(value: unknown): void {
     if (value !== null && value !== undefined) {
       if (this.multiple()) {
         const valueArray = Array.isArray(value) ? value : [value];
@@ -424,11 +426,11 @@ export class GenericSelectorInputComponent<T extends Record<string, any>>
     }
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: unknown) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 
@@ -454,7 +456,7 @@ export class GenericSelectorInputComponent<T extends Record<string, any>>
 
   getItemSecondaryText(item: T): string | null {
     const key = this.itemSecondaryTextKey();
-    return key ? item[key] : null;
+    return key ? String(item[key] || '') || null : null;
   }
 
   ngOnDestroy(): void {
