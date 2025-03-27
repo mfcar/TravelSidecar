@@ -1,0 +1,19 @@
+@if (isLoading()) {
+  <ts-loading-indicator />
+} @else {
+  <span [ngPlural]="count()">
+    <ng-template ngPluralCase="zero">No items found</ng-template>
+    <ng-template ngPluralCase="one">1 item</ng-template>
+    <ng-template ngPluralCase="other">{{ count() }} items</ng-template>
+  </span>
+  @if (isFiltered()) {
+    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+      (filtered)
+      <ts-button
+        label="Reset filters"
+        variant="neutralPrimary"
+        (buttonAction)="onResetFilterButtonClick()"
+      />
+    </span>
+  }
+}

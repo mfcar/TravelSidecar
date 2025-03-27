@@ -1,0 +1,133 @@
+<!-- ─── PAGE HEADER & ACTIONS ────────────────────────────────────────────── -->
+<ts-page-header title="Bucket List Items">
+  <!-- View Mode Toggle -->
+  <span class="sm:mx-1" page-header-button>
+    <ts-view-mode-toogle
+      [selectedViewMode]="selectedViewMode()"
+      (viewModeChange)="onViewModeChange($event)"
+    />
+  </span>
+
+  <!-- Field Display Selector -->
+  <span class="sm:mx-1" page-header-button>
+    <ts-field-display-selector
+      [options]="fieldOptions"
+      [selectedFields]="selectedFields()"
+      (fieldSelectionChange)="onFieldSelectionChange($event)"
+    />
+  </span>
+
+  <!-- Sort Options -->
+  <span class="sm:mx-1" page-header-button>
+    <ts-sort-options
+      [sortFields]="sortFields"
+      [selectedSortBy]="selectedSortBy()"
+      [selectedSortOrder]="selectedSortOrder()"
+      (sortChange)="onSortChange($event)"
+    />
+  </span>
+
+  <!-- Create Button -->
+  <span class="sm:mx-1" page-header-button>
+    <ts-button
+      label="Add Item"
+      size="lg"
+      icon="plus"
+      variant="primary"
+      (buttonAction)="showCreateModal()"
+    />
+  </span>
+</ts-page-header>
+
+<!-- ─── FILTER & STATUS ────────────────────────────────────────────────────── -->
+<ts-list-filter-text-input
+  placeholder="Search by name"
+  [autocomplete]="false"
+  (filterValueChange)="onFilterInputChange($event)"
+  [filterValue]="searchTerm()"
+/>
+
+<ts-list-status 
+  [count]="itemsCount()"
+  [isLoading]="isLoading()"
+  [isFiltered]="activeFilters()"
+  (resetFilterAction)="resetFilters()"
+/>
+
+<!-- ─── NO ITEMS STATE ─────────────────────────────────────────────────────── -->
+@if (!isLoading() && itemsCount() === 0 && !activeFilters()) {
+<ts-empty-content
+  icon="bucket"
+  title="No items found"
+  subtitle="No bucket list items yet? Start capturing your dreams by adding one today!"
+  buttonLabel="Add Item"
+  (newItemButtonAction)="showCreateModal()"
+/>
+}
+
+<!-- ─── VIEW MODE DISPLAY ───────────────────────────────────────────────────── -->
+@if (selectedViewMode() === ListViewMode.Table && displayedItems().length > 0) {
+  <ts-table-list
+    [items]="displayedItems()"
+    [columns]="columns"
+    [selectedFields]="selectedFields()"
+    [sortBy]="selectedSortBy()"
+    [sortDirection]="selectedSortOrder()"
+    (sortChanged)="onSortChange($event)"
+    (editButtonClicked)="showUpdateModal($event)"
+  />
+} @else if (selectedViewMode() === ListViewMode.Stack && displayedItems().length > 0) {
+  <ts-stack-list
+      [items]="displayedItems()"
+      [columns]="columns"
+      [selectedFields]="selectedFields()"
+      (editButtonClicked)="showUpdateModal($event)"
+      (deleteButtonClicked)="showDeleteModal()"
+  />
+}
+
+<!-- ─── CUSTOM TEMPLATE DEFINITIONS FOR TABLE CELLS ────────────────────────── -->
+<ng-template #createdAtCell let-item><span>{{ item.createdAt | userDateFormat }}</span></ng-template>
+<ng-template #lastModifiedAtCell let-item><span>{{ item.lastModifiedAt | userDateFormat }}</span></ng-template>
+<ng-template #startDateCell let-item><span>{{ item.startDate | userDateFormat:'date' }}</span></ng-template>
+<ng-template #endDateCell let-item><span>{{ item.endDate | userDateFormat:'date' }}</span></ng-template>
+<ng-template #tagsCell let-item>
+  <div class="flex flex-wrap gap-1">
+    @for (tag of item.tags; track tag.id) {
+      <ts-tag-badge [label]="tag.name" [color]="tag.color!" />
+    }
+  </div>
+</ng-template>
+
+<!-- Stack labels with conditional rendering -->
+<ng-template #createdAtStackLabel let-item>
+  @if (item.createdAt) {
+    <span>Created at {{ item.createdAt | userDateFormat:'datetime' }}</span>
+  }
+</ng-template>
+
+<ng-template #lastModifiedAtStackLabel let-item>
+  @if (item.lastModifiedAt) {
+    <span>Last modified at {{ item.lastModifiedAt | userDateFormat }}</span>
+  }
+</ng-template>
+
+<ng-template #startDateStackLabel let-item>
+  @if (item.startDate) {
+    <span>Starts on {{ item.startDate | userDateFormat:'date' }}</span>
+  }
+</ng-template>
+
+<ng-template #endDateStackLabel let-item>
+  @if (item.endDate) {
+    <span>Ends on {{ item.endDate | userDateFormat:'date' }}</span>
+  }
+</ng-template>
+
+<ng-template #tagsStackCell let-item>
+  <div class="flex flex-wrap gap-1 mt-1">
+    @for (tag of item.tags; track tag.id) {
+      <ts-tag-badge [label]="tag.name" [color]="tag.color!" />
+    }
+  </div>
+</ng-template>

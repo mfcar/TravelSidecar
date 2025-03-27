@@ -1,0 +1,98 @@
+<ts-page-header [title]="'Application Status'" />
+
+<div>
+  <div class="mt-6">
+    <dl class="grid grid-cols-1 sm:grid-cols-2">
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">Start Date:</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.startDate! | userDateFormat }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">Uptime:</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.uptime ? (systemStatus()?.uptime! | uptime) : 'N/A' }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">Version:</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.applicationVersion }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">Build Date:</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.buildDate! | userDateFormat }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+          Latest Version Installed At:
+        </dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.latestVersionInstalledAt! | userDateFormat }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+          Latest Migration Applied:
+        </dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.latestMigrationApplied }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+          First Version Installed:
+        </dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.firstVersionInstalled || 'N/A' }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+          First Version Installed At:
+        </dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.firstVersionInstalledAt! | userDateFormat }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">OS Name:</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.osName }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">OS Version:</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.osVersion }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">.NET Version:</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.dotNetVersion }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+          Database Version:
+        </dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.databaseVersion }}
+        </dd>
+      </div>
+      <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+          Running on Docker:
+        </dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:mt-2">
+          {{ systemStatus()?.isRunningOnDocker ? 'Yes' : 'No' }}
+        </dd>
+      </div>
+    </dl>
+  </div>
+</div>

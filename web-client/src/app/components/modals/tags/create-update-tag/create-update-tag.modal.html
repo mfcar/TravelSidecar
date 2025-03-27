@@ -1,0 +1,34 @@
+<ts-base-modal [modalTitle]="isUpdateMode ? 'Update Tag' : 'Create Tag'">
+    <div modal-body> 
+        @if (errorMessage()){
+            <ts-alert 
+                [type]="'error'"
+                [message]="errorMessage()"
+            />
+        }
+        <form id="modalForm" [formGroup]="form" (ngSubmit)="onSubmit()" aria-labelledby="addJourneyCategoryModalLabel" autocomplete="off">
+        @if (tag){
+                <span class="text-sm text-gray-500 mb-2">ID: {{tag.id}}</span>
+            }
+            <ts-text-input formControlName="name" label="Name" placeholder="Enter name" [showRequiredIndicator]="true"/>
+            <ts-color-input formControlName="color" label="Color" placeholder="Enter color" [showRequiredIndicator]="true"/>
+      
+        </form>
+    </div>
+    <div modal-footer>
+        <ts-button 
+            type="button" 
+            variant="neutralSecondary" 
+            label="Cancel" 
+            (click)="onCancel()"
+            [disabled]="isLoading()"
+        />
+        <ts-button 
+            type="button" 
+            variant="primary" 
+            label="Save" 
+            (click)="onSubmit()"
+            [isLoading]="isLoading()"
+        />
+    </div>  
+</ts-base-modal>

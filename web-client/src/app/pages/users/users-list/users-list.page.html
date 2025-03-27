@@ -1,0 +1,102 @@
+<!-- ─── PAGE HEADER & ACTIONS ────────────────────────────────────────────── -->
+<ts-page-header title="Users">
+  <!-- View Mode Toggle -->
+  <span class="sm:ml-3" page-header-button>
+    <ts-view-mode-toogle
+      [selectedViewMode]="selectedViewMode()"
+      (viewModeChange)="onViewModeChange($event)"
+    />
+  </span>
+
+  <!-- Field Display Selector -->
+  <span class="sm:ml-3" page-header-button>
+    <ts-field-display-selector
+      [options]="fieldOptions"
+      [selectedFields]="selectedFields()"
+      (fieldSelectionChange)="onFieldSelectionChange($event)"
+    />
+  </span>
+
+  <!-- Sort Options -->
+  <span class="sm:ml-3" page-header-button>
+    <ts-sort-options
+      [sortFields]="sortFields"
+      [selectedSortBy]="selectedSortBy()"
+      [selectedSortOrder]="selectedSortOrder()"
+      (sortChange)="onSortChange($event)"
+    />
+  </span>
+
+  <!-- Create Button -->
+  <span class="sm:ml-3" page-header-button>
+    <ts-button
+      label="Create User"
+      size="lg"
+      icon="plus"
+      variant="primary"
+      (buttonAction)="showCreateModal()"
+    />
+  </span>
+</ts-page-header>
+
+<!-- ─── FILTER & STATUS ────────────────────────────────────────────────────── -->
+<ts-list-filter-text-input
+  placeholder="Search by username or email"
+  [autocomplete]="false"
+  (filterValueChange)="onFilterInputChange($event)"
+  [filterValue]="searchTerm()"
+/>
+
+<ts-list-status 
+  [count]="itemsCount()"
+  [isLoading]="usersResource.isLoading()"
+  [isFiltered]="activeFilters()"
+  (resetFilterAction)="resetFilters()"
+/>
+
+<!-- ─── NO ITEMS STATE ─────────────────────────────────────────────────────── -->
+@if (!usersResource.isLoading() && itemsCount() === 0 && !activeFilters()) {
+  <ts-empty-content
+    icon="user-plus"
+    title="No users found"
+    subtitle="Create a new user to get started."
+    buttonLabel="Create User"
+    (newItemButtonAction)="showCreateModal()"
+  />
+}
+
+<!-- ─── VIEW MODE DISPLAY ───────────────────────────────────────────────────── -->
+@if (selectedViewMode() === ListViewMode.Table && displayedItems().length > 0) {
+  <ts-table-list
+    [items]="displayedItems()"
+    [columns]="columns"
+    [selectedFields]="selectedFields()"
+    [sortBy]="selectedSortBy()"
+    [sortDirection]="selectedSortOrder()"
+    (sortChanged)="onSortChange($event)"
+    (editButtonClicked)="showUpdateModal($event)"
+  />
+} @else if (selectedViewMode() === ListViewMode.Stack && displayedItems().length > 0) {
+  <ts-stack-list
+      [items]="displayedItems()"
+      [columns]="columns"
+      [selectedFields]="selectedFields()"
+      (editButtonClicked)="showUpdateModal($event)"
+      (deleteButtonClicked)="showDeleteModal()"
+  />
+} @else if (selectedViewMode() === ListViewMode.Grid && displayedItems().length > 0) {
+  <!-- <ts-users-list-grid
+    [items]="displayedItems()"
+    [selectedFields]="selectedFields()"
+    (editButtonClicked)="showUpdateModal()"
+    (deleteButtonClicked)="showDeleteModal()"
+  /> -->
+}
+
+<!-- ─── CUSTOM TEMPLATE DEFINITIONS FOR TABLE CELLS ────────────────────────── -->
+<ng-template #createdAtCell let-item><span>{{ item.createdAt | userDateFormat }}</span></ng-template>
+
+<ng-template #lastModifiedAtCell let-item><span>{{ item.lastModifiedAt | userDateFormat }}</span></ng-template>
+
+<ng-template #lastActiveAtCell let-item><span>{{ item.lastActiveAt | userDateFormat }}</span></ng-template>
+

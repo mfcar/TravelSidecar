@@ -1,0 +1,33 @@
+<ul role="list" class="divide-y divide-gray-100 dark:divide-white/5" aria-label="Items list" i18n-aria-label="@@stackListAriaLabel">
+    @for(item of items();  track $index) {
+        <li class="flex items-center justify-between gap-x-6 py-5">
+            <div class="min-w-0">
+                @for(column of columns(); track column.key) {
+                    @if (selectedFields().has(column.key)) {
+                        <div class="mt-1 flex items-center gap-x-2 
+                            {{ firstSelectedKey === column.key 
+                                ? 'text-sm font-semibold leading-6 text-gray-900 dark:text-white' 
+                                : 'text-xs leading-5 text-gray-500 dark:text-gray-400' }}">
+                            @if (column.cellTemplate) {
+                                <ng-container *ngTemplateOutlet="getCellTemplate(column, item); context: {$implicit: item}" />
+                            } @else {
+                                <p class="truncate">{{ item[column.key] }}</p>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+            <div class="flex flex-none items-center gap-x-4">
+                <ts-button 
+                    label="Edit" 
+                    i18n-label="@@editButtonLabel"
+                    variant="secondary" 
+                    size="md" 
+                    (buttonAction)="onEditButtonClicked(item)" 
+                    ariaLabel="Edit item"
+                    i18n-ariaLabel="@@editItemAriaLabel"
+                />
+            </div>
+        </li>
+    }
+</ul>

@@ -1,0 +1,147 @@
+@if (mobileSidebarIsVisible()) {
+  <div class="relative z-200 lg:hidden" role="dialog" aria-modal="true">
+    <div 
+      class="fixed inset-0 bg-gray-800/70 backdrop-blur-sm" 
+      aria-hidden="true"
+      (click)="closeMobileSidebar()"
+      (keydown.enter)="closeMobileSidebar()"
+      (keydown.space)="closeMobileSidebar()"
+    ></div>
+     
+    <div 
+      class="fixed inset-0 flex" 
+      role="presentation"
+      (click)="closeMobileSidebar()">
+      <div 
+        class="relative mr-16 flex w-full max-w-xs flex-1" 
+        role="presentation" 
+        (click)="$event.stopPropagation()">
+        <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
+          <button class="-m-2.5 p-2.5" type="button" (click)="closeMobileSidebar()">
+            <span class="sr-only">Close sidebar</span>
+            <fa-icon class="h-6 w-6 text-white" [icon]="['fas', 'xmark']" size="xl" />
+          </button>
+        </div>
+
+        <div
+          class="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-900 px-6 pb-4 dark:ring-1 dark:ring-white/10"
+        >
+        <div class="flex h-16 shrink-0 items-center">
+          <ts-application-logo
+            cssClass="h-8 w-auto"
+            [height]="32"
+            [width]="38" />
+        </div>
+          <nav class="flex flex-1 flex-col">
+            <ul class="flex flex-1 flex-col gap-y-7" role="list">
+              <li>
+                <ul class="-mx-2 space-y-1" role="list">
+                  @for (link of sidebarLinks; track $index) {
+                    <li>
+                      <a
+                        class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-sky-600 dark:hover:text-white"
+                        [routerLink]="link.routerLink"
+                        routerLinkActive="bg-gray-50 dark:bg-gray-800 text-sky-600 dark:text-white"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        (click)="closeMobileSidebar()"
+                      >
+                        <fa-icon
+                          class="h-6 w-6 shrink-0 text-gray-400 group-hover:text-sky-600 dark:group-hover:text-white"
+                          [icon]="['fas', link.icon]"
+                          size="lg"
+                        />
+                        {{ link.label }}
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </li>
+              <ng-container *ngTemplateOutlet="fixedLinksTemplate" />
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-50 lg:flex-col">
+  <div
+    class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-black/10  px-6 pb-4"
+  >
+    <div class="flex h-16 shrink-0 items-center">
+      <ts-application-logo
+        cssClass="h-8 w-auto"
+        [height]="32"
+        [width]="38" />
+    </div>
+    <nav class="flex flex-1 flex-col">
+      <ul class="flex flex-1 flex-col gap-y-7" role="list">
+        <li>
+          <ul class="-mx-2 space-y-1" role="list">
+            @for (link of sidebarLinks; track $index) {
+              <li>
+                <a
+                  class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-sky-600 dark:hover:text-white"
+                  [routerLink]="link.routerLink"
+                  routerLinkActive="bg-gray-50 dark:bg-gray-800 text-sky-600 dark:text-white"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                >
+                  <fa-icon
+                    class="h-6 w-6 shrink-0 text-gray-400 group-hover:text-sky-600 dark:group-hover:text-white"
+                    [icon]="['fas', link.icon]"
+                    size="lg"
+                  />
+                  {{ link.label }}
+                </a>
+              </li>
+            }
+          </ul>
+        </li>
+        <ng-container *ngTemplateOutlet="fixedLinksTemplate" />
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<ng-template #fixedLinksTemplate>
+    <li class="mt-auto">
+      <a
+        class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-sky-600 dark:hover:text-white"
+        [routerLink]="fixedLinks.settings.routerLink"
+        routerLinkActive="bg-gray-50 dark:bg-gray-800 text-sky-600 dark:text-white"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="mobileSidebarIsVisible() ? closeMobileSidebar() : null"
+      >
+        <fa-icon
+          class="h-6 w-6 shrink-0 text-gray-400 group-hover:text-sky-600 dark:group-hover:text-white"
+          [icon]="['fas', fixedLinks.settings.icon]"
+          size="lg"
+        />
+        {{ fixedLinks.settings.label }}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center justify-between">
+        <a
+          class="block -mx-2 flex gap-x-3 rounded-md p-2 text-xs text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-sky-600 dark:hover:text-white"
+          [routerLink]="fixedLinks.version.routerLink"
+          routerLinkActive="bg-gray-50 dark:bg-gray-800 text-sky-600 dark:text-white"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="mobileSidebarIsVisible() ? closeMobileSidebar() : null"
+        >
+          {{ fixedLinks.version.label }}
+        </a>
+        <div class="h-6 w-px bg-gray-200 dark:bg-gray-900/10"></div>
+        <a
+          class="block -mx-2 flex gap-x-3 rounded-md p-2 text-xs text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-sky-600 dark:hover:text-white"
+          [routerLink]="fixedLinks.status.routerLink"
+          routerLinkActive="bg-gray-50 dark:bg-gray-800 text-sky-600 dark:text-white"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="mobileSidebarIsVisible() ? closeMobileSidebar() : null"
+        >
+          {{ fixedLinks.status.label }}
+        </a>
+      </div>
+    </li>
+  </ng-template>

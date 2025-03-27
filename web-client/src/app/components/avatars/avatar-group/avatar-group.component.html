@@ -1,0 +1,32 @@
+<div 
+  class="flex overflow-hidden"
+  [ngClass]="[spacingClass()]"
+  [attr.aria-label]="usernames().length + ' users'"
+  i18n-aria-label="@@usersInGroup"
+  role="group"
+>
+  @for (username of displayedUsernames(); track username) {
+    <div class="relative inline-block ring-2 ring-white dark:ring-gray-800">
+      <ts-avatar [username]="username" [size]="size()" />
+    </div>
+  }
+  
+  @if (extraCount() > 0) {
+    <div class="relative inline-block">
+      <div 
+        class="inline-flex items-center justify-center rounded-full bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white font-medium ring-2 ring-white dark:ring-gray-800"
+        [ngClass]="[
+          size() === 'xs' ? 'h-6 w-6 text-xs' : '',
+          size() === 'sm' ? 'h-8 w-8 text-xs' : '',
+          size() === 'md' ? 'h-10 w-10 text-sm' : '',
+          size() === 'lg' ? 'h-12 w-12 text-base' : '',
+          size() === 'xl' ? 'h-14 w-14 text-lg' : ''
+        ]"
+        [attr.aria-label]="extraCount() + ' more users'"
+        i18n-aria-label="@@moreUsers"
+      >
+        <span>{{ getExtraCountText() }}</span>
+      </div>
+    </div>
+  }
+</div>

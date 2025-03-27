@@ -1,0 +1,156 @@
+<header
+  class="sticky top-0 z-100 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8"
+  role="banner"
+>
+  <button 
+    class="-m-2.5 p-2.5 text-gray-700 lg:hidden" 
+    (click)="openMobileSidebar()" 
+    type="button"
+    aria-haspopup="true"
+    i18n-aria-label="@@openSidebarAriaLabel"
+    aria-label="Open navigation sidebar"
+  >
+    <span class="sr-only" i18n="@@openSidebar">Open sidebar</span>
+    <fa-icon class="h-6 w-6" [icon]="['fas', 'bars']" size="xl" />
+  </button>
+
+  <div class="h-6 w-px bg-gray-200 dark:bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
+
+  <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+    <div class="min-w-0 flex-1 md:px-8 lg:px-0 xl:col-span-6">
+      <div
+        class="flex items-center justify-center px-6 py-4 md:mx-auto md:max-w-3xl lg:mx-0 lg:max-w-none xl:px-0"
+      >
+        <div class="w-3/4 lg:w-2/4">
+          <div class="relative group">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <fa-icon
+                class="h-5 w-5 text-gray-400 dark:text-neutral-300 group-hover:text-sky-400"
+                [icon]="['fas', 'magnifying-glass']"
+                aria-hidden="true"
+              />
+            </div>
+            <button
+              class="flex items-center justify-between w-full rounded-md border-0 bg-white dark:bg-gray-700 py-1.5 pl-10 pr-3 text-gray-900 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-neutral-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6 dark:focus:bg-white dark:focus:text-gray-900 dark:focus:ring-0 dark:focus:placeholder:text-gray-500"
+              id="globalSearchButton"
+              type="button"
+              (click)="showGlobalSearchDialog()"
+              i18n-aria-label="@@openSearchDialogAriaLabel"
+              aria-label="Open global search dialog"
+            >
+              <span class="inline-block sm:hidden">&nbsp;</span>
+              <span class="hidden sm:inline" i18n="@@globalSearch">Global Search</span>
+              <kbd class="hidden md:inline-flex items-center rounded bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 px-1.5 py-0.5 font-sans text-xs text-gray-600 dark:text-gray-300 shadow-sm">
+                <span i18n="@@searchKeyboardShortcut">⌘K / Ctrl+K</span>
+              </kbd>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-x-4 lg:gap-x-6">
+      <button 
+        class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500" 
+        type="button"
+        (click)="toggleDarkMode()"
+        i18n-aria-label="@@toggleDarkModeAriaLabel"
+        aria-label="Toggle dark mode"
+        [attr.aria-pressed]="isDarkMode()"
+      >
+        <span class="sr-only" i18n="@@toggleDarkMode">Toggle dark mode</span>
+        @if (!isDarkMode()){
+          <fa-icon class="h-6 w-6" [icon]="['fas', 'moon']" aria-hidden="true" />
+        } @else {
+          <fa-icon class="h-6 w-6" [icon]="['fas', 'sun']" aria-hidden="true" />
+        }
+      </button>
+
+      <div
+        class="hidden lg:block lg:h-6 lg:w-px bg-gray-200 dark:bg-gray-900/10"
+        aria-hidden="true"
+      ></div>
+
+      <div class="relative">
+        <button
+          class="-m-1.5 flex items-center p-1.5"
+          [id]="userMenuButtonId"
+          type="button"
+          #userMenuTrigger
+          cdkOverlayOrigin
+          (click)="toggleUserMenu($event)"
+          (keydown)="onMenuKeyDown($event)"
+          [attr.aria-expanded]="userMenuOpen()"
+          aria-haspopup="menu"
+          i18n-aria-label="@@openUserMenuAriaLabel"
+          aria-label="Open user menu"
+        >
+          <span class="sr-only" i18n="@@openUserMenu">Open user menu</span>
+          <ts-avatar username="John Doe" size="sm" />
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- User Menu Overlay -->
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="userMenuTrigger"
+  [cdkConnectedOverlayOpen]="userMenuOpen()"
+  [cdkConnectedOverlayPositions]="positions"
+  cdkConnectedOverlayPanelClass="user-menu-overlay"
+  (overlayOutsideClick)="closeUserMenu()"
+  (detach)="closeUserMenu()"
+>
+  <div
+    class="z-10 w-56 origin-top-right divide-y divide-gray-100 dark:divide-gray-600 rounded-md bg-white dark:bg-gray-700 ring-1 shadow-lg ring-black/5 dark:ring-neutral-600 focus:outline-none"
+    [id]="userMenuId"
+    role="menu"
+    [attr.aria-labelledby]="userMenuButtonId"
+  >
+    <div class="px-4 py-3 dark:text-white" role="none">
+      <p class="text-sm" role="none" i18n="@@signedInAs">Signed in as</p>
+      <p class="truncate text-sm font-medium dark:text-gray-200" role="none">{{ userName() }}</p>
+    </div>
+    
+    <div class="py-1" role="none">
+      <a
+        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 outline-none"
+        [ngClass]="{
+          'text-gray-700 dark:text-gray-200': activeMenuItemIndex() !== 0,
+          'bg-sky-600 text-white dark:bg-sky-600 hover:bg-sky-700 dark:hover:bg-sky-700': activeMenuItemIndex() === 0
+        }"
+        [id]="userMenuId + '-option-0'"
+        href="#"
+        routerLink="/account/profile"
+        role="menuitem"
+        tabindex="0"
+        (focus)="onMenuItemFocus(0)"
+        (keydown)="onMenuItemKeydown($event, 0)"
+        (click)="closeUserMenu()"
+        i18n="@@accountSettings"
+      >
+        Account settings
+      </a>
+    </div>
+    
+    <div class="py-1" role="none">
+      <button
+        class="block w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 outline-none"
+        [ngClass]="{
+          'text-gray-700 dark:text-gray-200': activeMenuItemIndex() !== 1,
+          'bg-sky-600 text-white dark:bg-sky-600 hover:bg-sky-700 dark:hover:bg-sky-700': activeMenuItemIndex() === 1
+        }"
+        [id]="userMenuId + '-option-1'"
+        role="menuitem"
+        tabindex="0"
+        (focus)="onMenuItemFocus(1)"
+        (keydown)="onMenuItemKeydown($event, 1)"
+        (click)="logout()"
+        i18n="@@signOut"
+      >
+        Sign out
+      </button>
+    </div>
+  </div>
+</ng-template>

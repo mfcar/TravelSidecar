@@ -1,0 +1,64 @@
+<button
+  class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white dark:bg-white/10 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-0 hover:bg-gray-50 dark:hover:bg-white/20"
+  [id]="buttonId"
+  type="button"
+  #trigger
+  cdkOverlayOrigin
+  (click)="toggle($event)"
+  (keydown)="onKeyDown($event)"
+  [attr.aria-expanded]="isOpen()"
+  aria-haspopup="menu"
+  aria-label="Select fields to display"
+  i18n-aria-label="@@fieldSelectorAriaLabel"
+>
+  <span i18n="@@fieldSelectorLabel">Fields</span>
+  <fa-icon class="-mr-1 h-5 w-5 text-gray-400" [icon]="['fas', 'chevron-down']" aria-hidden="true" />
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  cdkConnectedOverlayPanelClass="field-selector-overlay"
+  [cdkConnectedOverlayPositions]="positions"
+  (overlayOutsideClick)="close()"
+  (detach)="close()"
+>
+  <div
+    class="z-10 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-gray-300 dark:ring-neutral-600 ring-opacity-5 focus:outline-none"
+    [id]="menuId"
+    role="menu"
+    [attr.aria-labelledby]="buttonId"
+  >
+    <div class="py-1" role="none">
+      @for (field of options(); track field.id; let i = $index) {
+        <button
+          class="w-full text-left group flex items-center px-4 py-2 text-sm outline-none hover:bg-gray-100 dark:hover:bg-gray-600"
+          role="menuitemcheckbox"
+          [attr.aria-checked]="selectedFields().has(field.id)"
+          tabindex="0"
+          [attr.id]="menuId + '-option-' + i"
+          [ngClass]="{
+            'text-gray-700 dark:text-white': 
+              !selectedFields().has(field.id) && i !== activeItemIndex(),
+            'text-sky-600 dark:text-sky-500': 
+              selectedFields().has(field.id) && i !== activeItemIndex(),
+            'bg-sky-600 text-white hover:bg-sky-700 dark:hover:bg-sky-700': 
+              i === activeItemIndex()
+          }"
+          (click)="onToggleField(field, $event)"
+          (focus)="onOptionFocus(i)"
+          (keydown)="onOptionKeydown($event, field, i)"
+        >
+          <span class="block truncate">{{ field.label }}</span>
+          @if (selectedFields().has(field.id)) {
+            <span class="absolute right-0 flex items-center pr-4" 
+                  [ngClass]="{'text-sky-600 dark:text-sky-500': i !== activeItemIndex(), 'text-white': i === activeItemIndex()}">
+              <fa-icon class="h-5 w-5" [icon]="['fas', 'check']" aria-hidden="true" />
+            </span>
+          }
+        </button>
+      }
+    </div>
+  </div>
+</ng-template>

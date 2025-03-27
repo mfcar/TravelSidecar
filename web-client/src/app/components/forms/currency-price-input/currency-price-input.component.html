@@ -1,0 +1,174 @@
+<div class="my-2">
+  @if (label()) {
+    <label
+      class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+      [for]="inputId"
+    >
+      {{ label() }}
+      @if (showRequiredIndicator()) {
+        <span class="text-red-500 ml-1 text-xs font-normal">(required)</span>
+      }
+    </label>
+  }
+  <div class="relative mt-2 rounded-md">
+    <div class="absolute inset-y-0 left-0 flex items-center">
+      <button
+        class="h-full rounded-md border-0 py-0 pl-3 pr-7 focus:outline-none focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 dark:focus:outline-sky-500 sm:text-sm"
+        #currencyTrigger
+        type="button"
+        [id]="currencyId"
+        [disabled]="isDisabled()"
+        [attr.aria-expanded]="isOpen()"
+        [attr.aria-haspopup]="true"
+        (click)="toggleCurrencyDropdown()"
+        (keydown.enter)="toggleCurrencyDropdown()"
+        (keydown.space)="toggleCurrencyDropdown(); $event.preventDefault()"
+        [ngClass]="{
+          'dark:bg-white/5 text-gray-900 dark:text-white': !isDisabled(),
+          'dark:bg-white/5 text-gray-500 dark:text-gray-400 cursor-not-allowed': isDisabled(),
+        }"
+      >
+        {{ selectedCurrency()?.code || defaultCurrencyCode() }}
+        <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">
+          <fa-icon class="h-5 w-5 text-gray-400" [icon]="faChevronDown" />
+        </span>
+      </button>
+    </div>
+
+    <!-- Price Input -->
+    <input
+      class="block w-full rounded-md border-0 py-1.5 pl-20 outline-1 -outline-offset-1 sm:text-sm sm:leading-6 focus:outline-2 focus:-outline-offset-2"
+      #priceInput
+      [id]="inputId"
+      type="text"
+      inputmode="decimal"
+      [placeholder]="placeholder()"
+      [disabled]="isDisabled()"
+      [ngModel]="priceValue()"
+      (ngModelChange)="onPriceChange($event)"
+      (blur)="onTouched()"
+      [attr.aria-invalid]="hasError ? 'true' : 'false'"
+      [ngClass]="{
+        'outline-red-300 placeholder:text-red-300 text-red-900 dark:text-white focus:outline-red-500':
+          hasError,
+        'outline-gray-300 dark:outline-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-sky-600 dark:focus:outline-sky-500':
+          !hasError,
+        'bg-gray-100 dark:bg-white/5 cursor-not-allowed': isDisabled(),
+        'bg-white dark:bg-white/5': !isDisabled(),
+      }"
+    />
+  </div>
+
+  @if (hasError) {
+    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ errorMessage }}</p>
+  }
+
+  @if (helpText()) {
+    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400" [id]="helpTextId">{{ helpText() }}</p>
+  }
+</div>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="currencyTrigger"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayPositions]="positions"
+  cdkConnectedOverlayPanelClass="currency-price-overlay"
+  [cdkConnectedOverlayWidth]="250"
+  (overlayOutsideClick)="closeCurrencyDropdown()"
+  (detach)="closeCurrencyDropdown()"
+>
+  <div
+    class="overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base outline-1 shadow-lg outline-black/5 focus:outline-none sm:text-sm"
+    role="listbox"
+    [id]="listboxId"
+    [attr.aria-labelledby]="currencyId"
+  >
+    <div
+      class="sticky top-0 z-10 bg-white dark:bg-gray-800 px-2 py-1.5 border-b border-gray-200 dark:border-gray-700"
+    >
+      <div class="relative">
+        <fa-icon
+          class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+          [icon]="faSearch"
+        />
+        <input
+          class="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 dark:text-white dark:bg-gray-700/50 outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-600 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 dark:focus:outline-sky-500 sm:text-sm sm:leading-6"
+          #searchInput
+          [id]="searchId"
+          type="search"
+          [ngModel]="searchText()"
+          (ngModelChange)="updateSearchText($event)"
+          placeholder="Search currencies..."
+          (keydown)="onSearchKeydown($event)"
+        />
+      </div>
+    </div>
+
+    <cdk-virtual-scroll-viewport
+      class="h-60 w-full"
+      #virtualScroll
+      itemSize="40"
+      minBufferPx="200"
+      maxBufferPx="400"
+    >
+      @if ((filteredCurrencies$ | async)?.length) {
+        @for (currency of filteredCurrencies$ | async; track currency.code; let i = $index) {
+          <div
+            class="relative cursor-pointer select-none py-2 pl-3 pr-9 outline-none hover:bg-gray-100 dark:hover:bg-gray-600"
+            [ngClass]="{
+              'bg-sky-600 text-white hover:bg-sky-700 dark:hover:bg-sky-700':
+                i === activeItemIndex(),
+              'text-gray-900 dark:text-white':
+                i !== activeItemIndex() && selectedCurrency()?.code !== currency.code,
+              'text-sky-600 dark:text-sky-500':
+                i !== activeItemIndex() && selectedCurrency()?.code === currency.code,
+            }"
+            role="option"
+            tabindex="0"
+            [attr.aria-selected]="selectedCurrency()?.code === currency.code"
+            (click)="selectCurrency(currency)"
+            (keydown)="onOptionKeydown($event, currency, i)"
+            (focus)="onOptionFocus(i)"
+          >
+            <div class="flex items-center">
+              <span
+                [ngClass]="{
+                  'font-medium':
+                    selectedCurrency()?.code === currency.code || i === activeItemIndex(),
+                }"
+              >
+                {{ currency.code }}
+              </span>
+              <span
+                class="ml-1 truncate"
+                [ngClass]="{
+                  'text-gray-500 dark:text-gray-400':
+                    selectedCurrency()?.code !== currency.code && i !== activeItemIndex(),
+                }"
+              >
+                {{ currency.englishName }}
+              </span>
+            </div>
+
+            @if (selectedCurrency()?.code === currency.code) {
+              <span
+                class="absolute inset-y-0 right-0 flex items-center pr-4"
+                [ngClass]="{
+                  'text-sky-600 dark:text-sky-500': i !== activeItemIndex(),
+                  'text-white': i === activeItemIndex(),
+                }"
+              >
+                <fa-icon class="h-4 w-4" [icon]="faCheck" />
+              </span>
+            }
+          </div>
+        }
+      } @else {
+        <div class="py-8 px-3 text-center text-gray-500 dark:text-gray-400">
+          No currencies available
+        </div>
+      }
+    </cdk-virtual-scroll-viewport>
+  </div>
+</ng-template>

@@ -1,0 +1,39 @@
+<div class="p-4 bg-white dark:bg-gray-900 rounded-md shadow-lg flex flex-col">
+  <div class="flex items-center mb-4">
+    <div class="flex-1">
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <fa-icon [icon]="['fas', 'magnifying-glass']" class="text-gray-400"/>
+        </div>
+        <input
+          #searchInput
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="searchTerm.set($event)"
+          (keydown)="onKeyDown($event)"
+          placeholder="Quick Search..."
+          class="w-full py-2 pl-10 pr-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-2 focus:outline-blue-500 focus:border-blue-500"
+        />
+      </div>
+    </div>
+    <button 
+      type="button"
+      (click)="close()"
+      class="ml-2 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+    >
+      <span class="sr-only">Close</span>
+      <i class="fa-solid fa-times"></i>
+    </button>
+  </div>
+
+  <div class="mt-2">
+    <p class="text-gray-700 dark:text-gray-300">
+      Search results will appear here...
+    </p>
+    <!-- You can add search results here -->
+  </div>
+
+  <div class="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4 text-xs text-gray-500 dark:text-gray-400">
+    <p>Press <kbd class="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">Enter</kbd> to search, <kbd class="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">Esc</kbd> to close</p>
+  </div>
+</div>

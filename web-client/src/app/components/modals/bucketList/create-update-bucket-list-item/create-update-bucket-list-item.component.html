@@ -1,0 +1,148 @@
+<ts-base-modal [modalTitle]="isUpdateMode ? 'Update Bucket List Item' : 'Add Bucket List Item'">
+  <div modal-body>
+    @if (errorMessage()) {
+      <ts-alert [type]="'error'" [message]="errorMessage()" />
+    }
+    <form
+      id="modalForm"
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      autocomplete="off"
+      aria-labelledby="bucketListItemModalLabel"
+    >
+      <ts-text-input
+        formControlName="name"
+        label="Name"
+        placeholder="Enter item name"
+        [showRequiredIndicator]="true"
+      />
+
+      <!-- <ts-dropdown-input 
+                    formControlName="type" 
+                    label="Type" 
+                    [options]="typeOptions" 
+                    [required]="true"
+                /> -->
+
+      <ts-textarea-input
+        formControlName="description"
+        label="Description"
+        placeholder="Enter description"
+      />
+
+      <!-- <ts-dropdown-input 
+                    formControlName="bucketListId" 
+                    label="Bucket List" 
+                    [options]="bucketLists().map(bl => ({label: bl.name, value: bl.id}))" 
+                    placeholder="Select bucket list (optional)"
+                /> -->
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <ts-date-only-input formControlName="startDate" label="Start Date" 
+          [maxDate]="maxStartDate()" />
+        </div>
+        <div class="flex-1">
+          <ts-text-input formControlName="startTime" typeField="time" label="Start Time" />
+        </div>
+      </div>
+      <!-- <ts-dropdown-input 
+                            formControlName="startTimeZoneId" 
+                            label="Timezone" 
+                            [options]="timezoneOptions"
+                            [required]="!!form.get('startTime')?.value"
+                        /> -->
+
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <ts-date-only-input formControlName="endDate" label="End Date" 
+          [minDate]="minEndDate()"/>
+        </div>
+        <div class="flex-1">
+          <ts-text-input formControlName="endTime" typeField="time" label="End Time" />
+        </div>
+      </div>
+      <!-- <ts-dropdown-input 
+                            formControlName="endTimeZoneId" 
+                            label="Timezone" 
+                            [options]="timezoneOptions"
+                            [required]="!!form.get('endTime')?.value"
+                        /> -->
+
+      <!-- <ts-currency-input 
+                        formControlName="originalPrice" 
+                        label="Price" 
+                    />
+                    <ts-dropdown-input 
+                        formControlName="originalCurrencyCode" 
+                        label="Currency" 
+                        [options]="currencyOptions"
+                        [required]="!!form.get('originalPrice')?.value"
+                    /> -->
+
+      <!-- <ts-multi-select-input
+                    formControlName="tagIds"
+                    label="Tags"
+                    [options]="tags().map(tag => ({
+                        label: tag.name,
+                        value: tag.id,
+                        style: tag.color ? 'background-color:' + tag.color + '30; color:' + tag.color : ''
+                    }))"
+                /> -->
+
+      <ts-tags-selector-input
+        formControlName="tagIds"
+        label="Tags"/>
+      <!-- <ts-currency-selector-input
+        formControlName="originalCurrencyCode"
+        label="Currency"
+        helpText="Select the currency for your transaction"
+        defaultCurrencyCode="USD"
+      />
+      <ts-currency-select 
+        formControlName="originalCurrencyCode"
+        label="Currency"
+        helpText="Select the currency for your transaction"
+      /> -->
+      <ts-currency-price-input
+        formControlName="price"
+        label="Price"
+        placeholder="0.00"
+        helpText="Enter the price in the selected currency"
+        [showRequiredIndicator]="false"
+        [defaultCurrencyCode]="'USD'"
+      />
+      <!-- Image section (only show if in create mode or no existing image) -->
+      <div class="form-section">
+        <h3 class="section-title">Image</h3>
+        <p class="helper-text">
+          @if (isUpdateMode) {
+            Upload a new image to replace the current one
+          } @else {
+            You can upload an image after creating the item
+          }
+        </p>
+        <!-- <ts-file-input
+                    label="Item Image"
+                    accept="image/*"
+                    (fileSelected)="onFileSelected($event)"
+                /> -->
+      </div>
+    </form>
+  </div>
+  <div modal-footer>
+    <ts-button
+      type="button"
+      variant="neutralSecondary"
+      label="Cancel"
+      (click)="onCancel()"
+      [disabled]="isLoading()"
+    />
+    <ts-button
+      type="button"
+      variant="primary"
+      label="Save"
+      [isLoading]="isLoading()"
+      (click)="onSubmit()"
+    />
+  </div>
+</ts-base-modal>

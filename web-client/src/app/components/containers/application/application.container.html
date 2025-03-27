@@ -1,0 +1,20 @@
+<div class="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white" role="application">
+  <ts-application-sidebar
+    [isVisible]="mobileSidebarVisible()"
+    (actionCloseMobileSidebar)="closeMobileSidebar()"
+    [attr.aria-expanded]="mobileSidebarVisible()"
+    [attr.aria-hidden]="!mobileSidebarVisible()"
+  />
+  <div class="lg:pl-50">
+    <ts-application-header 
+      (openMobileSidebarAction)="openMobileSidebar()"
+      [attr.aria-label]="'header'" 
+    />
+
+    <main class="py-10" role="main" aria-label="Main content">
+      <div class="px-4 sm:px-6 lg:px-8">
+        <router-outlet />
+      </div>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<ts-base-modal [modalTitle]="isUpdateMode ? 'Update Journey' : 'Create Journey'">
+    <div modal-body> 
+        @if (errorMessage()){
+            <ts-alert 
+                [type]="'error'"
+                [message]="errorMessage()"
+            />
+        }
+        <form id="modalForm" [formGroup]="form" (ngSubmit)="onSubmit()" aria-labelledby="addJourneyModalLabel" autocomplete="off">
+        @if (journey){
+                <span class="text-sm text-gray-500 mb-2">ID: {{journey.id}}</span>
+            }
+            <ts-generic-selector-input
+            formControlName="categoryId"
+            label="Category"
+            [items]="categories()"
+            [showCreateButton]="true"
+            [multiple]="false"
+            itemValueKey="id"
+            itemLabelKey="name"
+            placeholder="Select a category"
+            helpText="Select a category or create a new one"
+            (createButtonClicked)="showCreateCategoryModal()"
+          />
+            <ts-text-input formControlName="name" label="Name" placeholder="Enter name" [showRequiredIndicator]="true"/>
+            <ts-textarea-input formControlName="description" label="Description" placeholder="Enter description"/>
+            <ts-tags-selector-input formControlName="tagIds" label="Tags"/>
+      
+        </form>
+    </div>
+    <div modal-footer>
+        <ts-button 
+            type="button" 
+            variant="neutralSecondary" 
+            label="Cancel" 
+            (click)="onCancel()" 
+            [disabled]="isLoading()"
+        />
+        <ts-button 
+            type="button" 
+            variant="primary" 
+            label="Save" 
+            (click)="onSubmit()"
+            [isLoading]="isLoading()" 
+        />
+    </div>  
+</ts-base-modal>

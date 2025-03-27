@@ -1,0 +1,44 @@
+<div class="my-2">
+    @if (label()) {
+      <label
+        class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+        [for]="inputId"
+        >{{ label() }}
+        @if (showRequiredIndicator()) {
+          <span class="text-red-500 ml-1 text-xs font-normal">
+            (required)
+          </span>
+        }
+        </label>
+    }
+    <div class="relative mt-2 rounded-md shadow-sm">
+      <input
+        [id]="inputId"
+        type="date"
+        [required]="isRequired"
+        [(ngModel)]="inputValue"
+        [disabled]="isDisabled"
+        [min]="minDate()"
+        [max]="maxDate()"
+        [ngClass]="{
+          'outline-red-300 placeholder:text-red-300 focus:outline-red-500 text-red-900 dark:bg-white/5 dark:text-white':
+            hasError,
+          'placeholder:text-gray-400 text-gray-900 dark:bg-white/5 dark:text-white outline-gray-300 dark:outline-white/10 focus:outline-sky-600 dark:focus:outline-sky-500':
+            !hasError
+        }"
+        class="block w-full rounded-md border-0 py-1.5 px-3 outline-1 -outline-offset-1 sm:text-sm sm:leading-6 focus:outline-2 focus:-outline-offset-2"
+        [attr.aria-invalid]="hasError ? 'true' : 'false'"
+        [attr.maxlength]="maxLength"
+        [attr.aria-required]="isRequired ? true : false"
+        [attr.tabindex]="tabIndex()"
+        (blur)="onTouched && onTouched()"
+        (input)="onChange && onChange(inputValue)"
+      />
+    </div>
+    @if (hasError) {
+      <p class="mt-2 text-sm text-red-600 dark:text-red-500" [id]="errorId">{{ errorMessage }}</p>
+    }
+    @if (helpText()) {
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400" [id]="helpTextId">{{ helpText() }}</p>
+    }
+  </div>

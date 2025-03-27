@@ -1,0 +1,33 @@
+<span
+  class="isolate inline-flex rounded-md shadow-sm"
+  role="group"
+  i18n-aria-label="@@viewModeSelectionLabel"
+  aria-label="View mode selection"
+>
+  @for (
+    mode of orderedViewModes;
+    track mode;
+    let i = $index;
+    let first = $first;
+    let last = $last
+  ) {
+    <button
+      class="relative inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-900 dark:bg-white/10 dark:text-white outline-1 -outline-offset-1 dark:outline-0 outline-gray-300 hover:bg-gray-50 dark:hover:bg-white/20 focus:z-10"
+      type="button"
+      (click)="onViewModeChange(mode)"
+      [attr.aria-pressed]="mode === selectedViewMode()"
+      [attr.aria-label]="getAriaLabel(mode)" i18n-aria-label="@@viewModeButtonLabel"
+      [ngClass]="{
+        'rounded-md': orderedViewModes.length === 1,
+        'rounded-l-md': orderedViewModes.length > 1 && first,
+        'rounded-r-md': orderedViewModes.length > 1 && last,
+        '-ml-px': i > 0,
+        'text-sky-600 dark:text-sky-500': mode === selectedViewMode(),
+        'text-gray-900 dark:text-white': mode !== selectedViewMode(),
+      }"
+    >
+      <fa-icon [icon]="['fas', MODE_MAPPING[mode].icon]" aria-hidden="true" />
+      <span class="sr-only">{{ getLocalizedLabel(mode) }}</span>
+    </button>
+  }
+</span>

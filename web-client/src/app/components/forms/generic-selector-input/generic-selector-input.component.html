@@ -1,0 +1,228 @@
+<div class="my-2">
+  @if (label()) {
+    <label
+      class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+      [for]="inputId"
+    >
+      {{ label() }}
+      @if (showRequiredIndicator()) {
+        <span class="text-red-500 ml-1 text-xs font-normal">(required)</span>
+      }
+    </label>
+  }
+
+  <div class="relative mt-2 flex rounded-md shadow-sm">
+    <div
+      class="relative flex flex-grow flex-wrap items-center min-h-[38px] cursor-default rounded-l-md py-1.5 pl-3 pr-10 sm:text-sm sm:leading-6"
+      #trigger
+      cdkOverlayOrigin
+      [ngClass]="{
+        'outline-red-300 text-red-900 dark:text-red-500 outline-1 -outline-offset-1 focus-within:outline-2 focus-within:outline-red-500':
+          hasError,
+        'outline-gray-300 dark:outline-white/10 text-gray-900 dark:text-white outline-1 -outline-offset-1 focus-within:outline-2 focus-within:outline-sky-600 dark:focus-within:outline-sky-500':
+          !hasError,
+        'bg-gray-100 dark:bg-white/5 cursor-not-allowed': isDisabled(),
+        'bg-white dark:bg-white/5': !isDisabled(),
+        'rounded-md': !showCreateButton(),
+        'rounded-l-md': showCreateButton(),
+      }"
+      tabindex="0"
+      role="combobox"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-owns]="listboxId"
+      [attr.aria-haspopup]="true"
+      [attr.aria-controls]="listboxId"
+      [attr.aria-labelledby]="label() ? inputId : null"
+      [attr.aria-invalid]="hasError ? 'true' : 'false'"
+      (click)="toggle()"
+      (keydown.enter)="toggle()"
+      (keydown.space)="toggle(); $event.preventDefault()"
+    >
+      @if (selectedItems().length > 0) {
+        <div class="flex flex-wrap gap-2 pr-7">
+          @for (item of selectedItems(); track item[itemValueKey()]) {
+            <div class="flex items-center py-0.5">
+              {{ item[itemLabelKey()] }}
+            </div>
+          }
+        </div>
+      } @else {
+        <span class="text-gray-500">{{ placeholder() }}</span>
+      }
+
+      <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+        <fa-icon class="h-5 w-5 text-gray-400" [icon]="faChevronDown" />
+      </span>
+
+      @if (selectedItems().length > 0 && showClearButton()) {
+        <button
+          class="absolute right-7 px-3 py-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-md"
+          type="button"
+          (click)="clearAllItems($event)"
+          title="Clear selection"
+          aria-label="Clear selection"
+        >
+          <fa-icon class="h-5 w-5" [icon]="faXmark" />
+        </button>
+      }
+    </div>
+
+    @if (showCreateButton()) {
+      <button
+        class="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+        type="button"
+        (click)="handleCreateButtonClick($event)"
+        [attr.title]="'Create new ' + label()"
+        [attr.aria-label]="'Create new ' + label()"
+      >
+        <fa-icon class="-ml-0.5 h-5 w-5 text-gray-400" [icon]="faPlus" />
+        <span>{{ createButtonLabel() }}</span>
+      </button>
+    }
+  </div>
+
+  @if (hasError) {
+    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ errorMessage }}</p>
+  }
+
+  @if (helpText()) {
+    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400" [id]="helpTextId">{{ helpText() }}</p>
+  }
+</div>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayPositions]="positions"
+  cdkConnectedOverlayPanelClass="generic-selector-overlay"
+  (overlayOutsideClick)="close()"
+  (detach)="close()"
+>
+  <div
+    class="overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base outline-1 shadow-lg outline-black/5 focus:outline-none sm:text-sm min-w-[250px]"
+    role="listbox"
+    [id]="listboxId"
+    [attr.aria-labelledby]="inputId"
+  >
+    <div
+      class="sticky top-0 z-10 bg-white dark:bg-gray-800 px-2 py-1.5 border-b border-gray-200 dark:border-gray-700"
+    >
+      <div class="relative">
+        <fa-icon
+          class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+          [icon]="faSearch"
+        />
+        <input
+          class="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 dark:text-white dark:bg-gray-700/50 outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-600 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 dark:focus:outline-sky-500 sm:text-sm sm:leading-6"
+          #searchInput
+          [id]="searchId"
+          type="search"
+          [ngModel]="searchText()"
+          (ngModelChange)="updateSearchText($event)"
+          placeholder="Search..."
+          (keydown)="onSearchKeydown($event)"
+        />
+      </div>
+    </div>
+
+    <cdk-virtual-scroll-viewport
+      class="h-60 w-full"
+      #virtualScroll
+      itemSize="40"
+      minBufferPx="200"
+      maxBufferPx="400"
+    >
+      @if (filteredItems$ | async; as items) {
+        @if (items.length) {
+          @for (item of items; track item[itemValueKey()]; let i = $index) {
+            <div
+              class="relative cursor-pointer select-none py-2 pl-3 pr-9 outline-none hover:bg-gray-100 dark:hover:bg-gray-600"
+              [ngClass]="{
+                'bg-sky-600 text-white hover:bg-sky-700 dark:hover:bg-sky-700':
+                  i === activeItemIndex(),
+                'text-gray-900 dark:text-white':
+                  i !== activeItemIndex() && !isItemSelected(item[itemValueKey()]),
+                'text-sky-600 dark:text-sky-500':
+                  i !== activeItemIndex() && isItemSelected(item[itemValueKey()]),
+              }"
+              role="option"
+              tabindex="0"
+              [attr.aria-selected]="isItemSelected(item[itemValueKey()])"
+              (click)="toggleItem(item)"
+              (keydown)="onOptionKeydown($event, item, i)"
+              (focus)="onOptionFocus(i)"
+            >
+              <div class="flex items-center">
+                @if (multiple()) {
+                  <div class="mr-2">
+                    <div
+                      class="h-5 w-5 rounded border flex items-center justify-center"
+                      [ngClass]="{
+                        'border-sky-600 bg-sky-600': isItemSelected(item[itemValueKey()]),
+                        'border-gray-300 dark:border-gray-400': !isItemSelected(
+                          item[itemValueKey()]
+                        ),
+                        'bg-white dark:bg-gray-800':
+                          !isItemSelected(item[itemValueKey()]) && i !== activeItemIndex(),
+                      }"
+                    >
+                      @if (isItemSelected(item[itemValueKey()])) {
+                        <fa-icon class="h-5 w-5 pl-1 text-white" [icon]="faCheck" />
+                      }
+                    </div>
+                  </div>
+                }
+                <div class="flex">
+                  <span
+                    class="truncate"
+                    [ngClass]="{
+                      'font-medium':
+                        isItemSelected(item[itemValueKey()]) && i !== activeItemIndex(),
+                    }"
+                    >{{ item[itemLabelKey()] }}</span
+                  >
+
+                  @if (itemSecondaryTextKey() && getItemSecondaryText(item)) {
+                    <span
+                      class="ml-2 truncate"
+                      [ngClass]="{
+                        'text-gray-500 dark:text-gray-400': i !== activeItemIndex(),
+                        'text-white dark:text-white': i === activeItemIndex(),
+                      }"
+                      >{{ getItemSecondaryText(item) }}</span
+                    >
+                  }
+                </div>
+
+                @if (!multiple() && isItemSelected(item[itemValueKey()])) {
+                  <span
+                    class="absolute right-0 flex items-center pr-4"
+                    [ngClass]="{
+                      'text-sky-600 dark:text-sky-500': i !== activeItemIndex(),
+                      'text-white': i === activeItemIndex(),
+                    }"
+                  >
+                    <fa-icon class="h-5 w-5" [icon]="faCheck" />
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="py-8 px-3 text-center text-gray-500 dark:text-gray-400 outline-none">
+            No items found.
+            @if (showCreateButton()) {
+              <button
+                class="text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 outline-none"
+                (click)="handleCreateButtonClick()"
+              >
+                Create a new one?
+              </button>
+            }
+          </div>
+        }
+      }
+    </cdk-virtual-scroll-viewport>
+  </div>
+</ng-template>

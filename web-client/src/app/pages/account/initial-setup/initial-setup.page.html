@@ -1,0 +1,95 @@
+<div class="h-full bg-gray-50 dark:bg-gray-800 min-h-screen">
+  <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+      <ts-application-logo cssClass="mx-auto h-10 w-auto" [height]="40" [width]="47" />
+      <h2
+        class="mt-6 dark:mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-white"
+      >
+        Welcome! Let's set up your preferences
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+        This will help us personalize your experience
+      </p>
+    </div>
+
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
+      <div class="bg-white dark:bg-gray-900 px-6 py-12 shadow sm:rounded-lg sm:px-12">
+        @if (errorMessage()) {
+        <ts-alert type="error" [message]="errorMessage()" />
+        }
+
+        <form class="space-y-6" [formGroup]="setupForm" (ngSubmit)="onSubmit()">
+          <ts-generic-selector-input
+            formControlName="dateFormat"
+            label="Date Format"
+            [items]="dateFormatOptions"
+            itemLabelKey="label"
+            itemValueKey="value"
+            [showClearButton]="false"
+          />
+          <ts-generic-selector-input
+            formControlName="timeFormat"
+            label="Time Format"
+            [items]="timeFormatOptions"
+            itemLabelKey="label"
+            itemValueKey="value"
+            [showClearButton]="false"
+          />
+          <ts-generic-selector-input
+            formControlName="timezone"
+            label="Timezone"
+            [items]="(timezoneOptions$ | async) || []"
+            itemLabelKey="label"
+            itemValueKey="value"
+            itemSecondaryTextKey="secondaryText"
+            [showClearButton]="false"
+          />
+          <ts-generic-selector-input
+            formControlName="currency"
+            label="Currency"
+            [items]="(currencyOptions$ | async) || []"
+            itemLabelKey="label"
+            itemValueKey="value"
+            itemSecondaryTextKey="secondaryText"
+            [showClearButton]="false"
+          />
+          <ts-generic-selector-input
+            formControlName="themeMode"
+            label="Theme"
+            [items]="themeModeOptions"
+            itemLabelKey="label"
+            itemValueKey="value"
+            [showClearButton]="false"
+          />
+          <ts-generic-selector-input
+            formControlName="itemsPerPage"
+            label="Items Per Page"
+            [items]="itemsPerPageOptions"
+            itemLabelKey="label"
+            itemValueKey="value"
+            [showClearButton]="false"
+          />
+          <ts-generic-selector-input
+            formControlName="language"
+            label="Language"
+            [items]="languageOptions"
+            itemLabelKey="label"
+            itemValueKey="value"
+            [showClearButton]="false"
+          />
+
+          <div class="mt-6">
+            <ts-button
+              type="submit"
+              variant="primary"
+              label="Save Preferences"
+              [disabled]="setupForm.invalid || isLoading()"
+              [isLoading]="isLoading()"
+              [fullWidth]="true"
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

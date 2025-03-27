@@ -1,0 +1,62 @@
+<div class="my-2">
+  @if (label()) {
+    <label
+      class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+      [for]="inputId"
+    >
+      {{ label() }}
+      @if (showRequiredIndicator()) {
+        <span class="text-red-500 ml-1 text-xs font-normal"> (required) </span>
+      }
+    </label>
+  }
+  <div class="mt-2 flex rounded-md shadow-sm relative">
+    <div class="relative flex-1">
+      <input
+        class="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-3 pr-10 outline-1 -outline-offset-1 sm:text-sm sm:leading-6 focus:outline-2 focus:-outline-offset-2"
+        type="text"
+        [id]="inputId"
+        [required]="isRequired"
+        [(ngModel)]="inputValue"
+        [disabled]="isDisabled"
+        [attr.tabindex]="tabIndex()"
+        [attr.aria-required]="isRequired ? true : false"
+        [attr.aria-describedby]="helpText() ? helpTextId : null"
+        [ngClass]="{
+          'outline-red-300 placeholder:text-red-300 focus:outline-red-500 text-red-900 dark:bg-white/5 dark:text-white':
+            hasError,
+          'placeholder:text-gray-400 text-gray-900 dark:bg-white/5 dark:text-white outline-gray-300 dark:outline-white/10 focus:outline-sky-600 dark:focus:outline-sky-500':
+            !hasError
+        }"
+        (blur)="onTouched && onTouched()"
+        (input)="onChange && onChange(inputValue)"
+        (focus)="showColorPicker.set(true)"
+      />
+    </div>
+    <button
+      class="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 dark:bg-white/5 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 hover:bg-gray-50 dark:hover:bg-gray-800"
+      type="button"
+      (click)="toggleColorPicker()"
+    >
+      <div
+        class="w-5 h-5 border border-gray-300 rounded-md"
+        [ngStyle]="{ 'background-color': inputValue }"
+      ></div>
+    </button>
+    @if (showColorPicker()) {
+      <div class="absolute top-full mt-2 z-10">
+        <color-chrome [color]="inputValue" (onChange)="handleColorChange($event)" />
+      </div>
+    }
+  </div>
+  @if (hasError) {
+    <p class="mt-2 text-sm text-red-600 dark:text-red-500" [id]="errorId">
+      {{ errorMessage }}
+    </p>
+  }
+  @if (helpText()) {
+    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400" [id]="helpTextId">
+      {{ helpText() }}
+    </p>
+  }
+</div>

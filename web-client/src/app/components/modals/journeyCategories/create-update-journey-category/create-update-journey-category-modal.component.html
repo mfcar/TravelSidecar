@@ -1,0 +1,33 @@
+<ts-base-modal [modalTitle]="isUpdateMode ? 'Update Journey Category' : 'Create Journey Category'">
+    <div modal-body> 
+        @if (errorMessage()){
+            <ts-alert 
+                [type]="'error'"
+                [message]="errorMessage()"
+            />
+        }
+        <form id="modalForm" [formGroup]="form" (ngSubmit)="onSubmit()" aria-labelledby="addJourneyCategoryModalLabel" autocomplete="off">
+            @if (journeyCategory){
+                <span class="text-sm text-gray-500 mb-2">ID: {{journeyCategory.id}}</span>
+            }
+            <ts-text-input formControlName="name" label="Name" placeholder="Enter name" [showRequiredIndicator]="true"/>
+            <ts-textarea-input formControlName="description" label="Description" placeholder="Enter description"/>
+        </form>
+    </div>
+    <div modal-footer>
+        <ts-button 
+            type="button" 
+            variant="neutralSecondary" 
+            label="Cancel" 
+            (click)="onCancel()"
+            [disabled]="isLoading()"
+        />
+        <ts-button 
+            type="button" 
+            variant="primary" 
+            label="Save" 
+            (click)="onSubmit()"
+            [isLoading]="isLoading()"
+        />
+    </div>  
+</ts-base-modal>

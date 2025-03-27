@@ -1,0 +1,19 @@
+<button
+  [type]="type()"
+  [disabled]="disabled() || isLoading()"
+  [attr.aria-disabled]="disabled()"
+  [attr.aria-label]="ariaLabel() || null"
+  [class]="buttonClasses"
+  (click)="onButtonClicked()"
+  [ngClass]="{'flex justify-center': fullWidth()}"
+>
+  @if (isLoading()) {
+    <ts-loading-indicator class="-ml-0.5 mr-1.5 h-5 w-5" />
+  } @else if (icon() && iconPosition() === 'left') {
+    <fa-icon class="-ml-0.5 mr-1.5 h-5 w-5" [icon]="['fas', icon()!]" />
+  }
+  {{ label() }}
+  @if (icon() && iconPosition() === 'right') {
+    <fa-icon class="ml-1.5 -mr-0.5 h-5 w-5" [icon]="['fas', icon()!]" />
+  }
+</button>

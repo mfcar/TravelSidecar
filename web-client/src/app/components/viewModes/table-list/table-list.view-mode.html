@@ -1,0 +1,84 @@
+<div role="region" aria-label="Data table" i18n-aria-label="@@dataTableRegion">
+<table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+  <caption class="sr-only" i18n="@@tableCaption">Data list in table format</caption>
+  <thead>
+    <tr>
+      <!-- Mobile header column (only on xs) -->
+      <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-white sm:hidden" scope="col">#</th>
+      <!-- Data columns header: hidden on xs -->
+      @for (column of columns(); track column.key){
+        @if (selectedFields().has(column.key)) {
+          <th class="hidden sm:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white" scope="col">
+              @if (column.sortable === false) {
+                  <span class="inline-flex">{{ column.header }}</span>
+              } @else {
+                  <a class="group inline-flex" 
+                      href="#" 
+                      (click)="onHeaderClicked(column); $event.preventDefault()"
+                      role="button"
+                      [attr.aria-label]="getSortAriaLabel(column)" i18n-aria-label="@@sortColumnAriaLabel">
+                      {{ column.header }}
+                      <span class="ml-2 flex-none">
+                          @if (sortBy() === column.key) {
+                              <fa-icon class="h-5 w-5" [icon]="sortDirection() === 'desc' ? ['fas','arrow-down'] : ['fas','arrow-up']" aria-hidden="true" />
+                          } @else {
+                              <fa-icon class="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity duration-150" [icon]="['fas','arrow-up']" aria-hidden="true" />
+                          }
+                      </span>
+                  </a>
+              }
+          </th>
+        }
+      }
+      <!-- Edit action header (always displayed) -->
+      <th class="relative py-3.5 pl-3 pr-4 sm:pr-0" scope="col">
+        <span class="sr-only" i18n="@@actionsColumnHeader">Actions</span>
+      </th>
+    </tr>
+  </thead>
+  <tbody class="divide-y divide-gray-200 dark:divide-gray-800 bg-white dark:bg-transparent">
+    @for(item of items(); track $index) {
+    <tr>
+      <!-- Mobile layout cell: only visible on xs -->
+      <td class="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-white sm:hidden">
+        <dl>
+          @for(column of columns(); track column.key) {
+            @if (selectedFields().has(column.key)) { 
+              <div class="mb-2">
+                <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ column.header }}</dt>
+                <dd class="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
+                  @if (column.cellTemplate) {
+                    <ng-container *ngTemplateOutlet="column.cellTemplate; context: {$implicit: item}" />
+                  } @else { 
+                    {{ item[column.key] }}
+                  }
+                </dd>
+              </div>
+            }
+          }
+        </dl>
+      </td>
+      <!-- Desktop layout cells for columns: hidden on xs -->
+      @for(column of columns(); track column.key){
+        @if (selectedFields().has(column.key)) {
+            <td class="hidden sm:table-cell px-3 py-4 text-sm text-gray-500 dark:text-gray-300">
+                @if (column.cellTemplate) {
+                <ng-container *ngTemplateOutlet="column.cellTemplate; context: {$implicit: item}" />
+                } @else { {{ item[column.key] }} }
+            </td>
+        }
+      }
+      <!-- Actions column: always displayed -->
+      <td class="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+        <ts-button 
+          label="Edit" i18n-label="@@editButtonLabel"
+          variant="neutralPrimary" 
+          (buttonAction)="onEditButtonClicked(item)" 
+          ariaLabel="Edit item" i18n-ariaLabel="@@editItemAriaLabel" 
+        />
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>
+</div>

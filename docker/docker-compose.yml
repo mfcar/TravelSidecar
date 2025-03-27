@@ -1,0 +1,83 @@
+name: travelsidecar
+
+x-db-config:
+  db-name: &db-name travelsidecar
+  db-user: &db-user travelsidecaru
+  db-password: &db-password travelsidecarpw
+
+services:
+  travelsidecar-app:
+    container_name: travelsidecar-application
+    image: travelsidecar:latest
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "3590:8080"
+      - "3591:8081"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: *db-name
+      DB_USER: *db-user
+      DB_PASSWORD: *db-password
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+    networks:
+      - travelsidecar-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  postgres:
+    container_name: travelsidecar-database
+    image: imresamu/postgis:17-3.5
+    ports:
+      - "55432:5432"
+    environment:
+      POSTGRES_DB: *db-name
+      POSTGRES_USER: *db-user
+      POSTGRES_PASSWORD: *db-password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - travelsidecar-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U *db-user -d *db-name"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  minio:
+    container_name: travelsidecar-storage
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    volumes:
+      - minio-data:/data
+    command: server --console-address ":9001" /data
+    networks:
+      - travelsidecar-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  postgres-data:
+  minio-data:
+
+networks:
+  travelsidecar-network:
