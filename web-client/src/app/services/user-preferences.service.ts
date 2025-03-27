@@ -80,8 +80,8 @@ export class UserPreferencesService {
   private pageDebounceSubjects = new Map<string, Subject<ListPagePreferences>>();
 
   // Cache for generic (non-page) preferences
-  private genericPreferenceSubjects = new Map<string, BehaviorSubject<PreferenceValue>>();
-  private genericDebounceSubjects = new Map<string, Subject<PreferenceValue>>();
+  private genericPreferenceSubjects = new Map<string, BehaviorSubject<any>>();
+  private genericDebounceSubjects = new Map<string, Subject<any>>();
 
   // Backend sync
   private isInitialSetupComplete = new BehaviorSubject<boolean>(true);
