@@ -1,79 +1,61 @@
 # TravelSidecar
 
-## Description
+<div align="center">
+
+[![License](https://img.shields.io/github/license/mfcar/travelsidecar)](LICENSE)
+[![Docker Pulls](https://img.shields.io/docker/pulls/travelsidecar/travelsidecar)](https://hub.docker.com/r/travelsidecar/travelsidecar)
+[![Release](https://img.shields.io/github/v/release/mfcar/travelsidecar)](https://github.com/mfcar/travelsidecar/releases)
+
+</div>
+
+## Overview
 TravelSidecar is a trip planning application built with .NET 9, Angular 19, and PostgreSQL.
 
-## Project Structure
-- **Server:** .NET - [Server Documentation](/server/README.md)
-- **Web Client:** Angular - [Web Client Documentation](/web-client/README.md)
-- **Database:** Postgres
-
-## Deployment Guide
-
-1 . Download the docker-compose file:
-
+## Quick Start
 ```bash
-curl -O https://raw.githubusercontent.com/mfcar/TravelSidecar/main/docker/docker-compose-production.yml
-```
+# Download docker-compose file
+curl -O https://raw.githubusercontent.com/mfcar/TravelSidecar/main/docker/docker-compose.production.yml
 
-2. (Optional) Create a `.env` file to customize deployment:
-
-### Application
- - APP_PORT=8590 
- - APP_HTTPS_PORT=8591
-### Database Configuration
- - DB_PORT=55432 
- - DB_PASSWORD=your_password_here
-### MinIO configuration (Blob Storage)
- - MINIO_PORT=9000 
- - MINIO_CONSOLE_PORT=9001 
- - MINIO_USER=your_minio_username 
- - MINIO_PASSWORD=your_secure_minio_password
-
-3. Start the application
-
-```bash
+# Start the application
 docker-compose -f docker-compose.production.yml up -d
-``` 
-
-4. Access the application at: http://localhost:8590 and use the default admin credentials to log in.
-
-### Default Admin User
-
-TravelSidecar is pre-configured with a default admin account:
-
-- **Username:** admin
-- **Email:** admin@admin.user
-- **Password:** Admin@123456
-- **Important:** Password change is required on first login
-
-### Persistent Data
-
-All data is stored in Docker volumes:
-- Database: `travelsidecar-postgres-data`
-- Storage: `travelsidecar-minio-data`
-
-### Upgrading
-
-To upgrade to a new version:
-```bash
-# Pull the latest image
-docker pull travelsidecar/travelsidecar:latest
 ```
 
-## Quick Start for the Development Environment
-The easiest way to run the entire application stack:
+Access at: http://localhost:8590 with default admin credentials:
+- **Username:** admin
+- **Password:** Admin@123456
 
+## Configuration
+Create a `.env` file to customize your deployment:
+
+```properties
+# Application
+APP_PORT=8590
+APP_HTTPS_PORT=8591
+
+# Database
+DB_PORT=55432
+DB_PASSWORD=your_password_here
+
+# Blog Storage (MinIO)
+MINIO_PORT=9000
+MINIO_CONSOLE_PORT=9001
+MINIO_USER=your_minio_username
+MINIO_PASSWORD=your_secure_minio_password
+```
+
+## For Developers
+View detailed documentation:
+- [Server (.NET)](/server/README.md)
+- [Web Client (Angular)](/web-client/README.md)
+
+### Development Environment
 ```bash
 # Clone the repository
 git clone https://github.com/mfcar/travelsidecar.git
 cd travelsidecar
 
-# Start the application
-docker compose -f docker/docker-compose-development.yml up -d
-
-# To stop the application
-docker compose -f docker/docker-compose-development.yml down
+# Start development environment
+docker compose -f docker/docker-compose.development.yml up -d
 ```
 
 ## Accessing the Application
@@ -102,7 +84,7 @@ The application uses the following default settings, which can be modified in `d
 - **Database User:** travelsidecaru
 - **Database Password:** travelsidecarpw
 
-## Development Environment
+## Local Development
 For local development, you can run components separately:
 
 ### Backend (.NET)

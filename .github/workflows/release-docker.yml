@@ -23,11 +23,10 @@ jobs:
           sed -i "s/<Version>.*<\/Version>/<Version>$VERSION<\/Version>/g" server/Api/Api.csproj
           cat server/Api/Api.csproj | grep Version
 
-      - name: Update Angular project version
+      - name: Update Angular version constant
         run: |
-          cd web-client
-          npm version $VERSION --no-git-tag-version
-          cat package.json | grep version
+          echo "export const version = '${{ env.VERSION }}';" > web-client/src/app/version.ts
+          cat web-client/src/app/version.ts
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
