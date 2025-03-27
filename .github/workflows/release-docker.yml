@@ -26,7 +26,7 @@ jobs:
       - name: Update Angular project version
         run: |
           cd web-client
-          npm version $VERSION --no-git-tag-version --allow-same-version
+          npm version $VERSION --no-git-tag-version
           cat package.json | grep version
 
       - name: Set up QEMU
