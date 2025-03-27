@@ -26,9 +26,12 @@ jobs:
       - name: Update Angular project version
         run: |
           cd web-client
-          npm version $VERSION --no-git-tag-version
+          npm version $VERSION --no-git-tag-version --allow-same-version
           cat package.json | grep version
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -43,9 +46,10 @@ jobs:
         with:
           context: .
           file: ./docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/travelsidecar-application:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/travelsidecar-application:${{ env.VERSION }}
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/travelsidecar:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/travelsidecar:buildcache,mode=max
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/travelsidecar-application:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/travelsidecar-application:buildcache,mode=max
