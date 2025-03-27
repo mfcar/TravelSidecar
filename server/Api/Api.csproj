@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <Version>1.0.4</Version>
+        <Version>0.1.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
