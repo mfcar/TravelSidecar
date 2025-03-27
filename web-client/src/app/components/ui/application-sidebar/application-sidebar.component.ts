@@ -2,12 +2,13 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { version } from '../../../version';
 import { ApplicationLogoComponent } from '../application-logo/application-logo.component';
 
 interface SidebarLink {
   label: string;
   icon: string;
-  routerLink: any[];
+  routerLink: (string | number)[];
 }
 
 @Component({
@@ -39,7 +40,7 @@ export class ApplicationSidebarComponent {
 
   fixedLinks = {
     settings: { label: 'Settings', icon: 'cog', routerLink: ['/settings'] },
-    version: { label: 'Version: 1.0.0', routerLink: ['/versions'] },
+    version: { label: `Version: ${version}`, routerLink: ['/versions'] },
     status: { label: 'Application Status', routerLink: ['/system'] },
   };
 

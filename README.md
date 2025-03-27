@@ -8,28 +8,35 @@ TravelSidecar is a trip planning application built with .NET 9, Angular 19, and 
 - **Web Client:** Angular - [Web Client Documentation](/web-client/README.md)
 - **Database:** Postgres
 
-## Quick Start with Docker Compose
-The easiest way to run the entire application stack:
+## Deployment Guide
+
+1 . Download the docker-compose file:
 
 ```bash
-# Clone the repository
-git clone https://github.com/mfcar/travelsidecar.git
-cd travelsidecar
-
-# Start the application
-docker compose -f docker/docker-compose.yml up -d
-
-# To stop the application
-docker compose -f docker/docker-compose.yml down
+curl -O https://raw.githubusercontent.com/mfcar/TravelSidecar/main/docker/docker-compose-production.yml
 ```
 
-## Accessing the Application
-After starting the Docker containers:
+2. (Optional) Create a `.env` file to customize deployment:
 
-- **Web Interface:** `http://localhost:3590`
-- **API:** `http://localhost:3590/api`
+### Application
+ - APP_PORT=8590 
+ - APP_HTTPS_PORT=8591
+### Database Configuration
+ - DB_PORT=55432 
+ - DB_PASSWORD=your_password_here
+### MinIO configuration (Blob Storage)
+ - MINIO_PORT=9000 
+ - MINIO_CONSOLE_PORT=9001 
+ - MINIO_USER=your_minio_username 
+ - MINIO_PASSWORD=your_secure_minio_password
 
-## Security Information
+3. Start the application
+
+```bash
+docker-compose -f docker-compose.production.yml up -d
+``` 
+
+4. Access the application at: http://localhost:8590 and use the default admin credentials to log in.
 
 ### Default Admin User
 
@@ -39,6 +46,43 @@ TravelSidecar is pre-configured with a default admin account:
 - **Email:** admin@admin.user
 - **Password:** Admin@123456
 - **Important:** Password change is required on first login
+
+### Persistent Data
+
+All data is stored in Docker volumes:
+- Database: `travelsidecar-postgres-data`
+- Storage: `travelsidecar-minio-data`
+
+### Upgrading
+
+To upgrade to a new version:
+```bash
+# Pull the latest image
+docker pull travelsidecar/travelsidecar:latest
+```
+
+## Quick Start for the Development Environment
+The easiest way to run the entire application stack:
+
+```bash
+# Clone the repository
+git clone https://github.com/mfcar/travelsidecar.git
+cd travelsidecar
+
+# Start the application
+docker compose -f docker/docker-compose-development.yml up -d
+
+# To stop the application
+docker compose -f docker/docker-compose-development.yml down
+```
+
+## Accessing the Application
+After starting the Docker containers:
+
+- **Web Interface:** `http://localhost:3590`
+- **API:** `http://localhost:3590/api`
+
+## Security Information
 
 ### Rate Limiting
 
@@ -52,7 +96,7 @@ The API implements rate limiting to prevent abuse:
 Exceeding these limits will result in HTTP 429 (Too Many Requests) responses.
 
 ## Basic Configuration
-The application uses the following default settings, which can be modified in `docker-compose.yml`:
+The application uses the following default settings, which can be modified in `docker-compose-development.yml`:
 
 - **Database Name:** travelsidecar
 - **Database User:** travelsidecaru

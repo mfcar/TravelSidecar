@@ -22,8 +22,8 @@ import { ThemeService } from '../../../services/theme.service';
 import { TimezoneService } from '../../../services/timezone.service';
 import { PreferenceKeys, UserPreferencesService } from '../../../services/user-preferences.service';
 
-interface SelectOption {
-  value: any;
+interface SelectOption<T = string | number> {
+  value: T;
   label: string;
   secondaryText?: string;
 }

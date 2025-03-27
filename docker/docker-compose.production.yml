@@ -1,0 +1,85 @@
+name: travelsidecar
+
+x-db-config:
+  db-name: &db-name travelsidecar
+  db-user: &db-user travelsidecaru
+  db-password: &db-password ${DB_PASSWORD:-travelsidecarpw}
+
+services:
+  travelsidecar-app:
+    container_name: travelsidecar
+    image: travelsidecar/travelsidecar:latest
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8590}:8080"
+      - "${APP_HTTPS_PORT:-8591}:8081"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: *db-name
+      DB_USER: *db-user
+      DB_PASSWORD: *db-password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - travelsidecar-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  postgres:
+    container_name: travelsidecar-database
+    image: imresamu/postgis:17-3.5
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-55432}:5432"
+    environment:
+      POSTGRES_DB: *db-name
+      POSTGRES_USER: *db-user
+      POSTGRES_PASSWORD: *db-password
+    volumes:
+      - travelsidecar-postgres-data:/var/lib/postgresql/data
+    networks:
+      - travelsidecar-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  minio:
+    container_name: travelsidecar-storage
+    image: minio/minio:latest
+    restart: unless-stopped
+    ports:
+      - "${MINIO_PORT:-9090}:9000"
+      - "${MINIO_CONSOLE_PORT:-9091}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-minio123}
+    volumes:
+      - travelsidecar-minio-data:/data
+    command: server --console-address ":9001" /data
+    networks:
+      - travelsidecar-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  travelsidecar-postgres-data:
+    name: travelsidecar-postgres-data
+  travelsidecar-minio-data:
+    name: travelsidecar-minio-data
+
+networks:
+  travelsidecar-network:
+    name: travelsidecar-network

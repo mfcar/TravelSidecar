@@ -8,6 +8,7 @@ import {
   faArrowUp91,
   faArrowUpZA,
   faBars,
+  faBucket,
   faCheck,
   faChevronDown,
   faCircleCheck,
@@ -71,6 +72,7 @@ export class IconRegistryService {
       faCog,
       faGrip,
       faArrowDown,
+      faBucket,
     );
   }
 }

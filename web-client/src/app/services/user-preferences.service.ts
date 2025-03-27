@@ -19,6 +19,16 @@ import {
   UserTimeFormat,
 } from '../models/enums/user-preferences.enum';
 
+type PreferenceValue =
+  | string
+  | number
+  | boolean
+  | UserDateFormat
+  | UserTimeFormat
+  | UserThemeMode
+  | ListViewMode
+  | null;
+
 export interface UserPreferencesDto {
   preferredDateFormat: UserDateFormat;
   preferredTimeFormat: UserTimeFormat;
@@ -70,8 +80,8 @@ export class UserPreferencesService {
   private pageDebounceSubjects = new Map<string, Subject<ListPagePreferences>>();
 
   // Cache for generic (non-page) preferences
-  private genericPreferenceSubjects = new Map<string, BehaviorSubject<any>>();
-  private genericDebounceSubjects = new Map<string, Subject<any>>();
+  private genericPreferenceSubjects = new Map<string, BehaviorSubject<PreferenceValue>>();
+  private genericDebounceSubjects = new Map<string, Subject<PreferenceValue>>();
 
   // Backend sync
   private isInitialSetupComplete = new BehaviorSubject<boolean>(true);
@@ -130,9 +140,9 @@ export class UserPreferencesService {
     return this.isInitialSetupComplete.asObservable();
   }
 
-  public completeInitialSetup(): Observable<any> {
+  public completeInitialSetup(): Observable<void> {
     return this.http
-      .post(`${this.API_BASE}/complete-setup`, {})
+      .post<void>(`${this.API_BASE}/complete-setup`, {})
       .pipe(tap(() => this.isInitialSetupComplete.next(true)));
   }
 
