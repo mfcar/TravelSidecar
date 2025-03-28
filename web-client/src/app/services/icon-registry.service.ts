@@ -17,6 +17,8 @@ import {
   faCircleXmark,
   faClipboardList,
   faCog,
+  faEye,
+  faEyeSlash,
   faFolderPlus,
   faGrip,
   faHome,
@@ -73,6 +75,8 @@ export class IconRegistryService {
       faGrip,
       faArrowDown,
       faBucket,
+      faEye,
+      faEyeSlash,
     );
   }
 }

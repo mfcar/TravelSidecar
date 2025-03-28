@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -20,6 +20,7 @@ export class TextInputComponent implements ControlValueAccessor {
   public showRequiredIndicator = input<boolean>(false);
 
   inputValue = '';
+  passwordVisible = signal(false);
 
   private ngControl = inject(NgControl);
   protected onTouched?: () => {};
@@ -33,6 +34,17 @@ export class TextInputComponent implements ControlValueAccessor {
 
   constructor() {
     if (this.ngControl) this.ngControl.valueAccessor = this;
+  }
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible.update((visible) => !visible);
+  }
+
+  getInputType(): string {
+    if (this.typeField() === 'password') {
+      return this.passwordVisible() ? 'text' : 'password';
+    }
+    return this.typeField();
   }
 
   writeValue(value: string): void {
