@@ -38,6 +38,9 @@ module.exports = tseslint.config(
           style: "kebab-case",
         },
       ],
+      "@angular-eslint/relative-url-prefix": [
+        "error"
+      ],
       "prettier/prettier": ["error"],
     },
   },
@@ -49,7 +52,6 @@ module.exports = tseslint.config(
     ],
     rules: {
       "@angular-eslint/template/prefer-self-closing-tags": ["error"],
-      // "@angular-eslint/template/accessibility-alt-text": ["error"],
       "@angular-eslint/template/eqeqeq": ["error"],
       "@angular-eslint/template/prefer-ngsrc": ["error"],
       "@angular-eslint/template/alt-text": ["error"]
