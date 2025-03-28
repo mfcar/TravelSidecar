@@ -1,3 +1,4 @@
+
 <!-- ─── PAGE HEADER & ACTIONS ────────────────────────────────────────────── -->
 <ts-page-header title="Journeys">
   <!-- View Mode Toggle -->
@@ -39,7 +40,7 @@
     />
   </span>
 </ts-page-header>
-
+<ts-sticky-list-tools>
 <!-- ─── FILTER & STATUS ────────────────────────────────────────────────────── -->
 <ts-list-filter-text-input
   placeholder="Search by name"
@@ -54,6 +55,7 @@
   [isFiltered]="activeFilters()"
   (resetFilterAction)="resetFilters()"
 />
+</ts-sticky-list-tools>
 
 <!-- ─── NO ITEMS STATE ─────────────────────────────────────────────────────── -->
 @if (!isLoading() && itemsCount() === 0 && !activeFilters()) {

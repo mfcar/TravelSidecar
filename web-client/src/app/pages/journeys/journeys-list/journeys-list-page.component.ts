@@ -22,6 +22,7 @@ import { ListFilterTextInputComponent } from '../../../components/forms/list-fil
 import { CreateUpdateJourneyModal } from '../../../components/modals/journeys/create-update-journey/create-update-journey-modal.component';
 import { FieldDisplaySelectorComponent } from '../../../components/tools/field-display-selector/field-display-selector.component';
 import { SortOptionsComponent } from '../../../components/tools/sort-options/sort-options.component';
+import { StickyListToolsComponent } from '../../../components/tools/sticky-list-tools/sticky-list-tools.component';
 import { ViewModeToogleComponent } from '../../../components/tools/view-mode-toogle/view-mode-toogle.component';
 import { EmptyContentComponent } from '../../../components/ui/empty-content/empty-content.component';
 import { ListStatusComponent } from '../../../components/ui/list-status/list-status.component';
@@ -54,6 +55,7 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     UserDateFormatPipe,
     StackListViewMode,
     TagBadgeComponent,
+    StickyListToolsComponent,
   ],
   providers: [DatePipe],
   templateUrl: './journeys-list-page.component.html',
