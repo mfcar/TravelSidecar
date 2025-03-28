@@ -5,9 +5,9 @@ import { CreateUpdateTagRequest, TagResponse } from '../../../../models/tags.mod
 import { TagService } from '../../../../services/tag.service';
 import { ToastService, ToastType } from '../../../../services/toast.service';
 import { ButtonComponent } from '../../../buttons/button/button.component';
-import { ColorInputComponent } from '../../../forms/color-input/color-input.component';
 import { TextInputComponent } from '../../../forms/text-input/text-input.component';
 
+import { ColorSelectorInputComponent } from '../../../forms/color-selector-input/color-selector-input.component';
 import { AlertComponent } from '../../../ui/alert/alert.component';
 import { BaseModalComponent } from '../../base-modal/base-modal.component';
 
@@ -19,7 +19,7 @@ import { BaseModalComponent } from '../../base-modal/base-modal.component';
     ButtonComponent,
     BaseModalComponent,
     AlertComponent,
-    ColorInputComponent,
+    ColorSelectorInputComponent,
   ],
   templateUrl: './create-update-tag.modal.html',
   styleUrl: './create-update-tag.modal.scss',
@@ -42,7 +42,7 @@ export class CreateUpdateTagModal implements OnInit {
   constructor() {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
-      color: ['', [Validators.required, Validators.maxLength(7)]],
+      color: ['', [Validators.required, Validators.maxLength(10)]],
     });
   }
 

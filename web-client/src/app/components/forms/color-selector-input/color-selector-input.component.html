@@ -1,0 +1,105 @@
+<div class="my-2">
+    @if (label()) {
+      <label
+        class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+        [for]="inputId"
+      >
+        {{ label() }}
+        @if (showRequiredIndicator()) {
+          <span class="text-red-500 ml-1 text-xs font-normal"> (required) </span>
+        }
+      </label>
+    }
+    <div class="mt-2 flex rounded-md shadow-sm relative">
+      <div class="relative flex-1">
+        <input
+          #trigger
+          cdkOverlayOrigin
+          class="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-3 pr-10 outline-1 -outline-offset-1 sm:text-sm sm:leading-6 focus:outline-2 focus:-outline-offset-2"
+          type="text"
+          [id]="inputId"
+          [required]="isRequired"
+          [value]="getSelectedColorDisplayName()"
+          [disabled]="isDisabled"
+          [attr.tabindex]="tabIndex()"
+          [attr.aria-required]="isRequired ? true : false"
+          [attr.aria-describedby]="helpText() ? helpTextId : null"
+          [attr.aria-expanded]="showColorPicker()"
+          [attr.aria-controls]="colorPickerId"
+          [ngClass]="{
+            'outline-red-300 placeholder:text-red-300 focus:outline-red-500 text-red-900 dark:bg-white/5 dark:text-white':
+              hasError,
+            'placeholder:text-gray-400 text-gray-900 dark:bg-white/5 dark:text-white outline-gray-300 dark:outline-white/10 focus:outline-sky-600 dark:focus:outline-sky-500':
+              !hasError
+          }"
+          readonly
+          (click)="toggle()"
+          (keydown.enter)="toggle()"
+          (keydown.space)="toggle(); $event.preventDefault()"
+        />
+      </div>
+      <button
+        class="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 dark:bg-white/5 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 hover:bg-gray-50 dark:hover:bg-gray-800"
+        type="button"
+        [disabled]="isDisabled"
+        (click)="toggle()"
+      >
+        <div 
+          class="w-5 h-5 border border-gray-300 rounded-md" 
+          [ngClass]="selectedColorName() ? 'bg-' + selectedColorName() + '-500' : ''"
+        ></div>
+      </button>
+    </div>
+  
+    @if (hasError) {
+      <p class="mt-2 text-sm text-red-600 dark:text-red-500" [id]="errorId">
+        {{ errorMessage }}
+      </p>
+    }
+    @if (helpText()) {
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400" [id]="helpTextId">
+        {{ helpText() }}
+      </p>
+    }
+  </div>
+  
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="showColorPicker()"
+    [cdkConnectedOverlayPositions]="positions"
+    cdkConnectedOverlayPanelClass="color-selector-overlay"
+    (overlayOutsideClick)="close()"
+    (detach)="close()"
+  >
+    <div 
+      class="overflow-auto rounded-md shadow-lg bg-white dark:bg-gray-800 p-3 outline outline-1 outline-gray-200 dark:outline-gray-700"
+      [id]="colorPickerId"
+      role="listbox"
+      [attr.aria-labelledby]="inputId"
+    >
+      <div class="w-64">
+        <div class="grid grid-cols-4 gap-2">
+          @for (color of tailwindColors; track color.name) {
+            <button 
+              type="button"
+              class="h-10 w-10 rounded-md hover:scale-110 transition-transform flex items-center justify-center focus:outline-2 focus:outline-sky-600"
+              [ngClass]="'bg-' + color.name + '-500'"
+              [attr.title]="color.displayName"
+              [attr.aria-label]="'Select ' + color.displayName + ' color'"
+              [attr.aria-selected]="color.name === selectedColorName()"
+              role="option"
+              (click)="selectColor(color)"
+            >
+              @if (color.name === selectedColorName()) {
+                <span class="text-white text-xs">✓</span>
+              }
+            </button>
+          }
+        </div>
+      </div>
+      <pre>
+        
+      </pre>
+    </div>
+  </ng-template>
