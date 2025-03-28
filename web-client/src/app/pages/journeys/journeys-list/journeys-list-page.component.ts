@@ -15,7 +15,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { debounceTime, Subject } from 'rxjs';
+import { debounceTime, Subject, take } from 'rxjs';
 import { TagBadgeComponent } from '../../../components/badges/tag-badge/tag-badge.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import { ListFilterTextInputComponent } from '../../../components/forms/list-filter-text-input/list-filter-text-input.component';
@@ -77,6 +77,7 @@ export class JourneysListPage implements OnInit, OnDestroy {
   selectedViewMode = signal<ListViewMode>(ListViewMode.Table);
   selectedFields = signal<Set<string>>(new Set(['name', 'description', 'categoryName']));
   displayedItems = signal<Journey[]>([]);
+  pageSize = signal<number>(25);
   private filterInput$ = new Subject<string>();
 
   // ─── UI Options & Configurations ──────────────────────────────────────────────
@@ -155,6 +156,11 @@ export class JourneysListPage implements OnInit, OnDestroy {
         cellTemplate: this.lastModifiedAtCell(),
       },
     ];
+
+    this.userPrefService
+      .getPreference<number>(PreferenceKeys.ItemsPerPage, 25)
+      .pipe(take(1))
+      .subscribe((size) => this.pageSize.set(size));
   }
 
   ngOnDestroy(): void {
@@ -172,7 +178,7 @@ export class JourneysListPage implements OnInit, OnDestroy {
   private buildFilterRequest(): JourneysFilterRequest {
     return {
       page: this.currentPage(),
-      pageSize: 25,
+      pageSize: this.pageSize(),
       searchTerm: this.searchTerm(),
       sortBy: this.selectedSortBy(),
       sortOrder: this.selectedSortOrder(),
