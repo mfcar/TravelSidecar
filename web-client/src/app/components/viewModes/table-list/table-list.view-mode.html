@@ -3,9 +3,7 @@
   <caption class="sr-only" i18n="@@tableCaption">Data list in table format</caption>
   <thead>
     <tr>
-      <!-- Mobile header column (only on xs) -->
       <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-white sm:hidden" scope="col">#</th>
-      <!-- Data columns header: hidden on xs -->
       @for (column of columns(); track column.key){
         @if (selectedFields().has(column.key)) {
           <th class="hidden sm:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white" scope="col">
@@ -30,7 +28,6 @@
           </th>
         }
       }
-      <!-- Edit action header (always displayed) -->
       <th class="relative py-3.5 pl-3 pr-4 sm:pr-0" scope="col">
         <span class="sr-only" i18n="@@actionsColumnHeader">Actions</span>
       </th>
@@ -38,8 +35,7 @@
   </thead>
   <tbody class="divide-y divide-gray-200 dark:divide-gray-800 bg-white dark:bg-transparent">
     @for(item of items(); track $index) {
-    <tr>
-      <!-- Mobile layout cell: only visible on xs -->
+    <tr class="even:bg-gray-50 dark:even:bg-gray-800/50">
       <td class="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-white sm:hidden">
         <dl>
           @for(column of columns(); track column.key) {
@@ -58,7 +54,6 @@
           }
         </dl>
       </td>
-      <!-- Desktop layout cells for columns: hidden on xs -->
       @for(column of columns(); track column.key){
         @if (selectedFields().has(column.key)) {
             <td class="hidden sm:table-cell px-3 py-4 text-sm text-gray-500 dark:text-gray-300">
@@ -68,7 +63,6 @@
             </td>
         }
       }
-      <!-- Actions column: always displayed -->
       <td class="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
         <ts-button 
           label="Edit" i18n-label="@@editButtonLabel"

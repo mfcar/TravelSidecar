@@ -105,3 +105,16 @@
 
 <ng-template #lastActiveAtCell let-item><span>{{ item.lastActiveAt | userDateFormat }}</span></ng-template>
 
+<ng-template #usernameAtCell let-item>
+  <div class="flex items-center gap-x-3">
+    <ts-avatar [username]="item.username" size="sm" />
+    <div class="truncate font-medium text-gray-900 dark:text-white">{{ item.username }}</div>
+  </div>
+</ng-template>
+
+<ng-template #usernameAtStackCell let-item>
+  <div class="flex items-center gap-x-2">
+    <ts-avatar [username]="item.username" size="sm" />
+    <span>{{ item.username }}</span>
+  </div>
+</ng-template>

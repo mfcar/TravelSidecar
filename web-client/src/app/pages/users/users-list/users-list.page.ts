@@ -16,6 +16,7 @@ import {
 } from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, Subject, take } from 'rxjs';
+import { AvatarComponent } from '../../../components/avatars/avatar/avatar.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import { ListFilterTextInputComponent } from '../../../components/forms/list-filter-text-input/list-filter-text-input.component';
 import { CreateUpdateUserModal } from '../../../components/modals/users/create-update-user/create-update-user.modal';
@@ -54,6 +55,7 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     StackListViewMode,
     StickyListToolsComponent,
     PaginationComponent,
+    AvatarComponent,
   ],
   providers: [DatePipe],
   templateUrl: './users-list.page.html',
@@ -114,9 +116,11 @@ export class UsersListPage implements OnInit, OnDestroy {
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<any>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<any>>('lastModifiedAtCell');
-  lastActiveAtCell = viewChild<TemplateRef<any>>('lastActiveAtCell');
+  createdAtCell = viewChild<TemplateRef<User>>('createdAtCell');
+  lastModifiedAtCell = viewChild<TemplateRef<User>>('lastModifiedAtCell');
+  lastActiveAtCell = viewChild<TemplateRef<User>>('lastActiveAtCell');
+  usernameAtCell = viewChild<TemplateRef<User>>('usernameAtCell');
+  usernameAtStackCell = viewChild<TemplateRef<User>>('usernameAtStackCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -147,7 +151,12 @@ export class UsersListPage implements OnInit, OnDestroy {
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────
   ngOnInit(): void {
     this.columns = [
-      { key: 'username', header: 'Username' },
+      {
+        key: 'username',
+        header: 'Username',
+        cellTemplate: this.usernameAtCell(),
+        stackLabelTemplate: this.usernameAtStackCell(),
+      },
       { key: 'email', header: 'Email' },
       { key: 'createdAt', header: 'Created At', cellTemplate: this.createdAtCell() },
       {
