@@ -25,8 +25,8 @@ import { SortOptionsComponent } from '../../../components/tools/sort-options/sor
 import { StickyListToolsComponent } from '../../../components/tools/sticky-list-tools/sticky-list-tools.component';
 import { ViewModeToogleComponent } from '../../../components/tools/view-mode-toogle/view-mode-toogle.component';
 import { EmptyContentComponent } from '../../../components/ui/empty-content/empty-content.component';
-import { ListStatusComponent } from '../../../components/ui/list-status/list-status.component';
 import { PageHeaderComponent } from '../../../components/ui/page-header/page-header.component';
+import { PaginationComponent } from '../../../components/ui/pagination/pagination.component';
 import { StackListViewMode } from '../../../components/viewModes/stack-list/stack-list.view-mode';
 import {
   ColumnConfig,
@@ -49,13 +49,13 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     ViewModeToogleComponent,
     SortOptionsComponent,
     FieldDisplaySelectorComponent,
-    ListStatusComponent,
     ListFilterTextInputComponent,
     TableListViewMode,
     UserDateFormatPipe,
     StackListViewMode,
     TagBadgeComponent,
     StickyListToolsComponent,
+    PaginationComponent,
   ],
   providers: [DatePipe],
   templateUrl: './journeys-list-page.component.html',
@@ -78,6 +78,7 @@ export class JourneysListPage implements OnInit, OnDestroy {
   selectedFields = signal<Set<string>>(new Set(['name', 'description', 'categoryName']));
   displayedItems = signal<Journey[]>([]);
   pageSize = signal<number>(25);
+  totalCount = signal<number>(0);
   private filterInput$ = new Subject<string>();
 
   // ─── UI Options & Configurations ──────────────────────────────────────────────
@@ -138,6 +139,7 @@ export class JourneysListPage implements OnInit, OnDestroy {
       const resource = this.journeysResource.value();
       if (resource && !this.journeysResource.isLoading()) {
         this.displayedItems.set(resource.items || []);
+        this.totalCount.set(resource.totalCount || 0);
       }
     });
   }
