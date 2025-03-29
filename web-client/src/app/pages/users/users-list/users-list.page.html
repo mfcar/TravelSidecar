@@ -40,19 +40,24 @@
 </ts-page-header>
 
 <!-- ─── FILTER & STATUS ────────────────────────────────────────────────────── -->
-<ts-list-filter-text-input
-  placeholder="Search by username or email"
-  [autocomplete]="false"
-  (filterValueChange)="onFilterInputChange($event)"
-  [filterValue]="searchTerm()"
-/>
+<ts-sticky-list-tools>
+  <ts-list-filter-text-input
+    placeholder="Search by username or email"
+    [autocomplete]="false"
+    (filterValueChange)="onFilterInputChange($event)"
+    [filterValue]="searchTerm()"
+  />
 
-<ts-list-status 
-  [count]="itemsCount()"
-  [isLoading]="usersResource.isLoading()"
-  [isFiltered]="activeFilters()"
-  (resetFilterAction)="resetFilters()"
-/>
+  <ts-pagination
+    [totalItems]="totalCount()"
+    [currentPage]="currentPage()"
+    [itemsPerPage]="pageSize()"
+    [isLoading]="isLoading()"
+    [isFiltered]="activeFilters()"
+    (pageChange)="onPageChange($event)"
+    (resetFilter)="resetFilters()"
+  />
+</ts-sticky-list-tools>
 
 <!-- ─── NO ITEMS STATE ─────────────────────────────────────────────────────── -->
 @if (!usersResource.isLoading() && itemsCount() === 0 && !activeFilters()) {

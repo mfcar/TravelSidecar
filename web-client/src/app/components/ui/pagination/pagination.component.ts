@@ -12,18 +12,18 @@ import { LoadingIndicatorComponent } from '../loading-indicator/loading-indicato
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaginationComponent {
-  // Input signals
   totalItems = input.required<number>();
   currentPage = input.required<number>();
   itemsPerPage = input.required<number>();
   isLoading = input<boolean>(false);
   isFiltered = input<boolean>(false);
 
-  // Output signals
   pageChange = output<number>();
   resetFilter = output<void>();
 
-  // Computed values
+  prevNextButtonClasses =
+    'relative inline-flex items-center px-2 py-2 text-gray-400 dark:text-gray-400 ring-1 ring-gray-300 dark:ring-gray-600 ring-inset hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50';
+
   totalPages = computed(() => {
     return Math.max(1, Math.ceil(this.totalItems() / this.itemsPerPage()));
   });
@@ -46,7 +46,6 @@ export class PaginationComponent {
     }
 
     let pages: (number | 'ellipsis')[] = [];
-
     pages.push(1);
 
     if (currentPage <= 3) {
@@ -74,6 +73,53 @@ export class PaginationComponent {
     return pages;
   });
 
+  getPageButtonClasses(page: number | 'ellipsis'): Record<string, boolean> {
+    if (page === 'ellipsis') {
+      return {};
+    }
+
+    const isCurrentPage = page === this.currentPage();
+
+    const baseClasses =
+      'relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0';
+
+    if (isCurrentPage) {
+      return {
+        [baseClasses]: true,
+        'z-10': true,
+        'bg-sky-600': true,
+        'text-white': true,
+        'focus-visible:outline-2': true,
+        'focus-visible:outline-offset-2': true,
+        'focus-visible:outline-sky-600': true,
+      };
+    } else {
+      return {
+        [baseClasses]: true,
+        'text-gray-900': true,
+        'dark:text-gray-100': true,
+        'ring-1': true,
+        'ring-gray-300': true,
+        'dark:ring-gray-600': true,
+        'ring-inset': true,
+        'hover:bg-gray-50': true,
+        'dark:hover:bg-gray-700': true,
+      };
+    }
+  }
+
+  getPageAriaLabel(page: number | 'ellipsis'): string {
+    if (page === 'ellipsis') {
+      return $localize`:@@pagination.morePages:More pages`;
+    }
+
+    if (page === this.currentPage()) {
+      return $localize`:@@pagination.currentPage:Current page, page ${page}`;
+    }
+
+    return $localize`:@@pagination.goToPage:Go to page ${page}`;
+  }
+
   onPageClick(page: number | 'ellipsis'): void {
     if (typeof page === 'number' && page !== this.currentPage()) {
       this.pageChange.emit(page);
@@ -96,7 +142,7 @@ export class PaginationComponent {
     this.resetFilter.emit();
   }
 
-  isEllipsis(item: any): boolean {
+  isEllipsis(item: unknown): item is 'ellipsis' {
     return item === 'ellipsis';
   }
 }

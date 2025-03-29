@@ -15,16 +15,17 @@ import {
   viewChild,
 } from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { debounceTime, Subject } from 'rxjs';
+import { debounceTime, Subject, take } from 'rxjs';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import { ListFilterTextInputComponent } from '../../../components/forms/list-filter-text-input/list-filter-text-input.component';
 import { CreateUpdateUserModal } from '../../../components/modals/users/create-update-user/create-update-user.modal';
 import { FieldDisplaySelectorComponent } from '../../../components/tools/field-display-selector/field-display-selector.component';
 import { SortOptionsComponent } from '../../../components/tools/sort-options/sort-options.component';
+import { StickyListToolsComponent } from '../../../components/tools/sticky-list-tools/sticky-list-tools.component';
 import { ViewModeToogleComponent } from '../../../components/tools/view-mode-toogle/view-mode-toogle.component';
 import { EmptyContentComponent } from '../../../components/ui/empty-content/empty-content.component';
-import { ListStatusComponent } from '../../../components/ui/list-status/list-status.component';
 import { PageHeaderComponent } from '../../../components/ui/page-header/page-header.component';
+import { PaginationComponent } from '../../../components/ui/pagination/pagination.component';
 import { StackListViewMode } from '../../../components/viewModes/stack-list/stack-list.view-mode';
 import {
   ColumnConfig,
@@ -47,11 +48,12 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     ViewModeToogleComponent,
     SortOptionsComponent,
     FieldDisplaySelectorComponent,
-    ListStatusComponent,
     ListFilterTextInputComponent,
     TableListViewMode,
     UserDateFormatPipe,
     StackListViewMode,
+    StickyListToolsComponent,
+    PaginationComponent,
   ],
   providers: [DatePipe],
   templateUrl: './users-list.page.html',
@@ -73,6 +75,8 @@ export class UsersListPage implements OnInit, OnDestroy {
   selectedViewMode = signal<ListViewMode>(ListViewMode.Table);
   selectedFields = signal<Set<string>>(new Set(['username', 'email', 'lastActiveAt']));
   displayedItems = signal<User[]>([]);
+  pageSize = signal<number>(25);
+  totalCount = signal<number>(0);
   private filterInput$ = new Subject<string>();
 
   // ─── UI Options & Configurations ──────────────────────────────────────────────
@@ -136,6 +140,7 @@ export class UsersListPage implements OnInit, OnDestroy {
       const resource = this.usersResource.value();
       if (resource && !this.usersResource.isLoading()) {
         this.displayedItems.set(resource.items || []);
+        this.totalCount.set(resource.totalCount || 0);
       }
     });
   }
@@ -153,6 +158,11 @@ export class UsersListPage implements OnInit, OnDestroy {
       },
       { key: 'lastActiveAt', header: 'Last Active At', cellTemplate: this.lastActiveAtCell() },
     ];
+
+    this.userPrefService
+      .getPreference<number>(PreferenceKeys.ItemsPerPage, 25)
+      .pipe(take(1))
+      .subscribe((size) => this.pageSize.set(size));
   }
 
   ngOnDestroy(): void {

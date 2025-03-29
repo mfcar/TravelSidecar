@@ -15,17 +15,18 @@ import {
   viewChild,
 } from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { debounceTime, Subject } from 'rxjs';
+import { debounceTime, Subject, take } from 'rxjs';
 import { TagBadgeComponent } from '../../../components/badges/tag-badge/tag-badge.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import { ListFilterTextInputComponent } from '../../../components/forms/list-filter-text-input/list-filter-text-input.component';
 import { CreateUpdateTagModal } from '../../../components/modals/tags/create-update-tag/create-update-tag.modal';
 import { FieldDisplaySelectorComponent } from '../../../components/tools/field-display-selector/field-display-selector.component';
 import { SortOptionsComponent } from '../../../components/tools/sort-options/sort-options.component';
+import { StickyListToolsComponent } from '../../../components/tools/sticky-list-tools/sticky-list-tools.component';
 import { ViewModeToogleComponent } from '../../../components/tools/view-mode-toogle/view-mode-toogle.component';
 import { EmptyContentComponent } from '../../../components/ui/empty-content/empty-content.component';
-import { ListStatusComponent } from '../../../components/ui/list-status/list-status.component';
 import { PageHeaderComponent } from '../../../components/ui/page-header/page-header.component';
+import { PaginationComponent } from '../../../components/ui/pagination/pagination.component';
 import { StackListViewMode } from '../../../components/viewModes/stack-list/stack-list.view-mode';
 import {
   ColumnConfig,
@@ -48,12 +49,13 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     ViewModeToogleComponent,
     SortOptionsComponent,
     FieldDisplaySelectorComponent,
-    ListStatusComponent,
     ListFilterTextInputComponent,
     TableListViewMode,
     UserDateFormatPipe,
     StackListViewMode,
     TagBadgeComponent,
+    StickyListToolsComponent,
+    PaginationComponent,
   ],
   providers: [DatePipe],
   templateUrl: './tags-list.page.html',
@@ -75,6 +77,8 @@ export class TagsListPage implements OnInit, OnDestroy {
   selectedViewMode = signal<ListViewMode>(ListViewMode.Table);
   selectedFields = signal<Set<string>>(new Set(['name', 'color']));
   displayedItems = signal<TagResponse[]>([]);
+  pageSize = signal<number>(25);
+  totalCount = signal<number>(0);
   private filterInput$ = new Subject<string>();
 
   // ─── UI Options & Configurations ──────────────────────────────────────────────
@@ -135,6 +139,7 @@ export class TagsListPage implements OnInit, OnDestroy {
       const resource = this.tagsResource.value();
       if (resource && !this.tagsResource.isLoading()) {
         this.displayedItems.set(resource.items || []);
+        this.totalCount.set(resource.totalCount || 0);
       }
     });
   }
@@ -151,6 +156,11 @@ export class TagsListPage implements OnInit, OnDestroy {
         cellTemplate: this.lastModifiedAtCell(),
       },
     ];
+
+    this.userPrefService
+      .getPreference<number>(PreferenceKeys.ItemsPerPage, 25)
+      .pipe(take(1))
+      .subscribe((size) => this.pageSize.set(size));
   }
 
   ngOnDestroy(): void {
