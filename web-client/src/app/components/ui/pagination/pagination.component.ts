@@ -8,7 +8,6 @@ import { LoadingIndicatorComponent } from '../loading-indicator/loading-indicato
   selector: 'ts-pagination',
   imports: [CommonModule, ButtonComponent, LoadingIndicatorComponent, FontAwesomeModule],
   templateUrl: './pagination.component.html',
-  styleUrl: './pagination.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaginationComponent {

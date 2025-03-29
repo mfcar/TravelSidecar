@@ -21,7 +21,6 @@ import { STANDARD_DROPDOWN_POSITIONS } from '../../../shared/constants/overlay-p
   selector: 'ts-field-display-selector',
   imports: [FontAwesomeModule, NgClass, OverlayModule, PortalModule],
   templateUrl: './field-display-selector.component.html',
-  styleUrl: './field-display-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FieldDisplaySelectorComponent implements OnDestroy {

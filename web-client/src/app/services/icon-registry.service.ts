@@ -28,6 +28,7 @@ import {
   faList,
   faMagnifyingGlass,
   faMoon,
+  faPencil,
   faPlaneDeparture,
   faPlus,
   faSpinner,
@@ -83,6 +84,7 @@ export class IconRegistryService {
       faBucket,
       faEye,
       faEyeSlash,
+      faPencil,
     );
   }
 }

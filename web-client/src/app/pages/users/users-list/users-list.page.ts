@@ -57,7 +57,6 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
   ],
   providers: [DatePipe],
   templateUrl: './users-list.page.html',
-  styleUrl: './users-list.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersListPage implements OnInit, OnDestroy {
@@ -180,7 +179,7 @@ export class UsersListPage implements OnInit, OnDestroy {
   private buildFilterRequest(): UserFilterRequest {
     return {
       page: this.currentPage(),
-      pageSize: 25,
+      pageSize: this.pageSize(),
       searchTerm: this.searchTerm(),
       sortBy: this.selectedSortBy(),
       sortOrder: this.selectedSortOrder(),

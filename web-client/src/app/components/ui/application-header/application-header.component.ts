@@ -31,7 +31,6 @@ import { GlobalSearchComponent } from '../global-search/global-search.component'
   standalone: true,
   imports: [FontAwesomeModule, OverlayModule, PortalModule, NgClass, RouterModule, AvatarComponent],
   templateUrl: './application-header.component.html',
-  styleUrl: './application-header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApplicationHeaderComponent implements OnDestroy {

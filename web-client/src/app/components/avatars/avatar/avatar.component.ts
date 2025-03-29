@@ -7,8 +7,17 @@ export type AvatarShape = 'circular' | 'rounded';
 @Component({
   selector: 'ts-avatar',
   imports: [NgClass],
-  templateUrl: './avatar.component.html',
-  styleUrl: './avatar.component.scss',
+  template: `
+    <span
+      class="inline-flex items-center justify-center font-medium leading-none text-white"
+      [ngClass]="[sizeClasses(), backgroundColor(), shapeClass()]"
+      i18n-aria-label="@@userAvatarLabel"
+      [attr.aria-label]="'User avatar for ' + username()"
+      role="img"
+    >
+      <span>{{ initials() }}</span>
+    </span>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvatarComponent {

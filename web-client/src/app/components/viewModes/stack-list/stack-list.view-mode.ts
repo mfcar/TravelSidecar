@@ -7,7 +7,6 @@ import { ColumnConfig } from '../table-list/table-list.view-mode';
   selector: 'ts-stack-list',
   imports: [CommonModule, ButtonComponent],
   templateUrl: './stack-list.view-mode.html',
-  styleUrl: './stack-list.view-mode.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StackListViewMode<T extends Record<string, any>> {

@@ -56,7 +56,6 @@ import { CreateUpdateTagModal } from '../../modals/tags/create-update-tag/create
     TagBadgeComponent,
   ],
   templateUrl: './tags-selector-input.component.html',
-  styleUrl: './tags-selector-input.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagsSelectorInputComponent implements ControlValueAccessor, OnDestroy {

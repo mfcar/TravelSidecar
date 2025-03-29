@@ -24,7 +24,6 @@ const MODE_MAPPING: Record<ListViewMode, ModeMapping> = {
   selector: 'ts-view-mode-toogle',
   imports: [FontAwesomeModule, NgClass],
   templateUrl: './view-mode-toogle.component.html',
-  styleUrl: './view-mode-toogle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewModeToogleComponent {

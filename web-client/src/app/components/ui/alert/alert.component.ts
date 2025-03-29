@@ -14,8 +14,33 @@ interface AlertTheme {
 @Component({
   selector: 'ts-alert',
   imports: [FontAwesomeModule, NgClass],
-  templateUrl: './alert.component.html',
-  styleUrl: './alert.component.scss',
+  template: `
+    <div [ngClass]="[theme.border, theme.bg, 'p-4', 'my-4', 'border-l-4']">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <fa-icon
+            class="h-5 w-5"
+            [icon]="['fas', theme.icon]"
+            [ngClass]="theme.text"
+            [fixedWidth]="true"
+            aria-hidden="true"
+          />
+        </div>
+        <div class="ml-3">
+          @if (title()) {
+            <h3 class="text-sm font-medium" [ngClass]="theme.title">
+              {{ title() }}
+            </h3>
+          }
+          @if (message()) {
+            <p class="text-sm" [ngClass]="theme.message">
+              {{ message() }}
+            </p>
+          }
+        </div>
+      </div>
+    </div>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlertComponent {

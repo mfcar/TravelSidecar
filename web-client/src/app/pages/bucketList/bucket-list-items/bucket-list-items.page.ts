@@ -59,7 +59,6 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
   ],
   providers: [DatePipe],
   templateUrl: './bucket-list-items.page.html',
-  styleUrl: './bucket-list-items.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BucketListItemsPage implements OnInit, OnDestroy {
@@ -218,7 +217,7 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
   private buildFilterRequest(): BucketListItemFilterRequest {
     return {
       page: this.currentPage(),
-      pageSize: 25,
+      pageSize: this.pageSize(),
       searchTerm: this.searchTerm(),
       sortBy: this.selectedSortBy(),
       sortOrder: this.selectedSortOrder(),

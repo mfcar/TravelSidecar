@@ -26,7 +26,7 @@
         'text-gray-900 dark:text-white': mode !== selectedViewMode(),
       }"
     >
-      <fa-icon [icon]="['fas', MODE_MAPPING[mode].icon]" aria-hidden="true" />
+      <fa-icon [icon]="['fas', MODE_MAPPING[mode].icon]" aria-hidden="true" [fixedWidth]="true" />
       <span class="sr-only">{{ getLocalizedLabel(mode) }}</span>
     </button>
   }

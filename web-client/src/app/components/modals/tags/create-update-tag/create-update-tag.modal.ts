@@ -22,7 +22,6 @@ import { BaseModalComponent } from '../../base-modal/base-modal.component';
     ColorSelectorInputComponent,
   ],
   templateUrl: './create-update-tag.modal.html',
-  styleUrl: './create-update-tag.modal.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateUpdateTagModal implements OnInit {
@@ -63,8 +62,8 @@ export class CreateUpdateTagModal implements OnInit {
 
       if (this.isUpdateMode && this.tag) {
         this.tagService.updateTag(this.tag.id, request).subscribe({
-          next: (response) => {
-            this.dialogRef.close(response);
+          next: () => {
+            this.dialogRef.close(true);
             this.toastsService.show({
               message: 'Tag updated successfully',
               type: ToastType.SUCCESS,

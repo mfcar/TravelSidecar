@@ -75,7 +75,7 @@
             aria-label="Previous page"
           >
             <span class="sr-only" i18n="@@pagination.previous">Previous</span>
-            <fa-icon [icon]="['fas', 'chevron-left']" aria-hidden="true" />
+            <fa-icon [icon]="['fas', 'chevron-left']" aria-hidden="true" [fixedWidth]="true"/>
           </button>
 
           @for (page of visiblePages(); track page) {
@@ -107,7 +107,7 @@
             aria-label="Next page"
           >
             <span class="sr-only" i18n="@@pagination.next">Next</span>
-            <fa-icon [icon]="['fas', 'chevron-right']" aria-hidden="true" />
+            <fa-icon [icon]="['fas', 'chevron-right']" aria-hidden="true" [fixedWidth]="true"/>
           </button>
         </nav>
 

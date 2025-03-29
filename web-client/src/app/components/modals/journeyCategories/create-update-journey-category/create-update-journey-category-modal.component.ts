@@ -22,7 +22,6 @@ import { BaseModalComponent } from '../../base-modal/base-modal.component';
     AlertComponent,
   ],
   templateUrl: './create-update-journey-category-modal.component.html',
-  styleUrl: './create-update-journey-category.modal.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateUpdateJourneyCategoryModal implements OnInit {

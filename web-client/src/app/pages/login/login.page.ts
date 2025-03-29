@@ -19,7 +19,6 @@ import { UserPreferencesService } from '../../services/user-preferences.service'
     ApplicationLogoComponent,
   ],
   templateUrl: './login.page.html',
-  styleUrl: './login.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginPage implements OnInit {

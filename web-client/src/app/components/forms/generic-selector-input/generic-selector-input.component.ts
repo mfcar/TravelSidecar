@@ -54,7 +54,6 @@ type SelectableItem = Record<string, any>;
     AsyncPipe,
   ],
   templateUrl: './generic-selector-input.component.html',
-  styleUrl: './generic-selector-input.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenericSelectorInputComponent<T extends SelectableItem = SelectableItem>

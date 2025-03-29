@@ -59,7 +59,6 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
   ],
   providers: [DatePipe],
   templateUrl: './journeys-list-page.component.html',
-  styleUrl: './journeys-list.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class JourneysListPage implements OnInit, OnDestroy {

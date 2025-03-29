@@ -7,7 +7,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   selector: 'ts-text-input',
   imports: [FormsModule, FontAwesomeModule, NgClass],
   templateUrl: './text-input.component.html',
-  styleUrl: './text-input.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextInputComponent implements ControlValueAccessor {

@@ -16,7 +16,6 @@ import { ColorChromeModule } from 'ngx-color/chrome';
   selector: 'ts-color-input',
   imports: [NgClass, FontAwesomeModule, FormsModule, NgStyle, ColorChromeModule],
   templateUrl: './color-input.component.html',
-  styleUrl: './color-input.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorInputComponent implements ControlValueAccessor {

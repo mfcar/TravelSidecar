@@ -7,7 +7,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   selector: 'ts-date-only-input',
   imports: [FormsModule, FontAwesomeModule, NgClass],
   templateUrl: './date-only-input.component.html',
-  styleUrl: './date-only-input.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateOnlyInputComponent implements ControlValueAccessor {

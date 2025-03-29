@@ -19,7 +19,6 @@ import { UserPreferencesService } from '../../../services/user-preferences.servi
     ApplicationLogoComponent,
   ],
   templateUrl: './change-password.page.html',
-  styleUrl: './change-password.page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChangePasswordPage {

@@ -21,7 +21,6 @@ import { STANDARD_DROPDOWN_POSITIONS } from '../../../shared/constants/overlay-p
   selector: 'ts-sort-options',
   imports: [FontAwesomeModule, NgClass, OverlayModule, PortalModule],
   templateUrl: './sort-options.component.html',
-  styleUrl: './sort-options.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SortOptionsComponent implements OnDestroy {

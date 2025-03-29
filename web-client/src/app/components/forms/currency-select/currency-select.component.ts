@@ -44,7 +44,6 @@ import { CurrencyService } from '../../../services/currency.service';
     AsyncPipe,
   ],
   templateUrl: './currency-select.component.html',
-  styleUrl: './currency-select.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencySelectComponent implements ControlValueAccessor, OnDestroy {

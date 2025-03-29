@@ -4,8 +4,16 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 @Component({
   selector: 'ts-application-logo',
   imports: [NgOptimizedImage],
-  templateUrl: './application-logo.component.html',
-  styleUrl: './application-logo.component.css',
+  template: `
+    <img
+      class="{{ cssClass() }}"
+      [ngSrc]="logoUrl"
+      [height]="height()"
+      [width]="width()"
+      alt="TravelSidecar Logo"
+      priority
+    />
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApplicationLogoComponent {

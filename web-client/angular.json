@@ -11,7 +11,8 @@
         },
         "@schematics/angular:component": {
           "skipTests": true,
-          "changeDetection": "OnPush"
+          "changeDetection": "OnPush",
+          "inlineStyle": true
         },
         "@schematics/angular:directive": {
           "skipTests": true

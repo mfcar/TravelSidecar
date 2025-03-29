@@ -44,11 +44,15 @@
                         routerLinkActive="bg-gray-50 dark:bg-gray-800 text-sky-600 dark:text-white"
                         [routerLinkActiveOptions]="{ exact: true }"
                         (click)="closeMobileSidebar()"
+                        [attr.alt]="link.label"
+                        [attr.aria-label]="link.label"
                       >
                         <fa-icon
                           class="h-6 w-6 shrink-0 text-gray-400 group-hover:text-sky-600 dark:group-hover:text-white"
                           [icon]="['fas', link.icon]"
                           size="lg"
+                          [attr.alt]="link.label"
+                          [attr.aria-label]="link.label"
                         />
                         {{ link.label }}
                       </a>
@@ -65,13 +69,17 @@
                         routerLinkActive="bg-gray-50 dark:bg-gray-800 text-sky-600 dark:text-white"
                         [routerLinkActiveOptions]="{ exact: true }"
                         [routerLink]="link.routerLink"
+                        [attr.alt]="link.label"
+                        [attr.aria-label]="link.label"
                       >
                         <fa-icon
                           class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-[0.625rem] font-medium text-gray-400 group-hover:border-sky-600 group-hover:text-sky-600 dark:border-gray-700 dark:bg-gray-800 dark:group-hover:border-white dark:group-hover:text-white"
-                          routerLinkActive="bg-gray-50 dark:bg-gray-800 text-sky-600 dark:text-white"
+                          routerLinkActive="text-sky-600 dark:text-white"
                           [routerLinkActiveOptions]="{ exact: true }"
                           [icon]="['fas', link.icon]"
                           size="lg"
+                          [attr.alt]="link.label"
+                          [attr.aria-label]="link.label"
                         />
                         <span class="truncate">{{ link.label }}</span>
                       </a>
@@ -109,6 +117,8 @@
                   [routerLink]="link.routerLink"
                   routerLinkActive="bg-gray-50 dark:bg-gray-800 text-sky-600 dark:text-white"
                   [routerLinkActiveOptions]="{ exact: true }"
+                  [attr.alt]="link.label"
+                  [attr.aria-label]="link.label"
                 >
                   <fa-icon
                     class="h-6 w-6 shrink-0 text-gray-400 group-hover:text-sky-600 dark:group-hover:text-white"
@@ -116,6 +126,8 @@
                     [routerLinkActiveOptions]="{ exact: true }"
                     [icon]="['fas', link.icon]"
                     size="lg"
+                    [attr.alt]="link.label"
+                    [attr.aria-label]="link.label"
                   />
                   {{ link.label }}
                 </a>
@@ -135,7 +147,7 @@
                 >
                   <fa-icon
                     class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-[0.625rem] font-medium text-gray-400 group-hover:border-sky-600 group-hover:text-sky-600 dark:border-gray-700 dark:bg-gray-800 dark:group-hover:border-white dark:group-hover:text-white"
-                    routerLinkActive="bg-gray-50 dark:bg-gray-800 text-sky-600 dark:text-white"
+                    routerLinkActive="text-sky-600 dark:text-white"
                     [routerLinkActiveOptions]="{ exact: true }"
                     [icon]="['fas', link.icon]"
                     size="lg"

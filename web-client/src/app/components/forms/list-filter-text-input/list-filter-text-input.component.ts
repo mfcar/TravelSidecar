@@ -5,7 +5,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   selector: 'ts-list-filter-text-input',
   imports: [FontAwesomeModule],
   templateUrl: './list-filter-text-input.component.html',
-  styleUrl: './list-filter-text-input.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListFilterTextInputComponent {

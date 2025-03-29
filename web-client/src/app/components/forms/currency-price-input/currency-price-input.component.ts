@@ -48,7 +48,6 @@ interface CurrencyPriceValue {
     AsyncPipe,
   ],
   templateUrl: './currency-price-input.component.html',
-  styleUrl: './currency-price-input.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyPriceInputComponent implements ControlValueAccessor, OnDestroy {

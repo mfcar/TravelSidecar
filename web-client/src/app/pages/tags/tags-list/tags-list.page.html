@@ -93,11 +93,29 @@
 }
 
 <!-- ─── CUSTOM TEMPLATE DEFINITIONS FOR TABLE CELLS ────────────────────────── -->
-<ng-template #colorAtCell let-item><ts-tag-badge [label]="item.color" [color]="item.color"/></ng-template>
+<ng-template #nameCell let-item>
+  <a [routerLink]="['/tags', item.id]" class="text-sky-600 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300">
+    {{ item.name }}
+  </a>
+</ng-template>
+
+<ng-template #colorAtCell let-item>
+  <ts-tag-badge 
+    [label]="item.color" 
+    [color]="item.color" />
+</ng-template>
 
 <ng-template #createdAtCell let-item><span>{{ item.createdAt | userDateFormat }}</span></ng-template>
 
 <ng-template #lastModifiedAtCell let-item><span>{{ item.lastModifiedAt | userDateFormat }}</span></ng-template>
+
+<ng-template #journeysCountAtStackCell let-item>
+  <span>{{ item.journeysCount }} {{ item.journeysCount === 1 ? 'Journey' : 'Journeys' }}</span>
+</ng-template>
+
+<ng-template #bucketListItemCountAtStackCell let-item>
+  <span>{{ item.bucketListItemCount }} {{ item.bucketListItemCount === 1 ? 'Bucket List Item' : 'Bucket List Items' }}</span>
+</ng-template>
 
 <ng-template #createdAtStackCell let-item><span>Created at {{ item.createdAt | userDateFormat }}</span></ng-template>
 

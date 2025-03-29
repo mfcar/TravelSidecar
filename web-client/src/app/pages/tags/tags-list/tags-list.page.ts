@@ -15,6 +15,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { debounceTime, Subject, take } from 'rxjs';
 import { TagBadgeComponent } from '../../../components/badges/tag-badge/tag-badge.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
@@ -56,10 +57,10 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     TagBadgeComponent,
     StickyListToolsComponent,
     PaginationComponent,
+    RouterLink,
   ],
   providers: [DatePipe],
   templateUrl: './tags-list.page.html',
-  styleUrl: './tags-list.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagsListPage implements OnInit, OnDestroy {
@@ -87,12 +88,16 @@ export class TagsListPage implements OnInit, OnDestroy {
   fieldOptions = [
     { id: 'name', label: 'Name' },
     { id: 'color', label: 'Color' },
+    { id: 'journeysCount', label: 'Journeys' },
+    { id: 'bucketListItemCount', label: 'Bucket List Items' },
     { id: 'createdAt', label: 'Created Date' },
     { id: 'lastModifiedAt', label: 'Last Modified Date' },
   ];
 
   sortFields: SortField[] = [
     { field: 'name', name: 'Name', type: 'text' },
+    { field: 'journeysCount', name: 'Journeys', type: 'number' },
+    { field: 'bucketListItemCount', name: 'Bucket List Items', type: 'number' },
     { field: 'createdAt', name: 'Created Date', type: 'number' },
     { field: 'lastModifiedAt', name: 'Last Modified Date', type: 'number' },
   ];
@@ -114,9 +119,14 @@ export class TagsListPage implements OnInit, OnDestroy {
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<any>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<any>>('lastModifiedAtCell');
-  colorAtCell = viewChild<TemplateRef<any>>('colorAtCell');
+  createdAtCell = viewChild<TemplateRef<TagResponse>>('createdAtCell');
+  lastModifiedAtCell = viewChild<TemplateRef<TagResponse>>('lastModifiedAtCell');
+  colorAtCell = viewChild<TemplateRef<TagResponse>>('colorAtCell');
+  nameCell = viewChild<TemplateRef<TagResponse>>('nameCell');
+  journeysCountAtStackCell = viewChild<TemplateRef<TagResponse>>('journeysCountAtStackCell');
+  bucketListItemCountAtStackCell = viewChild<TemplateRef<TagResponse>>(
+    'bucketListItemCountAtStackCell',
+  );
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -147,8 +157,22 @@ export class TagsListPage implements OnInit, OnDestroy {
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────
   ngOnInit(): void {
     this.columns = [
-      { key: 'name', header: 'Name' },
+      {
+        key: 'name',
+        header: 'Name',
+        cellTemplate: this.nameCell(),
+      },
       { key: 'color', header: 'Color', cellTemplate: this.colorAtCell() },
+      {
+        key: 'journeysCount',
+        header: 'Journeys',
+        stackLabelTemplate: this.journeysCountAtStackCell(),
+      },
+      {
+        key: 'bucketListItemCount',
+        header: 'Bucket List Items',
+        stackLabelTemplate: this.bucketListItemCountAtStackCell(),
+      },
       { key: 'createdAt', header: 'Created At', cellTemplate: this.createdAtCell() },
       {
         key: 'lastModifiedAt',
@@ -178,7 +202,7 @@ export class TagsListPage implements OnInit, OnDestroy {
   private buildFilterRequest(): TagFilterRequest {
     return {
       page: this.currentPage(),
-      pageSize: 25,
+      pageSize: this.pageSize(),
       searchTerm: this.searchTerm(),
       sortBy: this.selectedSortBy(),
       sortOrder: this.selectedSortOrder(),

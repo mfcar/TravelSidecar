@@ -28,7 +28,6 @@ import { CreateUpdateJourneyCategoryModal } from '../../journeyCategories/create
     GenericSelectorInputComponent,
   ],
   templateUrl: './create-update-journey-modal.component.html',
-  styleUrl: './create-update-journey.modal.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateUpdateJourneyModal implements OnInit {

@@ -99,7 +99,7 @@
 <ng-template #tagsCell let-item>
   <div class="flex flex-wrap gap-1">
     @for (tag of item.tags; track tag.id) {
-      <ts-tag-badge [label]="tag.name" [color]="tag.color!" />
+      <ts-tag-badge [label]="tag.name" [color]="tag.color!" [clickable]="true" [tagId]="tag.id" />
     }
   </div>
 </ng-template>
@@ -132,7 +132,7 @@
 <ng-template #tagsStackCell let-item>
   <div class="flex flex-wrap gap-1 mt-1">
     @for (tag of item.tags; track tag.id) {
-      <ts-tag-badge [label]="tag.name" [color]="tag.color!" />
+      <ts-tag-badge [label]="tag.name" [color]="tag.color!" [clickable]="true" [tagId]="tag.id" />
     }
   </div>
 </ng-template>

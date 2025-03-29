@@ -4,6 +4,7 @@ import { ApplicationVersionsPage } from '../pages/application/application-versio
 import { BucketListItemsPage } from '../pages/bucketList/bucket-list-items/bucket-list-items.page';
 import { DashboardPage } from '../pages/dashboard/dashboard.page';
 import { JourneysCategoriesListPage } from '../pages/journeysCategories/journey-categories-list/journeys-categories-list-page.component';
+import { TagDetailsPage } from '../pages/tags/tag-details/tag-details.page';
 import { TagsListPage } from '../pages/tags/tags-list/tags-list.page';
 
 export const USER_FEATURES_ROUTES: Routes = [
@@ -11,6 +12,7 @@ export const USER_FEATURES_ROUTES: Routes = [
   { path: 'bucket-list', component: BucketListItemsPage },
   { path: 'home', component: DashboardPage },
   { path: 'tags', component: TagsListPage },
+  { path: 'tags/:id', component: TagDetailsPage },
   { path: 'journey-categories', component: JourneysCategoriesListPage },
   { path: 'versions', component: ApplicationVersionsPage },
 ];

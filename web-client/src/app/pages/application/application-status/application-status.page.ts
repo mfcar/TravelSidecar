@@ -18,7 +18,6 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
   imports: [PageHeaderComponent, UptimePipe, FontAwesomeModule, UserDateFormatPipe],
   providers: [DatePipe],
   templateUrl: './application-status.page.html',
-  styleUrl: './application-status.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApplicationStatusPage {

@@ -34,7 +34,6 @@ import { BaseModalComponent } from '../../base-modal/base-modal.component';
     CurrencyPriceInputComponent,
   ],
   templateUrl: './create-update-bucket-list-item.component.html',
-  styleUrl: './create-update-bucket-list-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateUpdateBucketListItemComponent implements OnInit {

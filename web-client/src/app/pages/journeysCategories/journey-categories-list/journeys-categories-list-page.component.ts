@@ -60,7 +60,6 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
   ],
   providers: [DatePipe],
   templateUrl: './journeys-categories-list-page.component.html',
-  styleUrl: './journeys-categories-list.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class JourneysCategoriesListPage implements OnInit, OnDestroy {
@@ -186,7 +185,7 @@ export class JourneysCategoriesListPage implements OnInit, OnDestroy {
   private buildFilterRequest(): JourneyCategoryFilterRequest {
     return {
       page: this.currentPage(),
-      pageSize: 25,
+      pageSize: this.pageSize(),
       searchTerm: this.searchTerm(),
       sortBy: this.selectedSortBy(),
       sortOrder: this.selectedSortOrder(),

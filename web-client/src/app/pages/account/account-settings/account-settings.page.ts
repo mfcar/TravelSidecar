@@ -4,7 +4,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   selector: 'ts-account-settings',
   imports: [],
   templateUrl: './account-settings.page.html',
-  styleUrl: './account-settings.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountSettingsPage {}

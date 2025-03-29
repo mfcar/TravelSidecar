@@ -15,7 +15,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   selector: 'ts-global-search',
   imports: [FormsModule, FontAwesomeModule],
   templateUrl: './global-search.component.html',
-  styleUrl: './global-search.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalSearchComponent implements OnInit {

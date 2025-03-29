@@ -16,7 +16,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   selector: 'ts-textarea-input',
   imports: [FormsModule, NgClass, FontAwesomeModule, TextFieldModule],
   templateUrl: './textarea-input.component.html',
-  styleUrl: './textarea-input.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextareaInputComponent implements ControlValueAccessor {

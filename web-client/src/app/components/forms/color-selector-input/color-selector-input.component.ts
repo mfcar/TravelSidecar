@@ -23,7 +23,6 @@ interface TailwindColor {
   selector: 'ts-color-selector-input',
   imports: [NgClass, FormsModule, OverlayModule],
   templateUrl: './color-selector-input.component.html',
-  styleUrl: './color-selector-input.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorSelectorInputComponent implements ControlValueAccessor, OnDestroy {

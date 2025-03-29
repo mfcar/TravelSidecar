@@ -34,8 +34,8 @@ export class TagService {
     return this.httpClient.post<TagResponse>(this.apiUrl, request, { withCredentials: true });
   }
 
-  updateTag(id: string, request: CreateUpdateTagRequest): Observable<TagResponse> {
-    return this.httpClient.put<TagResponse>(`${this.apiUrl}/${id}`, request, {
+  updateTag(id: string, request: CreateUpdateTagRequest): Observable<void> {
+    return this.httpClient.put<void>(`${this.apiUrl}/${id}`, request, {
       withCredentials: true,
     });
   }

@@ -21,7 +21,6 @@ interface SidebarLink {
     ApplicationLogoComponent,
   ],
   templateUrl: './application-sidebar.component.html',
-  styleUrl: './application-sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApplicationSidebarComponent {
@@ -32,8 +31,8 @@ export class ApplicationSidebarComponent {
   mainSidebarLinks: SidebarLink[] = [
     { label: 'Home', icon: 'home', routerLink: ['/home'] },
     { label: 'Journeys', icon: 'plane-departure', routerLink: ['/journeys'] },
-    { label: 'Tags', icon: 'tags', routerLink: ['/tags'] },
     { label: 'Bucket List', icon: 'clipboard-list', routerLink: ['/bucket-list'] },
+    { label: 'Tags', icon: 'tags', routerLink: ['/tags'] },
   ];
 
   managementSidebarLinks: SidebarLink[] = [

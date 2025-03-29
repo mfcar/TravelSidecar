@@ -16,7 +16,6 @@ import { ToastService, ToastType } from '../../../services/toast.service';
   selector: 'ts-toast',
   imports: [FontAwesomeModule, NgClass],
   templateUrl: './toast.component.html',
-  styleUrl: './toast.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('slideIn', [

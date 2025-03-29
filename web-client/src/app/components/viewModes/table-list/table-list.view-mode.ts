@@ -16,7 +16,6 @@ export interface ColumnConfig<T extends Record<string, any>> {
   selector: 'ts-table-list',
   imports: [FontAwesomeModule, ButtonComponent, CommonModule],
   templateUrl: './table-list.view-mode.html',
-  styleUrl: './table-list.view-mode.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableListViewMode<T extends Record<string, any>> {

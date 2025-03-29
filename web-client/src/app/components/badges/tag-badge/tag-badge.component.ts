@@ -1,22 +1,54 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'ts-tag-badge',
   standalone: true,
   imports: [NgClass],
-  templateUrl: './tag-badge.component.html',
-  styleUrl: './tag-badge.component.scss',
+  template: `
+    <span
+      class="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
+      [ngClass]="[
+        lightClasses().bg,
+        lightClasses().text,
+        lightClasses().ring,
+        darkClasses().bg,
+        darkClasses().text,
+        darkClasses().ring,
+        cursorClass(),
+      ]"
+      [attr.role]="clickable() ? 'button' : undefined"
+      [attr.tabindex]="clickable() ? '0' : undefined"
+      (click)="navigateToTagDetails()"
+      (keydown.enter)="navigateToTagDetails()"
+    >
+      {{ label() }}
+    </span>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagBadgeComponent {
   label = input.required<string>();
   color = input.required<string>();
+  clickable = input<boolean>(false);
+  tagId = input<string | undefined>(undefined);
+
+  router = inject(Router);
+
+  navigateToTagDetails(): void {
+    if (this.clickable() && this.tagId()) {
+      this.router.navigate(['/tags', this.tagId()]);
+    }
+  }
+
+  cursorClass = computed(() => {
+    return this.clickable() ? 'cursor-pointer' : 'cursor-default';
+  });
 
   lightClasses = computed(() => {
     const colorName = this.color();
 
-    // Default case
     if (!colorName) {
       return {
         bg: 'bg-gray-50',
@@ -25,7 +57,6 @@ export class TagBadgeComponent {
       };
     }
 
-    // Use switch to explicitly declare all possible Tailwind classes
     switch (colorName) {
       case 'red':
         return {
@@ -160,7 +191,6 @@ export class TagBadgeComponent {
           ring: 'ring-stone-600/10',
         };
       default:
-        // Fallback to gray if an unknown color is provided
         return {
           bg: 'bg-gray-50',
           text: 'text-gray-600',
@@ -172,7 +202,6 @@ export class TagBadgeComponent {
   darkClasses = computed(() => {
     const colorName = this.color();
 
-    // Default case
     if (!colorName) {
       return {
         bg: 'dark:bg-gray-400/10',
@@ -181,7 +210,6 @@ export class TagBadgeComponent {
       };
     }
 
-    // Use switch to explicitly declare all possible Tailwind classes for dark mode
     switch (colorName) {
       case 'red':
         return {
