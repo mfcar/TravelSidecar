@@ -29,12 +29,15 @@ export class ApplicationSidebarComponent {
   mobileSidebarIsVisible = linkedSignal(this.isVisible);
   actionCloseMobileSidebar = output<void>();
 
-  sidebarLinks: SidebarLink[] = [
+  mainSidebarLinks: SidebarLink[] = [
     { label: 'Home', icon: 'home', routerLink: ['/home'] },
     { label: 'Journeys', icon: 'plane-departure', routerLink: ['/journeys'] },
-    { label: 'Journey Categories', icon: 'list', routerLink: ['/journey-categories'] },
     { label: 'Tags', icon: 'tags', routerLink: ['/tags'] },
     { label: 'Bucket List', icon: 'clipboard-list', routerLink: ['/bucket-list'] },
+  ];
+
+  managementSidebarLinks: SidebarLink[] = [
+    { label: 'Journey Categories', icon: 'list', routerLink: ['/journey-categories'] },
     { label: 'Users', icon: 'users', routerLink: ['/users'] },
   ];
 
