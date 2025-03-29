@@ -227,8 +227,6 @@ export class JourneysListPage implements OnInit, OnDestroy {
 
   showCreateModal(): void {
     const dialogRef = this.dialog.open(CreateUpdateJourneyModal, {
-      width: '400px',
-      hasBackdrop: true,
       data: {},
     });
 
@@ -241,8 +239,6 @@ export class JourneysListPage implements OnInit, OnDestroy {
 
   showUpdateModal(journey: Journey): void {
     const dialogRef = this.dialog.open(CreateUpdateJourneyModal, {
-      width: '400px',
-      hasBackdrop: true,
       data: { journey: journey },
     });
 

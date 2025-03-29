@@ -9,8 +9,10 @@ import { ToastService } from './services/toast.service';
 @Component({
   selector: 'ts-root',
   imports: [RouterOutlet, FontAwesomeModule, ToastComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  template: `
+    <ts-toast />
+    <router-outlet />
+  `,
 })
 export class AppComponent {
   private accountService = inject(AccountService);

@@ -54,8 +54,6 @@ export class TagDetailsPage {
     if (!this.tag()) return;
 
     const dialogRef = this.dialog.open(CreateUpdateTagModal, {
-      width: '400px',
-      hasBackdrop: true,
       data: { tag: this.tag() },
     });
 

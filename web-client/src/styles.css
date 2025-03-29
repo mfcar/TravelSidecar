@@ -5,20 +5,36 @@
 @import '@angular/cdk/overlay-prebuilt.css';
 
 .cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
-    background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.cdk-dialog-container {
+  animation: dialog-fade-in 0.2s ease-out forwards;
+}
+
+@keyframes dialog-fade-in {
+  from { 
+    opacity: 0;
+    transform: translateY(-20px);
   }
-  
-  .cdk-dialog-container {
-    animation: dialog-fade-in 0.2s ease-out forwards;
+  to { 
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  @keyframes dialog-fade-in {
-    from { 
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to { 
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+}
+
+.currency-price-overlay,
+.currency-select-overlay,
+.generic-selector-overlay,
+.tags-selector-overlay,
+.color-selector-overlay {
+  z-index: 1060 !important;
+}
+
+.cdk-overlay-container {
+  z-index: 1000;
+}
+
+.cdk-overlay-connected-position-bounding-box {
+  z-index: inherit;
+}

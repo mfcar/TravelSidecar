@@ -250,8 +250,6 @@ export class TagsListPage implements OnInit, OnDestroy {
 
   showCreateModal(): void {
     const dialogRef = this.dialog.open(CreateUpdateTagModal, {
-      width: '400px',
-      hasBackdrop: true,
       data: {},
     });
 
@@ -264,8 +262,6 @@ export class TagsListPage implements OnInit, OnDestroy {
 
   showUpdateModal(tag: TagResponse): void {
     const dialogRef = this.dialog.open(CreateUpdateTagModal, {
-      width: '400px',
-      hasBackdrop: true,
       data: { tag: tag },
     });
 

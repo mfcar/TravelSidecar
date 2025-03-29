@@ -265,8 +265,6 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
 
   showCreateModal(): void {
     const dialogRef = this.dialog.open(CreateUpdateBucketListItemComponent, {
-      width: '900px',
-      hasBackdrop: true,
       data: {},
     });
 
@@ -279,7 +277,6 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
 
   showUpdateModal(bucketListItem: BucketListItem): void {
     const dialogRef = this.dialog.open(CreateUpdateBucketListItemComponent, {
-      width: '900px',
       data: { bucketListItem },
     });
 

@@ -233,8 +233,6 @@ export class JourneysCategoriesListPage implements OnInit, OnDestroy {
 
   showCreateModal(): void {
     const dialogRef = this.dialog.open(CreateUpdateJourneyCategoryModal, {
-      width: '400px',
-      hasBackdrop: true,
       data: {},
     });
 
@@ -247,8 +245,6 @@ export class JourneysCategoriesListPage implements OnInit, OnDestroy {
 
   showUpdateModal(category: JourneyCategory): void {
     const dialogRef = this.dialog.open(CreateUpdateJourneyCategoryModal, {
-      width: '400px',
-      hasBackdrop: true,
       data: { journeyCategory: category },
     });
 

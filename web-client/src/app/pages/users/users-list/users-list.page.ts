@@ -227,8 +227,6 @@ export class UsersListPage implements OnInit, OnDestroy {
 
   showCreateModal(): void {
     const dialogRef = this.dialog.open(CreateUpdateUserModal, {
-      width: '500px',
-      hasBackdrop: true,
       data: {},
     });
 
@@ -241,8 +239,6 @@ export class UsersListPage implements OnInit, OnDestroy {
 
   showUpdateModal(user: User): void {
     const dialogRef = this.dialog.open(CreateUpdateUserModal, {
-      width: '500px',
-      hasBackdrop: true,
       data: { user: user },
     });
 
