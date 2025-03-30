@@ -15,6 +15,9 @@ jobs:
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
           VERSION=${VERSION#v}
+          if [[ $VERSION == .* ]]; then
+            VERSION=${VERSION:1}
+          fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Building version: $VERSION"
 
@@ -40,7 +43,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push on Docker Hub
         uses: docker/build-push-action@v5
         with:
           context: .
