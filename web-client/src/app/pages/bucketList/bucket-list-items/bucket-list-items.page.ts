@@ -27,6 +27,7 @@ import { ViewModeToogleComponent } from '../../../components/tools/view-mode-too
 import { EmptyContentComponent } from '../../../components/ui/empty-content/empty-content.component';
 import { PageHeaderComponent } from '../../../components/ui/page-header/page-header.component';
 import { PaginationComponent } from '../../../components/ui/pagination/pagination.component';
+import { GridListViewMode } from '../../../components/viewModes/grid-list/grid-list.view-mode';
 import { StackListViewMode } from '../../../components/viewModes/stack-list/stack-list.view-mode';
 import {
   ColumnConfig,
@@ -56,6 +57,7 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     TagBadgeComponent,
     StickyListToolsComponent,
     PaginationComponent,
+    GridListViewMode,
   ],
   providers: [DatePipe],
   templateUrl: './bucket-list-items.page.html',

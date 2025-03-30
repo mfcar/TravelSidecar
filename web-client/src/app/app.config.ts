@@ -24,7 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch(), withInterceptors([jwtInterceptor])),
     provideAnimationsAsync(),
     provideAppInitializer(() => {
-      const themeService = inject(ThemeService);
+      inject(ThemeService);
     }),
   ],
 };

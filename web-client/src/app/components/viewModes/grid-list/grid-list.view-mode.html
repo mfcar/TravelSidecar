@@ -1,1 +1,74 @@
-<p>grid-list works!</p>
+<ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-label="Items grid" i18n-aria-label="@@gridListAriaLabel">
+    @for(item of items(); track $index) {
+      <li class="col-span-1 flex flex-col divide-y divide-gray-200 dark:divide-gray-700 rounded-lg bg-white dark:bg-gray-800 text-center shadow">
+        <div class="flex flex-1 flex-col p-8">
+          <div class="mx-auto h-32 w-32 flex-shrink-0 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
+            <fa-icon class="h-16 w-16" [icon]="['fas', 'pencil']" />
+          </div>
+          
+          @for(column of columns(); track column.key) {
+            @if (column.key === primaryField()) {
+              <h3 class="mt-6 text-sm font-medium text-gray-900 dark:text-white truncate px-4">
+                {{ item[column.key] }}
+              </h3>
+            }
+          }
+          
+          <dl class="mt-1 flex flex-grow flex-col justify-between">
+            @for(column of columns(); track column.key) {
+              @if (column.key === secondaryField()) {
+                <div>
+                  <dt class="sr-only">{{ column.header }}</dt>
+                  <dd class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 px-4">
+                    {{ item[column.key] }}
+                  </dd>
+                </div>
+              }
+            }
+            
+            @for(column of columns(); track column.key) {
+              @if (selectedFields().has(column.key) && column.key === 'tags') {
+                <div class="mt-3 flex flex-wrap justify-center gap-1 px-2">
+                  @if (column.cellTemplate) {
+                    <ng-container *ngTemplateOutlet="column.cellTemplate; context: {$implicit: item}" />
+                  }
+                </div>
+              }
+            }
+            
+            @if (getDateField()) {
+              @for(column of columns(); track column.key) {
+                @if (selectedFields().has(column.key) && ['startDate', 'endDate', 'createdAt', 'lastModifiedAt'].includes(column.key)) {
+                  <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    <span class="font-medium">{{ column.header }}: </span>
+                    @if (column.cellTemplate) {
+                      <ng-container *ngTemplateOutlet="column.cellTemplate; context: {$implicit: item}" />
+                    } @else {
+                      {{ item[column.key] }}
+                    }
+                  </div>
+                }
+              }
+            }
+          </dl>
+        </div>
+        
+        <div>
+          <div class="-mt-px flex">
+            <div class="flex flex-1">
+              <button 
+                type="button"
+                class="relative inline-flex w-0 flex-1 items-center justify-center gap-x-2 rounded-bl-lg border border-transparent py-4 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-500 dark:hover:text-white transition-colors"
+                (click)="onEditButtonClicked(item)"
+                aria-label="Edit item"
+                i18n-aria-label="@@editItemAriaLabel"
+              >
+                <fa-icon class="h-5 w-5 text-gray-400" [icon]="['fas', 'pencil']" />
+                <span i18n="@@editButtonLabel">Edit</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </li>
+    }
+  </ul>

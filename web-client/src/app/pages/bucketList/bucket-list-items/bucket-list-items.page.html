@@ -89,6 +89,13 @@
       (editButtonClicked)="showUpdateModal($event)"
       (deleteButtonClicked)="showDeleteModal()"
   />
+} @else if (selectedViewMode() === ListViewMode.Grid && displayedItems().length > 0) {
+  <ts-grid-list
+      [items]="displayedItems()"
+      [columns]="columns"
+      [selectedFields]="selectedFields()"
+      (editButtonClicked)="showUpdateModal($event)"
+  />
 }
 
 <!-- ─── CUSTOM TEMPLATE DEFINITIONS FOR TABLE CELLS ────────────────────────── -->

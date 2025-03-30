@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   imports: [],
   template: `
     <div
-      class="sticky top-16 z-10 bg-white dark:bg-gray-900 pt-4 pb-2 border-b border-gray-200 dark:border-gray-700"
+      class="sticky top-16 z-10 bg-white dark:bg-gray-900 pt-4 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700"
     >
       <ng-content />
     </div>
