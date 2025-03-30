@@ -118,17 +118,17 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<any>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<any>>('lastModifiedAtCell');
-  startDateCell = viewChild<TemplateRef<any>>('startDateCell');
-  endDateCell = viewChild<TemplateRef<any>>('endDateCell');
-  tagsCell = viewChild<TemplateRef<any>>('tagsCell');
+  createdAtCell = viewChild<TemplateRef<BucketListItem>>('createdAtCell');
+  lastModifiedAtCell = viewChild<TemplateRef<BucketListItem>>('lastModifiedAtCell');
+  startDateAtCell = viewChild<TemplateRef<BucketListItem>>('startDateAtCell');
+  endDateAtCell = viewChild<TemplateRef<BucketListItem>>('endDateAtCell');
+  tagsAtCell = viewChild<TemplateRef<BucketListItem>>('tagstACell');
 
-  createdAtStackLabel = viewChild<TemplateRef<any>>('createdAtStackLabel');
-  lastModifiedAtStackLabel = viewChild<TemplateRef<any>>('lastModifiedAtStackLabel');
-  startDateStackLabel = viewChild<TemplateRef<any>>('startDateStackLabel');
-  endDateStackLabel = viewChild<TemplateRef<any>>('endDateStackLabel');
-  tagsStackCell = viewChild<TemplateRef<any>>('tagsStackCell');
+  createdAtStackLabel = viewChild<TemplateRef<BucketListItem>>('createdAtStackLabel');
+  lastModifiedAtStackLabel = viewChild<TemplateRef<BucketListItem>>('lastModifiedAtStackLabel');
+  startDateAtStackLabel = viewChild<TemplateRef<BucketListItem>>('startDateAtStackLabel');
+  endDateAtStackLabel = viewChild<TemplateRef<BucketListItem>>('endDateAtStackLabel');
+  tagsAtStackCell = viewChild<TemplateRef<BucketListItem>>('tagsAtStackCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -165,22 +165,22 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
         key: 'tags',
         header: 'Tags',
         sortable: false,
-        cellTemplate: this.tagsCell(),
-        stackLabelTemplate: this.tagsStackCell(),
+        cellTemplate: this.tagsAtCell(),
+        stackLabelTemplate: this.tagsAtStackCell(),
       },
       {
         key: 'startDate',
         header: 'Start Date',
         sortable: true,
-        cellTemplate: this.startDateCell(),
-        stackLabelTemplate: this.startDateStackLabel(),
+        cellTemplate: this.startDateAtCell(),
+        stackLabelTemplate: this.startDateAtStackLabel(),
       },
       {
         key: 'endDate',
         header: 'End Date',
         sortable: true,
-        cellTemplate: this.endDateCell(),
-        stackLabelTemplate: this.endDateStackLabel(),
+        cellTemplate: this.endDateAtCell(),
+        stackLabelTemplate: this.endDateAtStackLabel(),
       },
       {
         key: 'createdAt',

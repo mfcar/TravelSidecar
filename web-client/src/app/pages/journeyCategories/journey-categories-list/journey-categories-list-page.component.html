@@ -97,8 +97,14 @@
 
 <ng-template #lastModifiedAtCell let-item><span>{{ item.lastModifiedAt | userDateFormat }}</span></ng-template>
 
-<ng-template #journeysCountStackCell let-item><span>{{ item.journeysCount }} journeys</span></ng-template>
+<ng-template #journeysCountAtStackCell let-item><span>{{ item.journeysCount }} journeys</span></ng-template>
 
 <ng-template #createdAtStackCell let-item><span>Created at {{ item.createdAt | userDateFormat }}</span></ng-template>
 
 <ng-template #lastModifiedAtStackCell let-item><span>Last modified at {{ item.lastModifiedAt | userDateFormat }}</span></ng-template>
+
+<ng-template #nameAtCell let-item>
+  <a [routerLink]="['/journey-categories', item.id]" class="text-sky-600 dark:text-sky-400 hover:underline">
+    {{ item.name }}
+  </a>
+</ng-template>

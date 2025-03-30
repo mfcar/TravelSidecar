@@ -85,7 +85,7 @@
           aria-label="Open user menu"
         >
           <span class="sr-only" i18n="@@openUserMenu">Open user menu</span>
-          <ts-avatar username="John Doe" size="sm" />
+          <ts-avatar [username]="userName()" size="sm" />
         </button>
       </div>
     </div>
@@ -110,7 +110,7 @@
   >
     <div class="px-4 py-3 dark:text-white" role="none">
       <span class="text-sm" role="none" i18n="@@signedInAs">Signed in as</span>
-      <span class="pl-1 truncate text-sm font-medium dark:text-gray-200" role="none">{{ userName() }}</span>
+      <span class="pl-1 truncate text-sm font-bold dark:text-gray-200" role="none">{{ userName() }}</span>
     </div>
     
     <div class="py-1" role="none">

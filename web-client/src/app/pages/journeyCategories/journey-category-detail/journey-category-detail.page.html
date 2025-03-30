@@ -1,0 +1,93 @@
+@if (isLoading()) {
+  <div class="flex items-center justify-center py-12">
+    <ts-loading-indicator class="h-8 w-8 text-sky-600 dark:text-sky-400" />
+  </div>
+  } @if (error()) {
+  <ts-alert type="error" title="Error" [message]="error()" />
+  }
+   @if (category() && !isLoading()) {
+  <ts-page-header [title]="'Category: ' + category()!.name">
+    <div class="flex items-center mt-2" page-header-information>
+      <span class="text-sm text-gray-500 dark:text-gray-400">
+        Created {{ category()!.createdAt | date:'medium' }}
+      </span>
+    </div>
+  
+    <span page-header-button>
+      <ts-button
+        label="Edit Category"
+        variant="secondary"
+        size="lg"
+        icon="pencil"
+        (buttonAction)="showUpdateModal()"
+      />
+    </span>
+  </ts-page-header>
+  
+  <div class="mt-4">
+    @if (category()!.description) {
+    <div class="prose prose-sm dark:prose-invert">
+      <p>{{ category()!.description }}</p>
+    </div>
+    }
+  </div>
+  
+  <div class="mt-8">
+    <ts-stat-group title="Statistics">
+      <ts-stat
+        class="overflow-hidden rounded-lg shadow"
+        title="Total Journeys"
+        icon="plane-departure"
+        [value]="category()!.journeysCount"
+      />
+    </ts-stat-group>
+  
+    <div class="mt-8">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">Journeys</h3>
+  
+      @if(!category()!.journeys || category()!.journeys.length === 0) {
+      <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+        No journeys found in this category.
+      </div>
+      } @else {
+      <ul class="divide-y divide-gray-200 dark:divide-gray-800" role="list">
+        @for (journey of category()!.journeys; track journey.id) {
+        <li class="py-4">
+          <div class="flex items-center space-x-4">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <a class="hover:underline" [routerLink]="['/journeys', journey.id]">
+                  {{ journey.name }}
+                </a>
+              </p>
+              @if (journey.description) {
+              <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                {{ journey.description }}
+              </p>
+              }
+              <div class="flex items-center mt-1">
+                @if (journey.startDate) {
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ journey.startDate | date:'mediumDate' }} @if (journey.endDate) {
+                  <span> - {{ journey.endDate | date:'mediumDate' }}</span>
+                  }
+                </span>
+                }
+              </div>
+            </div>
+            <div>
+              <ts-button
+                label="View"
+                variant="secondary"
+                size="sm"
+                [routerLink]="['/journeys', journey.id]"
+              />
+            </div>
+          </div>
+        </li>
+        }
+      </ul>
+      }
+    </div>
+  </div>
+  }

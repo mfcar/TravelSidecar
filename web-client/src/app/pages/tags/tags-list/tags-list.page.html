@@ -93,7 +93,7 @@
 }
 
 <!-- ─── CUSTOM TEMPLATE DEFINITIONS FOR TABLE CELLS ────────────────────────── -->
-<ng-template #nameCell let-item>
+<ng-template #nameAtCell let-item>
   <a [routerLink]="['/tags', item.id]" class="text-sky-600 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300">
     {{ item.name }}
   </a>

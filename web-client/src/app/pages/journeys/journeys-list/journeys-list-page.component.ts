@@ -15,6 +15,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { debounceTime, Subject, take } from 'rxjs';
 import { TagBadgeComponent } from '../../../components/badges/tag-badge/tag-badge.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
@@ -56,6 +57,7 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     TagBadgeComponent,
     StickyListToolsComponent,
     PaginationComponent,
+    RouterLink,
   ],
   providers: [DatePipe],
   templateUrl: './journeys-list-page.component.html',
@@ -112,10 +114,12 @@ export class JourneysListPage implements OnInit, OnDestroy {
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<any>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<any>>('lastModifiedAtCell');
-  tagsCell = viewChild<TemplateRef<any>>('tagsCell');
-  tagsStackCell = viewChild<TemplateRef<any>>('tagsStackCell');
+  createdAtCell = viewChild<TemplateRef<Journey>>('createdAtCell');
+  lastModifiedAtCell = viewChild<TemplateRef<Journey>>('lastModifiedAtCell');
+  tagsAtCell = viewChild<TemplateRef<Journey>>('tagsAtCell');
+  tagsAtStackCell = viewChild<TemplateRef<Journey>>('tagsAtStackCell');
+  categoryAtCell = viewChild<TemplateRef<any>>('categoryAtCell');
+  categoryAtStackCell = viewChild<TemplateRef<any>>('categoryAtStackCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -148,8 +152,14 @@ export class JourneysListPage implements OnInit, OnDestroy {
     this.columns = [
       { key: 'name', header: 'Name' },
       { key: 'description', header: 'Description', sortable: false },
-      { key: 'categoryName', header: 'Category', sortable: false },
-      { key: 'tags', header: 'Tags', sortable: false, cellTemplate: this.tagsCell() },
+      {
+        key: 'categoryName',
+        header: 'Category',
+        sortable: false,
+        cellTemplate: this.categoryAtCell(),
+        stackLabelTemplate: this.categoryAtStackCell(),
+      },
+      { key: 'tags', header: 'Tags', sortable: false, cellTemplate: this.tagsAtCell() },
       { key: 'createdAt', header: 'Created At', cellTemplate: this.createdAtCell() },
       {
         key: 'lastModifiedAt',

@@ -122,7 +122,7 @@ export class TagsListPage implements OnInit, OnDestroy {
   createdAtCell = viewChild<TemplateRef<TagResponse>>('createdAtCell');
   lastModifiedAtCell = viewChild<TemplateRef<TagResponse>>('lastModifiedAtCell');
   colorAtCell = viewChild<TemplateRef<TagResponse>>('colorAtCell');
-  nameCell = viewChild<TemplateRef<TagResponse>>('nameCell');
+  nameAtCell = viewChild<TemplateRef<TagResponse>>('nameAtCell');
   journeysCountAtStackCell = viewChild<TemplateRef<TagResponse>>('journeysCountAtStackCell');
   bucketListItemCountAtStackCell = viewChild<TemplateRef<TagResponse>>(
     'bucketListItemCountAtStackCell',
@@ -160,7 +160,7 @@ export class TagsListPage implements OnInit, OnDestroy {
       {
         key: 'name',
         header: 'Name',
-        cellTemplate: this.nameCell(),
+        cellTemplate: this.nameAtCell(),
       },
       { key: 'color', header: 'Color', cellTemplate: this.colorAtCell() },
       {

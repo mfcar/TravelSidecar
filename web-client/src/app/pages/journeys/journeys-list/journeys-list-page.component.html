@@ -101,7 +101,7 @@
 
 <ng-template #lastModifiedAtStackCell let-item><span>Last modified at {{ item.lastModifiedAt | userDateFormat }}</span></ng-template>
 
-<ng-template #tagsCell let-item>
+<ng-template #tagsAtCell let-item>
   <div class="flex flex-wrap gap-1">
     @for (tag of item.tags; track tag.id) {
       <ts-tag-badge [label]="tag.name" [color]="tag.color!" [clickable]="true" [tagId]="tag.id" />
@@ -109,10 +109,29 @@
   </div>
 </ng-template>
 
-<ng-template #tagsStackCell let-item>
+<ng-template #tagsAtStackCell let-item>
   <div class="flex flex-wrap gap-1 mt-1">
     @for (tag of item.tags; track tag.id) {
       <ts-tag-badge [label]="tag.name" [color]="tag.color!" [clickable]="true" [tagId]="tag.id" />
+    }
+  </div>
+</ng-template>
+
+<ng-template #categoryAtCell let-item>
+  @if (item.categoryId) {
+    <a [routerLink]="['/journey-categories', item.categoryId]" class="text-sky-600 dark:text-sky-400 hover:underline">
+      {{ item.categoryName }}
+    </a>
+  }
+</ng-template>
+
+<ng-template #categoryAtStackCell let-item>
+  <div class="flex items-center">
+    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mr-2">Category:</span>
+    @if (item.categoryId) {
+      <a [routerLink]="['/journey-categories', item.categoryId]" class="text-sky-600 dark:text-sky-400 hover:underline">
+        {{ item.categoryName }}
+      </a>
     }
   </div>
 </ng-template>

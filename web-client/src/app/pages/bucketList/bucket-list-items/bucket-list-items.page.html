@@ -94,9 +94,9 @@
 <!-- ─── CUSTOM TEMPLATE DEFINITIONS FOR TABLE CELLS ────────────────────────── -->
 <ng-template #createdAtCell let-item><span>{{ item.createdAt | userDateFormat }}</span></ng-template>
 <ng-template #lastModifiedAtCell let-item><span>{{ item.lastModifiedAt | userDateFormat }}</span></ng-template>
-<ng-template #startDateCell let-item><span>{{ item.startDate | userDateFormat:'date' }}</span></ng-template>
-<ng-template #endDateCell let-item><span>{{ item.endDate | userDateFormat:'date' }}</span></ng-template>
-<ng-template #tagsCell let-item>
+<ng-template #startDateAtCell let-item><span>{{ item.startDate | userDateFormat:'date' }}</span></ng-template>
+<ng-template #endDateAtCell let-item><span>{{ item.endDate | userDateFormat:'date' }}</span></ng-template>
+<ng-template #tagsAtCell let-item>
   <div class="flex flex-wrap gap-1">
     @for (tag of item.tags; track tag.id) {
       <ts-tag-badge [label]="tag.name" [color]="tag.color!" [clickable]="true" [tagId]="tag.id" />
@@ -117,19 +117,19 @@
   }
 </ng-template>
 
-<ng-template #startDateStackLabel let-item>
+<ng-template #startDateAtStackLabel let-item>
   @if (item.startDate) {
     <span>Starts on {{ item.startDate | userDateFormat:'date' }}</span>
   }
 </ng-template>
 
-<ng-template #endDateStackLabel let-item>
+<ng-template #endDateAtStackLabel let-item>
   @if (item.endDate) {
     <span>Ends on {{ item.endDate | userDateFormat:'date' }}</span>
   }
 </ng-template>
 
-<ng-template #tagsStackCell let-item>
+<ng-template #tagsAtStackCell let-item>
   <div class="flex flex-wrap gap-1 mt-1">
     @for (tag of item.tags; track tag.id) {
       <ts-tag-badge [label]="tag.name" [color]="tag.color!" [clickable]="true" [tagId]="tag.id" />

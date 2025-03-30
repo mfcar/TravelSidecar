@@ -9,7 +9,7 @@ import { JourneysListPage } from '../pages/journeys/journeys-list/journeys-list-
 export const JOURNEY_ROUTES: Routes = [
   { path: 'journeys', component: JourneysListPage },
   {
-    path: 'journey/:id',
+    path: 'journeys/:id',
     component: JourneyContainer,
     children: [
       { path: 'itinerary', component: JourneyItineraryPage },

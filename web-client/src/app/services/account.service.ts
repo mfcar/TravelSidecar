@@ -87,7 +87,30 @@ export class AccountService {
   }
 
   public getUserInfo(): any {
-    return this.jwtService.getUserInfo();
+    const userInfo = this.jwtService.getUserInfo();
+    if (!userInfo) return null;
+
+    const name =
+      userInfo.name ||
+      userInfo.preferred_username ||
+      userInfo.username ||
+      userInfo['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+      userInfo.email ||
+      userInfo['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
+      userInfo.sub ||
+      'User';
+
+    const email =
+      userInfo.email ||
+      userInfo['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
+      '';
+
+    return {
+      name,
+      email,
+      id: userInfo.sub || '',
+      ...userInfo,
+    };
   }
 
   public isAdmin(): boolean {

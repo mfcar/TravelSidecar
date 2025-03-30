@@ -45,4 +45,10 @@ export class JourneyCategoryService {
       observe: 'response',
     });
   }
+
+  getJourneyCategoryById(id: string): Observable<JourneyCategory> {
+    return this.httpClient.get<JourneyCategory>(`${this.apiUrl}/${id}`, {
+      withCredentials: true,
+    });
+  }
 }

@@ -1,3 +1,5 @@
+import { Journey } from './journeys.model';
+
 export interface JourneyCategory {
   id: string;
   name: string;
@@ -5,6 +7,7 @@ export interface JourneyCategory {
   createdAt: Date;
   lastModifiedAt: Date;
   journeysCount: number;
+  journeys: Journey[];
 }
 
 export interface CreateUpdateJourneyCategoryRequest {

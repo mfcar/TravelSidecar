@@ -15,6 +15,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { Subject, debounceTime, take } from 'rxjs';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import { ListFilterTextInputComponent } from '../../../components/forms/list-filter-text-input/list-filter-text-input.component';
@@ -57,12 +58,13 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     StackListViewMode,
     StickyListToolsComponent,
     PaginationComponent,
+    RouterLink,
   ],
   providers: [DatePipe],
-  templateUrl: './journeys-categories-list-page.component.html',
+  templateUrl: './journey-categories-list-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class JourneysCategoriesListPage implements OnInit, OnDestroy {
+export class JourneyCategoriesListPage implements OnInit, OnDestroy {
   // ─── Services ────────────────────────────────────────────────────────────────
   private journeyCategoryService = inject(JourneyCategoryService);
   private userPrefService = inject(UserPreferencesService);
@@ -116,9 +118,10 @@ export class JourneysCategoriesListPage implements OnInit, OnDestroy {
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<any>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<any>>('lastModifiedAtCell');
-  journeysCountStackCell = viewChild<TemplateRef<any>>('journeysCountStackCell');
+  createdAtCell = viewChild<TemplateRef<JourneyCategory>>('createdAtCell');
+  lastModifiedAtCell = viewChild<TemplateRef<JourneyCategory>>('lastModifiedAtCell');
+  journeysCountAtStackCell = viewChild<TemplateRef<JourneyCategory>>('journeysCountAtStackCell');
+  nameAtCell = viewChild<TemplateRef<JourneyCategory>>('nameAtCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -149,12 +152,12 @@ export class JourneysCategoriesListPage implements OnInit, OnDestroy {
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────
   ngOnInit(): void {
     this.columns = [
-      { key: 'name', header: 'Name' },
+      { key: 'name', header: 'Name', cellTemplate: this.nameAtCell() },
       { key: 'description', header: 'Description', sortable: false },
       {
         key: 'journeysCount',
         header: 'Journey Count',
-        cellTemplate: this.journeysCountStackCell(),
+        cellTemplate: this.journeysCountAtStackCell(),
       },
       { key: 'createdAt', header: 'Created At', cellTemplate: this.createdAtCell() },
       {

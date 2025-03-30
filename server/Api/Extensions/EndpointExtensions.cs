@@ -90,6 +90,7 @@ public static class EndpointExtensions
         journeyCategoryEndpoints.MapGet("/", JourneyCategoryEndpoints.ListAllJourneyCategoriesAsync);
         journeyCategoryEndpoints.MapPost("/", JourneyCategoryEndpoints.CreateJourneyCategoryAsync);
         journeyCategoryEndpoints.MapPut("/{journeyCategoryId:guid}", JourneyCategoryEndpoints.UpdateJourneyCategoryAsync);
+        journeyCategoryEndpoints.MapGet("/{journeyCategoryId:guid}", JourneyCategoryEndpoints.GetJourneyCategoryByIdAsync);
 
         var settingsEndpoints = apiGroup.MapGroup(Routes.ApplicationSettings.Base)
             .WithTags("Settings")
