@@ -11,23 +11,30 @@
     let first = $first;
     let last = $last
   ) {
-    <button
-      class="relative inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-900 dark:bg-white/10 dark:text-white outline-1 -outline-offset-1 dark:outline-0 outline-gray-300 hover:bg-gray-50 dark:hover:bg-white/20 focus:z-10"
-      type="button"
-      (click)="onViewModeChange(mode)"
-      [attr.aria-pressed]="mode === selectedViewMode()"
-      [attr.aria-label]="getAriaLabel(mode)" i18n-aria-label="@@viewModeButtonLabel"
-      [ngClass]="{
-        'rounded-md': orderedViewModes.length === 1,
-        'rounded-l-md': orderedViewModes.length > 1 && first,
-        'rounded-r-md': orderedViewModes.length > 1 && last,
-        '-ml-px': i > 0,
-        'text-sky-600 dark:text-sky-500': mode === selectedViewMode(),
-        'text-gray-900 dark:text-white': mode !== selectedViewMode(),
-      }"
-    >
-      <fa-icon [icon]="['fas', MODE_MAPPING[mode].icon]" aria-hidden="true" [fixedWidth]="true" />
-      <span class="sr-only">{{ getLocalizedLabel(mode) }}</span>
-    </button>
+    <div class="relative group">
+      <button
+        class="relative inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-900 dark:bg-white/10 dark:text-white outline-1 -outline-offset-1 dark:outline-0 outline-gray-300 hover:bg-gray-50 dark:hover:bg-white/20 focus:z-10"
+        type="button"
+        (click)="onViewModeChange(mode)"
+        [attr.aria-pressed]="mode === selectedViewMode()"
+        [attr.aria-label]="getAriaLabel(mode)" i18n-aria-label="@@viewModeButtonLabel"
+        [ngClass]="{
+          'rounded-md': orderedViewModes.length === 1,
+          'rounded-l-md': orderedViewModes.length > 1 && first,
+          'rounded-r-md': orderedViewModes.length > 1 && last,
+          '-ml-px': i > 0,
+          'text-sky-600 dark:text-sky-500': mode === selectedViewMode(),
+          'text-gray-900 dark:text-white': mode !== selectedViewMode(),
+        }"
+      >
+        <fa-icon [icon]="['fas', MODE_MAPPING[mode].icon]" aria-hidden="true" [fixedWidth]="true" />
+        <span class="sr-only">{{ getLocalizedLabel(mode) }}</span>
+      </button>
+      
+      <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity pointer-events-none">
+        {{ getLocalizedLabel(mode) }}
+        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-2 border-4 border-x-transparent border-b-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+      </div>
+    </div>
   }
 </span>

@@ -4,7 +4,6 @@
   <!-- View Mode Toggle -->
   <span class="sm:mx-1" page-header-button>
     <ts-view-mode-toogle
-      [viewModes]="[ListViewMode.Stack, ListViewMode.Table]"
       [selectedViewMode]="selectedViewMode()"
       (viewModeChange)="onViewModeChange($event)"
     />
@@ -89,6 +88,16 @@
       [selectedFields]="selectedFields()"
       (editButtonClicked)="showUpdateModal($event)"
       (deleteButtonClicked)="showDeleteModal()"
+      [hasImage]="true"
+      placeholderImage="/images/placeholders/JourneyPlaceholder.png"
+  />
+} @else if (selectedViewMode() === ListViewMode.Grid && displayedItems().length > 0) {
+  <ts-grid-list
+      [items]="displayedItems()"
+      [columns]="columns"
+      [selectedFields]="selectedFields()"
+      (editButtonClicked)="showUpdateModal($event)"
+      placeholderImage="/images/placeholders/JourneyPlaceholder.png"
   />
 }
 
@@ -126,12 +135,24 @@
 </ng-template>
 
 <ng-template #categoryAtStackCell let-item>
-  <div class="flex items-center">
-    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mr-2">Category:</span>
-    @if (item.categoryId) {
+  @if (item.categoryId && item.categoryName) {
+    <div class="flex items-center">
+      <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mr-2">Category:</span>
       <a [routerLink]="['/journey-categories', item.categoryId]" class="text-sky-600 dark:text-sky-400 hover:underline">
         {{ item.categoryName }}
       </a>
-    }
-  </div>
+    </div>
+  }
+</ng-template>
+
+<ng-template #nameCell let-item>
+  <a [routerLink]="['/journeys', item.id]" class="text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 font-medium">
+    {{ item.name }}
+  </a>
+</ng-template>
+
+<ng-template #nameStackCell let-item>
+  <a [routerLink]="['/journeys', item.id]" class="text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 font-medium">
+    {{ item.name }}
+  </a>
 </ng-template>

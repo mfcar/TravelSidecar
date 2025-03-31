@@ -28,6 +28,7 @@ import { ViewModeToogleComponent } from '../../../components/tools/view-mode-too
 import { EmptyContentComponent } from '../../../components/ui/empty-content/empty-content.component';
 import { PageHeaderComponent } from '../../../components/ui/page-header/page-header.component';
 import { PaginationComponent } from '../../../components/ui/pagination/pagination.component';
+import { GridListViewMode } from '../../../components/viewModes/grid-list/grid-list.view-mode';
 import { StackListViewMode } from '../../../components/viewModes/stack-list/stack-list.view-mode';
 import {
   ColumnConfig,
@@ -58,6 +59,7 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     StickyListToolsComponent,
     PaginationComponent,
     RouterLink,
+    GridListViewMode,
   ],
   providers: [DatePipe],
   templateUrl: './journeys-list-page.component.html',
@@ -118,8 +120,10 @@ export class JourneysListPage implements OnInit, OnDestroy {
   lastModifiedAtCell = viewChild<TemplateRef<Journey>>('lastModifiedAtCell');
   tagsAtCell = viewChild<TemplateRef<Journey>>('tagsAtCell');
   tagsAtStackCell = viewChild<TemplateRef<Journey>>('tagsAtStackCell');
-  categoryAtCell = viewChild<TemplateRef<any>>('categoryAtCell');
-  categoryAtStackCell = viewChild<TemplateRef<any>>('categoryAtStackCell');
+  categoryAtCell = viewChild<TemplateRef<Journey>>('categoryAtCell');
+  categoryAtStackCell = viewChild<TemplateRef<Journey>>('categoryAtStackCell');
+  nameCell = viewChild<TemplateRef<Journey>>('nameCell');
+  nameStackCell = viewChild<TemplateRef<Journey>>('nameStackCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -150,7 +154,12 @@ export class JourneysListPage implements OnInit, OnDestroy {
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────
   ngOnInit(): void {
     this.columns = [
-      { key: 'name', header: 'Name' },
+      {
+        key: 'name',
+        header: 'Name',
+        cellTemplate: this.nameCell(),
+        stackLabelTemplate: this.nameStackCell(),
+      },
       { key: 'description', header: 'Description', sortable: false },
       {
         key: 'categoryName',
@@ -158,6 +167,7 @@ export class JourneysListPage implements OnInit, OnDestroy {
         sortable: false,
         cellTemplate: this.categoryAtCell(),
         stackLabelTemplate: this.categoryAtStackCell(),
+        gridLabelTemplate: this.categoryAtStackCell(),
       },
       { key: 'tags', header: 'Tags', sortable: false, cellTemplate: this.tagsAtCell() },
       { key: 'createdAt', header: 'Created At', cellTemplate: this.createdAtCell() },

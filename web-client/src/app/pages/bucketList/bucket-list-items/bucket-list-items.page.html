@@ -88,6 +88,8 @@
       [selectedFields]="selectedFields()"
       (editButtonClicked)="showUpdateModal($event)"
       (deleteButtonClicked)="showDeleteModal()"
+      [hasImage]="true"
+      placeholderImage="/images/placeholders/BucketListItemPlaceholder.png"
   />
 } @else if (selectedViewMode() === ListViewMode.Grid && displayedItems().length > 0) {
   <ts-grid-list
@@ -95,6 +97,7 @@
       [columns]="columns"
       [selectedFields]="selectedFields()"
       (editButtonClicked)="showUpdateModal($event)"
+      placeholderImage="/images/placeholders/BucketListItemPlaceholder.png"
   />
 }
 

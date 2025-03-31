@@ -1,11 +1,12 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output, TemplateRef } from '@angular/core';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ButtonComponent } from '../../buttons/button/button.component';
 import { ColumnConfig } from '../table-list/table-list.view-mode';
 
 @Component({
   selector: 'ts-stack-list',
-  imports: [CommonModule, ButtonComponent],
+  imports: [CommonModule, ButtonComponent, NgOptimizedImage, FontAwesomeModule],
   templateUrl: './stack-list.view-mode.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -13,6 +14,8 @@ export class StackListViewMode<T extends Record<string, any>> {
   items = input<T[]>([]);
   columns = input<ColumnConfig<T>[]>([]);
   selectedFields = input.required<Set<string>>();
+  hasImage = input<boolean>(false);
+  placeholderImage = input<string | undefined | null>(null);
 
   editButtonClicked = output<T>();
   deleteButtonClicked = output<T>();
@@ -37,5 +40,9 @@ export class StackListViewMode<T extends Record<string, any>> {
       }
     }
     return undefined;
+  }
+
+  hasValue(item: T, key: string): boolean {
+    return item[key] !== null && item[key] !== undefined && item[key] !== '';
   }
 }
