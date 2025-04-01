@@ -100,7 +100,7 @@ export class CreateUpdateJourneyModal implements OnInit {
       if (this.isUpdateMode && this.journey) {
         this.journeyService.updateJourney(this.journey.id, request).subscribe({
           next: (response) => {
-            this.dialogRef.close(response);
+            this.dialogRef.close(true);
             this.toastsService.show({
               message: 'Journey updated successfully',
               type: ToastType.SUCCESS,

@@ -39,6 +39,7 @@ public static class EndpointExtensions
             .RequireRateLimiting(RateLimitExtensions.DefaultPolicy);
         bucketListItemEndpoints.MapPost("/filter", BucketListItemEndpoints.FilterBucketListItemsAsync);
         bucketListItemEndpoints.MapPost("/", BucketListItemEndpoints.CreateBucketListItemAsync);
+        bucketListItemEndpoints.MapPut("/{bucketListItemId:guid}", BucketListItemEndpoints.UpdateBucketListItemAsync);
         
         var currencyEndpoints = apiGroup.MapGroup(Routes.Currency.Base)
             .WithTags("Currencies")

@@ -256,7 +256,11 @@ export class CreateUpdateBucketListItemComponent implements OnInit {
       type: ToastType.SUCCESS,
     });
     this.isLoading.set(false);
-    this.dialogRef.close(bucketListItem);
+    if (this.isUpdateMode) {
+      this.dialogRef.close(true);
+    } else {
+      this.dialogRef.close(bucketListItem);
+    }
   }
 
   private handleError(error: any): void {
