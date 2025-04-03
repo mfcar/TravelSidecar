@@ -4,12 +4,12 @@ import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@a
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
+import { PageHeaderComponent } from '../../../components/headers/page-header/page-header.component';
 import { CreateUpdateJourneyCategoryModal } from '../../../components/modals/journeyCategories/create-update-journey-category/create-update-journey-category-modal.component';
 import { StatGroupComponent } from '../../../components/stats/stat-group/stat-group.component';
 import { StatComponent } from '../../../components/stats/stat/stat.component';
 import { AlertComponent } from '../../../components/ui/alert/alert.component';
 import { LoadingIndicatorComponent } from '../../../components/ui/loading-indicator/loading-indicator.component';
-import { PageHeaderComponent } from '../../../components/ui/page-header/page-header.component';
 import { JourneyCategoryService } from '../../../services/journey-category.service';
 
 @Component({

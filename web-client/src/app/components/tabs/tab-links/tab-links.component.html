@@ -1,0 +1,36 @@
+<div>
+    <div class="sm:hidden">
+      <label [attr.for]="'tabs-' + uniqueId" class="sr-only">{{ ariaLabel() }}</label>
+      <select 
+        [id]="'tabs-' + uniqueId" 
+        name="tabs" 
+        class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-sky-500 dark:focus:border-sky-400 focus:ring-sky-500 dark:focus:ring-sky-400"
+        (change)="onSelectChange($event)"
+      >
+        @for (tab of tabs(); track tab.route; let i = $index) {
+          <option [selected]="i === selectedTabIndex()">{{ tab.label }}</option>
+        }
+      </select>
+    </div>
+    
+    <div class="hidden sm:block">
+      <div class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="-mb-px flex" [attr.aria-label]="ariaLabel()">
+          @for (tab of tabs(); track tab.route) {
+            <a 
+              [routerLink]="tab.route" 
+              routerLinkActive="border-sky-500 text-sky-600 dark:text-sky-400"
+              [routerLinkActiveOptions]="{ exact: tab.exact ?? false }"
+              [class]="equalWidth() ? 'flex-1' : ''"
+              class="border-b-2 border-transparent px-1 py-4 text-center text-sm font-medium text-gray-500 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
+              role="tab"
+              [attr.aria-selected]="routerLinkActive.isActive"
+              #routerLinkActive="routerLinkActive"
+            >
+              {{ tab.label }}
+            </a>
+          }
+        </nav>
+      </div>
+    </div>
+  </div>

@@ -20,13 +20,13 @@ import { debounceTime, Subject, take } from 'rxjs';
 import { TagBadgeComponent } from '../../../components/badges/tag-badge/tag-badge.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import { ListFilterTextInputComponent } from '../../../components/forms/list-filter-text-input/list-filter-text-input.component';
+import { PageHeaderComponent } from '../../../components/headers/page-header/page-header.component';
 import { CreateUpdateTagModal } from '../../../components/modals/tags/create-update-tag/create-update-tag.modal';
 import { FieldDisplaySelectorComponent } from '../../../components/tools/field-display-selector/field-display-selector.component';
 import { SortOptionsComponent } from '../../../components/tools/sort-options/sort-options.component';
 import { StickyListToolsComponent } from '../../../components/tools/sticky-list-tools/sticky-list-tools.component';
 import { ViewModeToogleComponent } from '../../../components/tools/view-mode-toogle/view-mode-toogle.component';
 import { EmptyContentComponent } from '../../../components/ui/empty-content/empty-content.component';
-import { PageHeaderComponent } from '../../../components/ui/page-header/page-header.component';
 import { PaginationComponent } from '../../../components/ui/pagination/pagination.component';
 import { StackListViewMode } from '../../../components/viewModes/stack-list/stack-list.view-mode';
 import {

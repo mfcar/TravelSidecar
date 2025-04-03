@@ -1,0 +1,159 @@
+
+<!-- ─── PAGE HEADER & ACTIONS ────────────────────────────────────────────── -->
+<ts-page-header title="Journeys">
+    <!-- View Mode Toggle -->
+    <span class="sm:mx-1" page-header-button>
+      <ts-view-mode-toogle
+        [selectedViewMode]="selectedViewMode()"
+        (viewModeChange)="onViewModeChange($event)"
+      />
+    </span>
+  
+    <!-- Field Display Selector -->
+    <span class="sm:mx-1" page-header-button>
+      <ts-field-display-selector
+        [options]="fieldOptions"
+        [selectedFields]="selectedFields()"
+        (fieldSelectionChange)="onFieldSelectionChange($event)"
+      />
+    </span>
+  
+    <!-- Sort Options -->
+    <span class="sm:mx-1" page-header-button>
+      <ts-sort-options
+        [sortFields]="sortFields"
+        [selectedSortBy]="selectedSortBy()"
+        [selectedSortOrder]="selectedSortOrder()"
+        (sortChange)="onSortChange($event)"
+      />
+    </span>
+  
+    <!-- Create Button -->
+    <span class="sm:mx-1" page-header-button>
+      <ts-button
+        label="Create Journey"
+        size="lg"
+        icon="plus"
+        variant="primary"
+        (buttonAction)="showCreateModal()"
+      />
+    </span>
+  </ts-page-header>
+  <!-- ─── FILTER & PAGINATION ────────────────────────────────────────────────── -->
+  <ts-sticky-list-tools>
+    <ts-list-filter-text-input
+      placeholder="Search by journey name"
+      [autocomplete]="false"
+      (filterValueChange)="onFilterInputChange($event)"
+      [filterValue]="searchTerm()"
+    />
+  
+    <ts-pagination
+      [totalItems]="totalCount()"
+      [currentPage]="currentPage()"
+      [itemsPerPage]="pageSize()"
+      [isLoading]="isLoading()"
+      [isFiltered]="activeFilters()"
+      (pageChange)="onPageChange($event)"
+      (resetFilter)="resetFilters()"
+    />
+  </ts-sticky-list-tools>
+  
+  <!-- ─── NO ITEMS STATE ─────────────────────────────────────────────────────── -->
+  @if (!isLoading() && itemsCount() === 0 && !activeFilters()) {
+  <ts-empty-content
+    icon="plane-departure"
+    title="No journeys found"
+    subtitle="Ready to explore? Add a journey and let your adventure begin!"
+    buttonLabel="Create Journey"
+    (newItemButtonAction)="showCreateModal()"
+  />
+  }
+  
+  <!-- ─── VIEW MODE DISPLAY ───────────────────────────────────────────────────── -->
+  @if (selectedViewMode() === ListViewMode.Table && displayedItems().length > 0) {
+    <ts-table-list
+      [items]="displayedItems()"
+      [columns]="columns"
+      [selectedFields]="selectedFields()"
+      [sortBy]="selectedSortBy()"
+      [sortDirection]="selectedSortOrder()"
+      (sortChanged)="onSortChange($event)"
+      (editButtonClicked)="showUpdateModal($event)"
+    />
+  } @else if (selectedViewMode() === ListViewMode.Stack && displayedItems().length > 0) {
+    <ts-stack-list
+        [items]="displayedItems()"
+        [columns]="columns"
+        [selectedFields]="selectedFields()"
+        (editButtonClicked)="showUpdateModal($event)"
+        (deleteButtonClicked)="showDeleteModal()"
+        [hasImage]="true"
+        placeholderImage="/images/placeholders/JourneyPlaceholder.png"
+    />
+  } @else if (selectedViewMode() === ListViewMode.Grid && displayedItems().length > 0) {
+    <ts-grid-list
+        [items]="displayedItems()"
+        [columns]="columns"
+        [selectedFields]="selectedFields()"
+        (editButtonClicked)="showUpdateModal($event)"
+        [hasImage]="true"
+        placeholderImage="/images/placeholders/JourneyPlaceholder.png"
+    />
+  }
+  
+  <!-- ─── CUSTOM TEMPLATE DEFINITIONS FOR TABLE CELLS ────────────────────────── -->
+  <ng-template #createdAtCell let-item><span>{{ item.createdAt | userDateFormat }}</span></ng-template>
+  
+  <ng-template #lastModifiedAtCell let-item><span>{{ item.lastModifiedAt | userDateFormat }}</span></ng-template>
+  
+  <ng-template #createdAtStackCell let-item><span>Created at {{ item.createdAt | userDateFormat }}</span></ng-template>
+  
+  <ng-template #lastModifiedAtStackCell let-item><span>Last modified at {{ item.lastModifiedAt | userDateFormat }}</span></ng-template>
+  
+  <ng-template #tagsAtCell let-item>
+    <div class="flex flex-wrap gap-1">
+      @for (tag of item.tags; track tag.id) {
+        <ts-tag-badge [label]="tag.name" [color]="tag.color!" [clickable]="true" [tagId]="tag.id" />
+      }
+    </div>
+  </ng-template>
+  
+  <ng-template #tagsAtStackCell let-item>
+    <div class="flex flex-wrap gap-1 mt-1">
+      @for (tag of item.tags; track tag.id) {
+        <ts-tag-badge [label]="tag.name" [color]="tag.color!" [clickable]="true" [tagId]="tag.id" />
+      }
+    </div>
+  </ng-template>
+  
+  <ng-template #categoryAtCell let-item>
+    @if (item.categoryId) {
+      <a [routerLink]="['/journey-categories', item.categoryId]" class="text-sky-600 dark:text-sky-400 hover:underline">
+        {{ item.categoryName }}
+      </a>
+    }
+  </ng-template>
+  
+  <ng-template #categoryAtStackCell let-item>
+    @if (item.categoryId && item.categoryName) {
+      <div class="flex items-center">
+        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mr-2">Category:</span>
+        <a [routerLink]="['/journey-categories', item.categoryId]" class="text-sky-600 dark:text-sky-400 hover:underline">
+          {{ item.categoryName }}
+        </a>
+      </div>
+    }
+  </ng-template>
+  
+  <ng-template #nameCell let-item>
+    <a [routerLink]="['/journeys', item.id]" class="text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 font-medium">
+      {{ item.name }}
+    </a>
+  </ng-template>
+  
+  <ng-template #nameStackCell let-item>
+    <a [routerLink]="['/journeys', item.id]" class="text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 font-medium">
+      {{ item.name }}
+    </a>
+  </ng-template>

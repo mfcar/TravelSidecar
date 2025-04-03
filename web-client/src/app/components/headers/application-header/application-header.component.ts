@@ -24,7 +24,7 @@ import { ThemeService } from '../../../services/theme.service';
 import { PreferenceKeys, UserPreferencesService } from '../../../services/user-preferences.service';
 import { STANDARD_DROPDOWN_POSITIONS } from '../../../shared/constants/overlay-positions';
 import { AvatarComponent } from '../../avatars/avatar/avatar.component';
-import { GlobalSearchComponent } from '../global-search/global-search.component';
+import { GlobalSearchComponent } from '../../ui/global-search/global-search.component';
 
 @Component({
   selector: 'ts-application-header',

@@ -3,7 +3,7 @@ import { AccountSettingsPage } from '../pages/account/account-settings/account-s
 import { ApplicationVersionsPage } from '../pages/application/application-versions/application-versions.page';
 import { BucketListItemsPage } from '../pages/bucketList/bucket-list-items/bucket-list-items.page';
 import { DashboardPage } from '../pages/dashboard/dashboard.page';
-import { JourneyCategoriesListPage } from '../pages/journeyCategories/journey-categories-list/journey-categories-list-page.component';
+import { JourneyCategoriesListPage } from '../pages/journeyCategories/journey-categories-list/journey-categories-list.page';
 import { JourneyCategoryDetailPage } from '../pages/journeyCategories/journey-category-detail/journey-category-detail.page';
 import { TagDetailsPage } from '../pages/tags/tag-details/tag-details.page';
 import { TagsListPage } from '../pages/tags/tags-list/tags-list.page';

@@ -1,1 +1,33 @@
-<p>journey works!</p>
+@if (isLoading()) {
+  <div class="flex justify-center items-center py-12">
+    <div class="animate-pulse text-center">
+      <p class="text-gray-500 dark:text-gray-400">Loading journey...</p>
+    </div>
+  </div>
+} @else if (journey()) {
+  <ts-journey-header
+    [journey]="journey()"
+    (editJourney)="onEditJourney()"
+    (addActivity)="onAddActivity()"
+  />
+
+  <ts-sticky-list-tools [showBorder]="false">
+    <ts-tab-links [tabs]="journeyTabs()" ariaLabel="Journey navigation" />
+  </ts-sticky-list-tools>
+
+  <div class="mt-6">
+    <router-outlet />
+  </div>
+} @else {
+  <div class="flex justify-center items-center py-12">
+    <div class="text-center">
+      <p class="text-gray-500 dark:text-gray-400">Journey not found</p>
+      <a
+        class="mt-4 inline-block text-sky-600 dark:text-sky-400 hover:underline"
+        routerLink="/journeys"
+      >
+        Return to journeys list
+      </a>
+    </div>
+  </div>
+}

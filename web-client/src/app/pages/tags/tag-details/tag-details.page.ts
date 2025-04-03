@@ -5,12 +5,12 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TagBadgeComponent } from '../../../components/badges/tag-badge/tag-badge.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
+import { PageHeaderComponent } from '../../../components/headers/page-header/page-header.component';
 import { CreateUpdateTagModal } from '../../../components/modals/tags/create-update-tag/create-update-tag.modal';
 import { StatGroupComponent } from '../../../components/stats/stat-group/stat-group.component';
 import { StatComponent } from '../../../components/stats/stat/stat.component';
 import { AlertComponent } from '../../../components/ui/alert/alert.component';
 import { LoadingIndicatorComponent } from '../../../components/ui/loading-indicator/loading-indicator.component';
-import { PageHeaderComponent } from '../../../components/ui/page-header/page-header.component';
 import { TagService } from '../../../services/tag.service';
 
 @Component({

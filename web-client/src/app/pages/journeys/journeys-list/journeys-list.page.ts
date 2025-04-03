@@ -3,48 +3,47 @@ import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
-  OnDestroy,
-  OnInit,
-  TemplateRef,
   computed,
+  DestroyRef,
   effect,
   inject,
   linkedSignal,
+  OnDestroy,
+  OnInit,
   signal,
+  TemplateRef,
   viewChild,
 } from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { Subject, debounceTime, take } from 'rxjs';
+import { debounceTime, Subject, take } from 'rxjs';
+import { TagBadgeComponent } from '../../../components/badges/tag-badge/tag-badge.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import { ListFilterTextInputComponent } from '../../../components/forms/list-filter-text-input/list-filter-text-input.component';
-import { CreateUpdateJourneyCategoryModal } from '../../../components/modals/journeyCategories/create-update-journey-category/create-update-journey-category-modal.component';
+import { PageHeaderComponent } from '../../../components/headers/page-header/page-header.component';
+import { CreateUpdateJourneyModal } from '../../../components/modals/journeys/create-update-journey/create-update-journey-modal.component';
 import { FieldDisplaySelectorComponent } from '../../../components/tools/field-display-selector/field-display-selector.component';
 import { SortOptionsComponent } from '../../../components/tools/sort-options/sort-options.component';
 import { StickyListToolsComponent } from '../../../components/tools/sticky-list-tools/sticky-list-tools.component';
 import { ViewModeToogleComponent } from '../../../components/tools/view-mode-toogle/view-mode-toogle.component';
 import { EmptyContentComponent } from '../../../components/ui/empty-content/empty-content.component';
-import { PageHeaderComponent } from '../../../components/ui/page-header/page-header.component';
 import { PaginationComponent } from '../../../components/ui/pagination/pagination.component';
+import { GridListViewMode } from '../../../components/viewModes/grid-list/grid-list.view-mode';
 import { StackListViewMode } from '../../../components/viewModes/stack-list/stack-list.view-mode';
 import {
   ColumnConfig,
   TableListViewMode,
 } from '../../../components/viewModes/table-list/table-list.view-mode';
 import { ListViewMode } from '../../../models/enums/list-view-mode.enum';
-import {
-  JourneyCategory,
-  JourneyCategoryFilterRequest,
-} from '../../../models/journey-categories.model';
+import { Journey, JourneysFilterRequest } from '../../../models/journeys.model';
 import { SortField } from '../../../models/page-options.model';
 import { PaginatedResult } from '../../../models/pagination.model';
-import { JourneyCategoryService } from '../../../services/journey-category.service';
+import { JourneyService } from '../../../services/journey.service';
 import { PreferenceKeys, UserPreferencesService } from '../../../services/user-preferences.service';
 import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe';
 
 @Component({
-  selector: 'ts-journey-categories-list',
+  selector: 'ts-journeys-list',
   imports: [
     PageHeaderComponent,
     EmptyContentComponent,
@@ -56,17 +55,20 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     TableListViewMode,
     UserDateFormatPipe,
     StackListViewMode,
+    TagBadgeComponent,
     StickyListToolsComponent,
     PaginationComponent,
     RouterLink,
+    GridListViewMode,
   ],
   providers: [DatePipe],
-  templateUrl: './journey-categories-list-page.component.html',
+  templateUrl: './journeys-list.page.html',
+  styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class JourneyCategoriesListPage implements OnInit, OnDestroy {
+export class JourneysListPage implements OnInit, OnDestroy {
   // ─── Services ────────────────────────────────────────────────────────────────
-  private journeyCategoryService = inject(JourneyCategoryService);
+  private JourneyService = inject(JourneyService);
   private userPrefService = inject(UserPreferencesService);
   private dialog = inject(Dialog);
   private destroyRef = inject(DestroyRef);
@@ -77,51 +79,52 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
   selectedSortBy = signal<string>('name');
   selectedSortOrder = signal<'asc' | 'desc'>('asc');
   selectedViewMode = signal<ListViewMode>(ListViewMode.Table);
-  selectedFields = signal<Set<string>>(new Set(['name', 'description', 'journeysCount']));
-  displayedItems = signal<JourneyCategory[]>([]);
+  selectedFields = signal<Set<string>>(new Set(['name', 'description', 'categoryName']));
+  displayedItems = signal<Journey[]>([]);
   pageSize = signal<number>(25);
   totalCount = signal<number>(0);
   private filterInput$ = new Subject<string>();
 
   // ─── UI Options & Configurations ──────────────────────────────────────────────
-  userPreferencesKey = PreferenceKeys.PageJourneyCategories;
+  userPreferencesKey = PreferenceKeys.PageJourneys;
 
   fieldOptions = [
     { id: 'name', label: 'Name' },
     { id: 'description', label: 'Description' },
-    { id: 'journeysCount', label: 'Journeys Count' },
+    { id: 'categoryName', label: 'Category' },
+    { id: 'tags', label: 'Tags' },
     { id: 'createdAt', label: 'Created Date' },
     { id: 'lastModifiedAt', label: 'Last Modified Date' },
   ];
 
   sortFields: SortField[] = [
     { field: 'name', name: 'Name', type: 'text' },
-    { field: 'journeysCount', name: 'Journey Count', type: 'number' },
     { field: 'createdAt', name: 'Created Date', type: 'number' },
     { field: 'lastModifiedAt', name: 'Last Modified Date', type: 'number' },
   ];
 
-  columns: ColumnConfig<JourneyCategory>[] = [];
+  columns: ColumnConfig<Journey>[] = [];
 
-  itemsCount = linkedSignal(() => Number(this.categoriesResource.value()?.items?.length || 0));
+  itemsCount = linkedSignal(() => Number(this.journeysResource.value().items.length || 0));
   activeFilters = computed(() => this.searchTerm().trim().length > 0);
-  isLoading = linkedSignal(() => this.categoriesResource.isLoading());
+  isLoading = linkedSignal(() => this.journeysResource.isLoading());
 
   // ─── Data Loading (Resource) ──────────────────────────────────────────────────
-  categoriesResource = rxResource({
-    defaultValue: {
-      items: [] as JourneyCategory[],
-      totalCount: 0,
-    } as PaginatedResult<JourneyCategory>,
+  journeysResource = rxResource({
+    defaultValue: { items: [] as Journey[], totalCount: 0 } as PaginatedResult<Journey>,
     request: () => this.buildFilterRequest(),
-    loader: ({ request }) => this.journeyCategoryService.getJourneyCategories(request),
+    loader: ({ request }) => this.JourneyService.getJourneys(request),
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<JourneyCategory>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<JourneyCategory>>('lastModifiedAtCell');
-  journeysCountAtStackCell = viewChild<TemplateRef<JourneyCategory>>('journeysCountAtStackCell');
-  nameAtCell = viewChild<TemplateRef<JourneyCategory>>('nameAtCell');
+  createdAtCell = viewChild<TemplateRef<Journey>>('createdAtCell');
+  lastModifiedAtCell = viewChild<TemplateRef<Journey>>('lastModifiedAtCell');
+  tagsAtCell = viewChild<TemplateRef<Journey>>('tagsAtCell');
+  tagsAtStackCell = viewChild<TemplateRef<Journey>>('tagsAtStackCell');
+  categoryAtCell = viewChild<TemplateRef<Journey>>('categoryAtCell');
+  categoryAtStackCell = viewChild<TemplateRef<Journey>>('categoryAtStackCell');
+  nameCell = viewChild<TemplateRef<Journey>>('nameCell');
+  nameStackCell = viewChild<TemplateRef<Journey>>('nameStackCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -141,8 +144,8 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
     this.initFilterDebounce();
 
     effect(() => {
-      const resource = this.categoriesResource.value();
-      if (resource && !this.categoriesResource.isLoading()) {
+      const resource = this.journeysResource.value();
+      if (resource && !this.journeysResource.isLoading()) {
         this.displayedItems.set(resource.items || []);
         this.totalCount.set(resource.totalCount || 0);
       }
@@ -152,13 +155,22 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────
   ngOnInit(): void {
     this.columns = [
-      { key: 'name', header: 'Name', cellTemplate: this.nameAtCell() },
+      {
+        key: 'name',
+        header: 'Name',
+        cellTemplate: this.nameCell(),
+        stackLabelTemplate: this.nameStackCell(),
+      },
       { key: 'description', header: 'Description', sortable: false },
       {
-        key: 'journeysCount',
-        header: 'Journey Count',
-        cellTemplate: this.journeysCountAtStackCell(),
+        key: 'categoryName',
+        header: 'Category',
+        sortable: false,
+        cellTemplate: this.categoryAtCell(),
+        stackLabelTemplate: this.categoryAtStackCell(),
+        gridLabelTemplate: this.categoryAtStackCell(),
       },
+      { key: 'tags', header: 'Tags', sortable: false, cellTemplate: this.tagsAtCell() },
       { key: 'createdAt', header: 'Created At', cellTemplate: this.createdAtCell() },
       {
         key: 'lastModifiedAt',
@@ -181,11 +193,11 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
   private initFilterDebounce(): void {
     this.filterInput$.pipe(debounceTime(400)).subscribe((term: string) => {
       this.searchTerm.set(term);
-      this.categoriesResource.reload();
+      this.journeysResource.reload();
     });
   }
 
-  private buildFilterRequest(): JourneyCategoryFilterRequest {
+  private buildFilterRequest(): JourneysFilterRequest {
     return {
       page: this.currentPage(),
       pageSize: this.pageSize(),
@@ -214,7 +226,7 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
       sortBy: event.sortBy,
       sortOrder: sortDirection,
     });
-    this.categoriesResource.reload();
+    this.journeysResource.reload();
   }
 
   onViewModeChange(mode: ListViewMode): void {
@@ -231,40 +243,40 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     this.currentPage.set(page);
-    this.categoriesResource.reload();
+    this.journeysResource.reload();
   }
 
   showCreateModal(): void {
-    const dialogRef = this.dialog.open(CreateUpdateJourneyCategoryModal, {
+    const dialogRef = this.dialog.open(CreateUpdateJourneyModal, {
       data: {},
     });
 
     dialogRef.closed.subscribe((result) => {
       if (result) {
-        this.categoriesResource.reload();
+        this.journeysResource.reload();
       }
     });
   }
 
-  showUpdateModal(category: JourneyCategory): void {
-    const dialogRef = this.dialog.open(CreateUpdateJourneyCategoryModal, {
-      data: { journeyCategory: category },
+  showUpdateModal(journey: Journey): void {
+    const dialogRef = this.dialog.open(CreateUpdateJourneyModal, {
+      data: { journey: journey },
     });
 
     dialogRef.closed.subscribe((result) => {
       if (result) {
-        this.categoriesResource.reload();
+        this.journeysResource.reload();
       }
     });
   }
 
   showDeleteModal(): void {
-    console.log('Delete journey category');
+    console.log('Delete journey');
   }
 
   resetFilters(): void {
     this.searchTerm.set('');
-    this.categoriesResource.reload();
+    this.journeysResource.reload();
   }
 
   // ─── Expose Enums to the Template ──────────────────────────────────────────────

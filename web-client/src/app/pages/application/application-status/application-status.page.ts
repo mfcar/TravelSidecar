@@ -8,7 +8,7 @@ import {
   ResourceStatus,
 } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { PageHeaderComponent } from '../../../components/ui/page-header/page-header.component';
+import { PageHeaderComponent } from '../../../components/headers/page-header/page-header.component';
 import { SystemInfoService } from '../../../services/system-info.service';
 import { UptimePipe } from '../../../shared/pipes/uptime.pipe';
 import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe';

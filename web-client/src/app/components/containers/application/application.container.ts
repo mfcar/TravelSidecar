@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, HostListener, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ApplicationHeaderComponent } from '../../ui/application-header/application-header.component';
+import { ApplicationHeaderComponent } from '../../headers/application-header/application-header.component';
 import { ApplicationSidebarComponent } from '../../ui/application-sidebar/application-sidebar.component';
 
 @Component({

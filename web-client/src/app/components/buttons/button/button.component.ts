@@ -14,7 +14,10 @@ import { LoadingIndicatorComponent } from '../../ui/loading-indicator/loading-in
       [attr.aria-label]="ariaLabel() || null"
       [class]="buttonClasses"
       (click)="onButtonClicked()"
-      [ngClass]="{ 'flex justify-center': fullWidth() }"
+      [ngClass]="{
+        'flex justify-center': fullWidth(),
+        'w-full sm:w-auto flex justify-center sm:inline-flex': fullWidthOnMobile(),
+      }"
     >
       @if (isLoading()) {
         <ts-loading-indicator class="-ml-0.5 mr-1.5 h-5 w-5" />
@@ -42,6 +45,7 @@ export class ButtonComponent {
   disabled = input(false, { transform: booleanAttribute });
   isLoading = input(false, { transform: booleanAttribute });
   fullWidth = input(false, { transform: booleanAttribute });
+  fullWidthOnMobile = input(false, { transform: booleanAttribute });
 
   buttonAction = output<void>();
 
@@ -65,8 +69,6 @@ export class ButtonComponent {
         'bg-red-600 text-white hover:bg-red-500 dark:bg-red-500 dark:hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:focus-visible:outline-red-500',
     };
 
-    const widthClass = this.fullWidth() ? 'w-full' : '';
-
     if (this.disabled()) {
       let disabledColor = '';
       switch (this.variant()) {
@@ -87,10 +89,10 @@ export class ButtonComponent {
           disabledColor = 'bg-gray-400 text-gray-500';
           break;
       }
-      return `font-semibold ${sizeClasses[this.size()]} ${disabledColor} opacity-50 cursor-not-allowe ${widthClass}`;
+      return `font-semibold ${sizeClasses[this.size()]} ${disabledColor} opacity-50 cursor-not-allowed`;
     }
 
-    return `font-semibold ${sizeClasses[this.size()]} ${variantClasses[this.variant()]} ${widthClass}`;
+    return `font-semibold ${sizeClasses[this.size()]} ${variantClasses[this.variant()]}`;
   }
 
   onButtonClicked() {
