@@ -39,6 +39,7 @@ export class JourneyContainer {
 
   journey = computed(() => this.journeyResource.value()!);
   isLoading = computed(() => this.journeyResource.isLoading());
+
   onEditJourney(): void {
     const currentJourney = this.journey();
     if (!currentJourney) return;
