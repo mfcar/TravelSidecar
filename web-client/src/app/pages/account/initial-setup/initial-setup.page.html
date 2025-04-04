@@ -36,6 +36,14 @@
             [showClearButton]="false"
           />
           <ts-generic-selector-input
+            formControlName="firstDayOfWeek"
+            label="First Day of the Week"
+            [items]="firstDayOfWeekOptions"
+            itemLabelKey="label"
+            itemValueKey="value"
+            [showClearButton]="false"
+          />
+          <ts-generic-selector-input
             formControlName="timezone"
             label="Timezone"
             [items]="(timezoneOptions$ | async) || []"

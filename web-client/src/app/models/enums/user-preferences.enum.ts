@@ -25,6 +25,16 @@ export enum UserThemeMode {
   Dark = 2,
 }
 
+export enum UserFirstDayOfWeek {
+  Sunday = 0,
+  Monday = 1,
+  Tuesday = 2,
+  Wednesday = 3,
+  Thursday = 4,
+  Friday = 5,
+  Saturday = 6,
+}
+
 export const DateFormatLabels: Record<UserDateFormat, string> = {
   [UserDateFormat.DD_MM_YYYY]: '24-12-2024',
   [UserDateFormat.DD_MM_YYYY_SLASH]: '24/12/2024',
@@ -64,6 +74,13 @@ export const timeFormatOptions = Object.entries(UserTimeFormat)
   .map(([key, value]) => ({
     value,
     label: TimeFormatLabels[value as UserTimeFormat] || key,
+  }));
+
+export const firstDayOfWeekOptions = Object.entries(UserFirstDayOfWeek)
+  .filter(([key]) => isNaN(Number(key)))
+  .map(([key, value]) => ({
+    value,
+    label: key.charAt(0).toUpperCase() + key.slice(1),
   }));
 
 export const themeModeOptions = Object.entries(UserThemeMode)

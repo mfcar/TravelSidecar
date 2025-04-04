@@ -15,6 +15,7 @@ import { environment } from '../../environments/environment';
 import { ListViewMode } from '../models/enums/list-view-mode.enum';
 import {
   UserDateFormat,
+  UserFirstDayOfWeek,
   UserThemeMode,
   UserTimeFormat,
 } from '../models/enums/user-preferences.enum';
@@ -32,6 +33,7 @@ type PreferenceValue =
 export interface UserPreferencesDto {
   preferredDateFormat: UserDateFormat;
   preferredTimeFormat: UserTimeFormat;
+  preferredFirstDayOfWeek: UserFirstDayOfWeek;
   preferredTimezone: string;
   preferredCurrencyCode: string;
   preferredThemeMode: UserThemeMode;
@@ -53,6 +55,7 @@ export enum PreferenceKeys {
   ThemeMode = 'pref_themeMode',
   DateFormat = 'pref_dateFormat',
   TimeFormat = 'pref_timeFormat',
+  FirstDayOfWeek = 'pref_firstDayOfWeek',
   Timezone = 'pref_timezone',
   CurrencyCode = 'pref_currencyCode',
   ItemsPerPage = 'pref_itemsPerPage',
@@ -95,6 +98,9 @@ export class UserPreferencesService {
           skipSync: true,
         });
         this.setPreference(PreferenceKeys.TimeFormat, preferences.preferredTimeFormat, {
+          skipSync: true,
+        });
+        this.setPreference(PreferenceKeys.FirstDayOfWeek, preferences.preferredFirstDayOfWeek, {
           skipSync: true,
         });
         this.setPreference(PreferenceKeys.Timezone, preferences.preferredTimezone, {
@@ -255,6 +261,7 @@ export class UserPreferencesService {
     const dto = {
       preferredDateFormat: preferencesDto.preferredDateFormat,
       preferredTimeFormat: preferencesDto.preferredTimeFormat,
+      preferredFirstDayOfWeek: preferencesDto.preferredFirstDayOfWeek,
       preferredTimezone: preferencesDto.preferredTimezone,
       preferredCurrencyCode: preferencesDto.preferredCurrencyCode,
       preferredThemeMode: preferencesDto.preferredThemeMode,
@@ -273,6 +280,15 @@ export class UserPreferencesService {
           this.setPreference(PreferenceKeys.TimeFormat, preferencesDto.preferredTimeFormat, {
             skipSync: true,
           });
+        }
+        if (preferencesDto.preferredFirstDayOfWeek !== undefined) {
+          this.setPreference(
+            PreferenceKeys.FirstDayOfWeek,
+            preferencesDto.preferredFirstDayOfWeek,
+            {
+              skipSync: true,
+            },
+          );
         }
         if (preferencesDto.preferredTimezone) {
           this.setPreference(PreferenceKeys.Timezone, preferencesDto.preferredTimezone, {
@@ -392,6 +408,9 @@ export class UserPreferencesService {
       case PreferenceKeys.TimeFormat:
         dto.preferredTimeFormat = value;
         break;
+      case PreferenceKeys.FirstDayOfWeek:
+        dto.preferredFirstDayOfWeek = value;
+        break;
       case PreferenceKeys.Timezone:
         dto.preferredTimezone = value;
         break;
@@ -424,6 +443,9 @@ export class UserPreferencesService {
           break;
         case PreferenceKeys.TimeFormat:
           dto.preferredTimeFormat = value;
+          break;
+        case PreferenceKeys.FirstDayOfWeek:
+          dto.preferredFirstDayOfWeek = value;
           break;
         case PreferenceKeys.Timezone:
           dto.preferredTimezone = value;

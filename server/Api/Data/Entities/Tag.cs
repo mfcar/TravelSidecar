@@ -18,7 +18,7 @@ public class Tag
     public required string Name { get; set; }
     
     [Required]
-    [MaxLength(7)]
+    [MaxLength(10)]
     public required string Color { get; set; }
     
     // Tracking properties

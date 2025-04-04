@@ -58,6 +58,7 @@ public class UserPreferencesService : IUserPreferencesService
         {
             PreferredDateFormat = user.PreferredDateFormat,
             PreferredTimeFormat = user.PreferredTimeFormat,
+            PreferredFirstDayOfWeek = user.PreferredFirstDayOfWeek,
             PreferredTimezone = user.PreferredTimezone,
             PreferredCurrencyCode = user.PreferredCurrencyCode,
             PreferredThemeMode = user.PreferredThemeMode,
@@ -87,6 +88,9 @@ public class UserPreferencesService : IUserPreferencesService
         
         if (preferences.PreferredTimeFormat.HasValue)
             user.PreferredTimeFormat = preferences.PreferredTimeFormat.Value;
+        
+        if (preferences.PreferredFirstDayOfWeek.HasValue)
+            user.PreferredFirstDayOfWeek = preferences.PreferredFirstDayOfWeek.Value;
         
         if (preferences.PreferredTimezone != null)
             user.PreferredTimezone = preferences.PreferredTimezone;

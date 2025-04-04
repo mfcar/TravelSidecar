@@ -10,9 +10,11 @@ import { ApplicationLogoComponent } from '../../../components/ui/application-log
 import { Currency } from '../../../models/currency.model';
 import {
   dateFormatOptions,
+  firstDayOfWeekOptions,
   themeModeOptions,
   timeFormatOptions,
   UserDateFormat,
+  UserFirstDayOfWeek,
   UserThemeMode,
   UserTimeFormat,
 } from '../../../models/enums/user-preferences.enum';
@@ -54,6 +56,7 @@ export class InitialSetupPage implements OnInit {
 
   public dateFormatOptions = dateFormatOptions;
   public timeFormatOptions = timeFormatOptions;
+  public firstDayOfWeekOptions = firstDayOfWeekOptions;
   public themeModeOptions = themeModeOptions;
   public itemsPerPageOptions: SelectOption[] = [
     { value: 10, label: '10' },
@@ -84,6 +87,7 @@ export class InitialSetupPage implements OnInit {
   setupForm: FormGroup = this.formBuilder.group({
     dateFormat: [UserDateFormat.DD_MM_YYYY, Validators.required],
     timeFormat: [UserTimeFormat.HH_MM_24, Validators.required],
+    firstDayOfWeek: [UserFirstDayOfWeek.Sunday, Validators.required],
     timezone: ['UTC', Validators.required],
     currency: ['EUR', Validators.required],
     themeMode: [UserThemeMode.System, Validators.required],
@@ -124,6 +128,10 @@ export class InitialSetupPage implements OnInit {
         PreferenceKeys.TimeFormat,
         UserTimeFormat.HH_MM_24,
       ),
+      firstDayOfWeek: this.preferencesService.getPreference<UserFirstDayOfWeek>(
+        PreferenceKeys.FirstDayOfWeek,
+        UserFirstDayOfWeek.Monday,
+      ),
       timezone: this.preferencesService.getPreference<string>(PreferenceKeys.Timezone, 'UTC'),
       currency: this.preferencesService.getPreference<string>(PreferenceKeys.CurrencyCode, 'EUR'),
       themeMode: this.preferencesService.getPreference<UserThemeMode>(
@@ -138,6 +146,7 @@ export class InitialSetupPage implements OnInit {
         this.setupForm.patchValue({
           dateFormat: prefs.dateFormat,
           timeFormat: prefs.timeFormat,
+          firstDayOfWeek: prefs.firstDayOfWeek,
           timezone: prefs.timezone,
           currency: prefs.currency,
           themeMode: prefs.themeMode,
@@ -160,6 +169,7 @@ export class InitialSetupPage implements OnInit {
     const preferencesDto = {
       preferredDateFormat: formValues.dateFormat,
       preferredTimeFormat: formValues.timeFormat,
+      preferredFirstDayOfWeek: formValues.firstDayOfWeek,
       preferredTimezone: formValues.timezone,
       preferredCurrencyCode: formValues.currency,
       preferredThemeMode: formValues.themeMode,

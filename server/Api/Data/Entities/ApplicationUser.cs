@@ -11,6 +11,7 @@ public class ApplicationUser : IdentityUser<Guid>
     public bool IsInitialSetupComplete { get; set; } = false;
     public UserDateFormat PreferredDateFormat { get; set; } = UserDateFormat.DD_MM_YYYY;
     public UserTimeFormat PreferredTimeFormat { get; set; } = UserTimeFormat.HH_MM_24;
+    public FirstDayOfWeek PreferredFirstDayOfWeek { get; set; } = FirstDayOfWeek.Monday;
     [MaxLength(50)]
     public string PreferredTimezone { get; set; } = "UTC";
     [MaxLength(3)]

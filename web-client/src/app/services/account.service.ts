@@ -149,7 +149,6 @@ export class AccountService {
     const payload = new URLSearchParams();
     payload.set('grant_type', 'refresh_token');
     payload.set('refresh_token', refreshToken);
-    console.log('refreshToken', refreshToken);
 
     return this.httpClient
       .post<any>(`${this.apiUrl}/connect/token`, payload.toString(), {
