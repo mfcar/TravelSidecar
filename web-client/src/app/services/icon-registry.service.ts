@@ -25,6 +25,8 @@ import {
   faFolderPlus,
   faGrip,
   faHome,
+  faImage,
+  faImages,
   faList,
   faMagnifyingGlass,
   faMoon,
@@ -85,6 +87,8 @@ export class IconRegistryService {
       faEye,
       faEyeSlash,
       faPencil,
+      faImage,
+      faImages,
     );
   }
 }

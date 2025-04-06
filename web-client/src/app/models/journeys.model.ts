@@ -16,6 +16,18 @@ export interface Journey {
   createdAt: Date;
   lastModifiedAt: Date;
   tags?: Tag[];
+  coverImageId?: string;
+  bannerImage?: string;
+}
+
+export interface JourneyImage {
+  id: string;
+  journeyId: string;
+  url: string;
+  fileName: string;
+  contentType: string;
+  sizeInBytes: number;
+  createdAt: Date;
 }
 
 export interface CreateUpdateJourneyRequest {

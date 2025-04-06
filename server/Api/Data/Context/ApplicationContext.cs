@@ -142,6 +142,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options)
                 entity.HasIndex(x => x.ActivityId);
                 entity.HasIndex(x => x.BucketListItemId);
                 entity.HasIndex(x => x.Category);
+                entity.HasIndex(x => x.Visibility);
                 entity.HasIndex(x => x.Type);
             });
 

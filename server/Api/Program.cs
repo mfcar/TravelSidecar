@@ -4,11 +4,14 @@ using Minio;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMinio(configureClient => configureClient
-    .WithEndpoint("localhost:9000")
-    .WithCredentials("JOttG9cnriD0I3sIoK6Q", "h8dhqDnC6wWyUUFN5VOnV5ZCNifiq5whLjlEnJaV")
+    .WithEndpoint("localhost:9090")
+    .WithCredentials("minio", "minio123")
     .WithSSL(false)
     .Build());
 
+builder.Services.AddAntiforgery(options => {
+    options.HeaderName = "X-CSRF-TOKEN";
+});
 
 builder.Services.AddAuthorization();
 builder.Services.AddApplicationHealthChecks();
@@ -55,6 +58,7 @@ app.UseConfiguredCors(app.Environment);
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery();
 app.UseRateLimiter();
 
 app.MapEndpoints();

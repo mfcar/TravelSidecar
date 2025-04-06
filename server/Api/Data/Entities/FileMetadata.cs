@@ -32,7 +32,7 @@ public class FileMetadata
     // File properties
     public FileVisibility Visibility { get; set; } = FileVisibility.Private;
     public FileType Type { get; set; }
-    public FileCategory Category { get; set; }
+    public FileCategory? Category { get; set; }
     public FileStorageStatus StorageStatus { get; set; } = FileStorageStatus.Available;
     
     // Security properties

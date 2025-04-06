@@ -15,6 +15,7 @@ import {
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { ThemeService } from './services/theme.service';
+import { provideTravelSidecarImageLoader } from './shared/imageLoaders/image-loader';
 import { jwtInterceptor } from './shared/interceptors/jwt.interceptor';
 
 export const appConfig: ApplicationConfig = {
@@ -23,6 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules)),
     provideHttpClient(withFetch(), withInterceptors([jwtInterceptor])),
     provideAnimationsAsync(),
+    provideTravelSidecarImageLoader,
     provideAppInitializer(() => {
       inject(ThemeService);
     }),

@@ -140,6 +140,7 @@ public static partial class JourneyEndpoints
                 EndDate = j.EndDate?.ToDateOnly(),
                 CreatedAt = j.CreatedAt.ToDateTimeOffset(),
                 LastModifiedAt = j.LastModifiedAt.ToDateTimeOffset(),
+                CoverImageId = j.CoverImageId,
                 CategoryId = j.JourneyCategoryId,
                 CategoryName = j.JourneyCategory?.Name ?? string.Empty,
                 DaysUntilStart = journeyService.CalculateDaysUntilStartJourney(j.StartDate),

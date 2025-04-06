@@ -10,6 +10,7 @@ using Api.Endpoints.SystemInfo;
 using Api.Endpoints.Tags;
 using Api.Endpoints.Timezone;
 using Api.Endpoints.User;
+using Api.Helpers;
 using JourneyCategoryEndpoints = Api.Endpoints.JourneyCategory.JourneyCategoryEndpoints;
 
 namespace Api.Extensions;
@@ -82,6 +83,12 @@ public static class EndpointExtensions
         journeysEndpoint.MapPost("/", JourneyEndpoints.CreateJourneyAsync);
         journeysEndpoint.MapGet("/{journeyId:guid}", JourneyEndpoints.GetJourneyByJourneyIdAsync);
         journeysEndpoint.MapPut("/{journeyId:guid}", JourneyEndpoints.UpdateJourneyAsync);
+        journeysEndpoint.MapPost("/{journeyId:guid}/images", JourneyImageEndpoints.UploadJourneyCoverImageAsync)
+            .WithMetadata(new IgnoreAntiforgeryTokenAttribute());
+        journeysEndpoint.MapGet("/{journeyId:guid}/cover/{coverImageId:guid}/{imageSize}", JourneyImageEndpoints.GetJourneyCoverImageAsync)
+            .AllowAnonymous();
+        journeysEndpoint.MapDelete("/{journeyId:guid}/images/{imageId:guid}",
+            JourneyImageEndpoints.DeleteJourneyCoverImageAsync);
 
         var journeyCategoryEndpoints = apiGroup.MapGroup(Routes.JourneyCategories.Base)
             .WithTags("Journey Categories")

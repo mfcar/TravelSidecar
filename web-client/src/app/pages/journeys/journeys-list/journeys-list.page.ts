@@ -5,7 +5,6 @@ import {
   Component,
   computed,
   DestroyRef,
-  effect,
   inject,
   linkedSignal,
   OnDestroy,
@@ -17,6 +16,7 @@ import {
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { debounceTime, Subject, take } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { TagBadgeComponent } from '../../../components/badges/tag-badge/tag-badge.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import { ListFilterTextInputComponent } from '../../../components/forms/list-filter-text-input/list-filter-text-input.component';
@@ -80,9 +80,9 @@ export class JourneysListPage implements OnInit, OnDestroy {
   selectedSortOrder = signal<'asc' | 'desc'>('asc');
   selectedViewMode = signal<ListViewMode>(ListViewMode.Table);
   selectedFields = signal<Set<string>>(new Set(['name', 'description', 'categoryName']));
-  displayedItems = signal<Journey[]>([]);
+  // displayedItems = signal<Journey[]>([]);
   pageSize = signal<number>(25);
-  totalCount = signal<number>(0);
+  // totalCount = signal<number>(0);
   private filterInput$ = new Subject<string>();
 
   // ─── UI Options & Configurations ──────────────────────────────────────────────
@@ -142,15 +142,19 @@ export class JourneysListPage implements OnInit, OnDestroy {
     });
 
     this.initFilterDebounce();
-
-    effect(() => {
-      const resource = this.journeysResource.value();
-      if (resource && !this.journeysResource.isLoading()) {
-        this.displayedItems.set(resource.items || []);
-        this.totalCount.set(resource.totalCount || 0);
-      }
-    });
   }
+
+  displayedItems = computed(() => {
+    const resource = this.journeysResource.value();
+    if (!resource || this.journeysResource.isLoading()) return [];
+
+    return resource.items.map((item) => ({
+      ...item,
+      imageUrl: this.getJourneyImageUrl(item),
+    }));
+  });
+
+  totalCount = computed(() => this.journeysResource.value()?.totalCount || 0);
 
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────
   ngOnInit(): void {
@@ -205,6 +209,13 @@ export class JourneysListPage implements OnInit, OnDestroy {
       sortBy: this.selectedSortBy(),
       sortOrder: this.selectedSortOrder(),
     };
+  }
+
+  private getJourneyImageUrl(journey: Journey): string {
+    if (!journey.coverImageId) {
+      return '/images/placeholders/JourneyPlaceholder.png';
+    }
+    return `${environment.apiBaseUrl}/journeys/${journey.id}/cover/${journey.coverImageId}/Small`;
   }
 
   // ─── Public Event Handlers ──────────────────────────────────────────────────────

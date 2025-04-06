@@ -1,40 +1,52 @@
+<!-- eslint-disable @angular-eslint/template/prefer-ngsrc -->
+
 <div class="mb-1">
-    <div>
-      <img
-        class="h-32 w-full object-cover lg:h-48 rounded-t-lg"
-        [ngSrc]="'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'"
-        alt="Journey Banner"
-        width="1920"
-        height="480"
-        priority
-      />
-    </div>
-    <div class="pt-4 sm:pt-6">
-      <div class="sm:flex sm:items-center sm:justify-between">
-        <div class="min-w-0 flex-1">
-          <h1 class="truncate text-2xl font-bold text-gray-900 dark:text-white">
-            Journey: {{ journey()?.name || 'Loading...' }}
-          </h1>
-        </div>
-  
-        <div
-          class="mt-4 sm:mt-0 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0"
-        >
-          <ts-button 
-            icon="plus" 
-            label="Add Activity" 
-            size="lg" 
-            [fullWidthOnMobile]="true"
-            (buttonAction)="onAddActivityClick()" 
-          />
-          <ts-button 
-            icon="pencil" 
-            label="Edit" 
-            size="lg" 
-            [fullWidthOnMobile]="true"
-            (buttonAction)="onEditClick()" 
-          />
-        </div>
+  <div>
+    <img
+      class="h-32 w-full object-cover lg:h-48 rounded-t-lg"
+      [src]="getJourneyImageUrl('Normal')"
+      [srcset]="getJourneyImageSrcSet()"
+      [sizes]="
+        '(-webkit-min-device-pixel-ratio: 4.001) 20vw, (-webkit-min-device-pixel-ratio: 3.001) 25vw, (-webkit-min-device-pixel-ratio: 2.001) 33.33vw, (-webkit-min-device-pixel-ratio: 1.501) 50vw, 100vw'
+      "
+      [alt]="journey()?.name || 'Journey Banner'"
+      width="1920"
+      height="480"
+    />
+  </div>
+  <div class="pt-4 sm:pt-6">
+    <div class="sm:flex sm:items-center sm:justify-between">
+      <div class="min-w-0 flex-1">
+        <h1 class="truncate text-2xl font-bold text-gray-900 dark:text-white">
+          Journey: {{ journey()?.name || 'Loading...' }}
+        </h1>
+      </div>
+
+      <div
+        class="mt-4 sm:mt-0 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0"
+      >
+        <ts-button
+          icon="plus"
+          label="Add Activity"
+          size="lg"
+          [fullWidthOnMobile]="true"
+          (buttonAction)="onAddActivityClick()"
+        />
+        <ts-button
+          icon="pencil"
+          label="Edit"
+          size="lg"
+          [fullWidthOnMobile]="true"
+          (buttonAction)="onEditClick()"
+        />
+        <ts-button
+          icon="images"
+          label="Change Image"
+          size="lg"
+          [fullWidthOnMobile]="true"
+          (buttonAction)="onChangeImageClick()"
+        />
       </div>
     </div>
   </div>
+</div>

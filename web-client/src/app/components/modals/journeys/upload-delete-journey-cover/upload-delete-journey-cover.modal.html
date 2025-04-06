@@ -1,0 +1,122 @@
+<!-- eslint-disable @angular-eslint/template/prefer-ngsrc -->
+<ts-base-modal modalTitle="Journey Image">
+    <div modal-body>
+      @if (errorMessage()) {
+        <ts-alert type="error" [message]="errorMessage()!" class="mb-4" />
+      }
+      
+      @if (previewUrl()) {
+        <div class="mb-4">
+          <span class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 mb-2">
+            Current Image
+          </span>
+          <div class="relative rounded-lg overflow-hidden">
+            <img 
+              [src]="previewUrl()!" 
+              alt="Journey preview" 
+              class="w-full h-48 object-cover"
+              [ngClass]="{'opacity-50': selectedFile() || isDeletingImage()}"
+            />
+            @if (isDeletingImage()) {
+              <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                <span class="text-white animate-pulse">Deleting...</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+  
+      <div class="col-span-full mt-4">
+        <label for="banner-photo" class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+          {{ journey.bannerImage ? 'Replace Banner Image' : 'Upload Banner Image' }}
+        </label>
+        <div 
+          class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 dark:border-gray-500/25 px-6 py-10"
+          [ngClass]="{'bg-gray-50 dark:bg-gray-800/50': isDragOver()}"
+          (dragover)="onDragOver($event)" 
+          (dragleave)="onDragLeave($event)" 
+          (drop)="onDrop($event)"
+        >
+          <div class="text-center">
+            @if (!selectedFile()) {
+              <fa-icon
+                [icon]="['fas', 'image']"
+                class="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600"
+                [fixedWidth]="true"
+                size="3x"
+              />
+            } @else {
+              <div class="relative h-32 w-32 mx-auto">
+                <img 
+                  [src]="previewUrl()!" 
+                  alt="Selected file preview" 
+                  class="h-32 w-32 object-cover rounded-md"
+                />
+                <button
+                  type="button"
+                  class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  (click)="selectedFile.set(null); previewUrl.set(journey.bannerImage || null)"
+                  title="Remove selected image"
+                >
+                  <fa-icon
+                    [icon]="['fas', 'times']"
+                    class="w-4 h-4"
+                    [fixedWidth]="true"
+                  />
+                </button>
+              </div>
+            }
+            <div class="mt-4 flex text-sm leading-6 text-gray-600 dark:text-gray-400">
+              <label for="file-upload" class="relative cursor-pointer rounded-md bg-white dark:bg-gray-800 font-semibold text-sky-600 dark:text-sky-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-sky-600 dark:focus-within:ring-sky-400 focus-within:ring-offset-2 hover:text-sky-500 dark:hover:text-sky-300">
+                <span>Upload a file</span>
+                <input 
+                  id="file-upload" 
+                  name="file-upload" 
+                  type="file" 
+                  class="sr-only" 
+                  accept="image/jpeg,image/png,image/gif"
+                  (change)="onFileSelected($event)"
+                >
+              </label>
+              <p class="pl-1">or drag and drop</p>
+            </div>
+            <p class="text-xs leading-5 text-gray-600 dark:text-gray-400">PNG, JPG, GIF up to {{maxSizeInMB}}MB</p>
+            <p class="text-xs mt-2 text-gray-500 dark:text-gray-400">Recommended size: 1920x480 pixels</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div modal-footer class="flex justify-between">
+      <div>
+        @if (journey.bannerImage && !selectedFile()) {
+          <ts-button 
+            type="button" 
+            variant="danger" 
+            label="Delete Image" 
+            [isLoading]="isDeletingImage()"
+            [disabled]="isLoading()"
+            (buttonAction)="deleteImage()" 
+          />
+        }
+      </div>
+      
+      <div class="flex space-x-2">
+        <ts-button 
+          type="button" 
+          variant="neutralSecondary" 
+          label="Cancel" 
+          [disabled]="isLoading() || isDeletingImage()"
+          (buttonAction)="onCancel()" 
+        />
+        <ts-button 
+          type="button" 
+          variant="primary" 
+          label="Save" 
+          [disabled]="!selectedFile() || isDeletingImage()"
+          [isLoading]="isLoading()"
+          (buttonAction)="uploadImage()" 
+        />
+      </div>
+    </div>
+  </ts-base-modal>

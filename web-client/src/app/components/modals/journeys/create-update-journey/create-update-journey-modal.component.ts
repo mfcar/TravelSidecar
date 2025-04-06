@@ -91,8 +91,6 @@ export class CreateUpdateJourneyModal implements OnInit {
   }
 
   onSubmit() {
-    console.log('onSubmit');
-    console.log(this.form.value);
     if (this.form.valid) {
       this.isLoading.set(true);
       const request: CreateUpdateJourneyRequest = this.form.value;

@@ -6,6 +6,7 @@ import { CollectionMatchMode } from '../models/enums/filter-modes.enum';
 import {
   CreateUpdateJourneyRequest,
   Journey,
+  JourneyImage,
   JourneysFilterRequest,
 } from '../models/journeys.model';
 import { PaginatedResult } from '../models/pagination.model';
@@ -39,6 +40,21 @@ export class JourneyService {
 
   updateJourney(id: string, request: CreateUpdateJourneyRequest): Observable<Journey> {
     return this.httpClient.put<Journey>(`${this.apiUrl}/${id}`, request, {
+      withCredentials: true,
+    });
+  }
+
+  uploadJourneyImage(journeyId: string, file: File): Observable<JourneyImage> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.httpClient.post<JourneyImage>(`${this.apiUrl}/${journeyId}/images`, formData, {
+      withCredentials: true,
+    });
+  }
+
+  deleteJourneyImage(journeyId: string, imageId: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.apiUrl}/${journeyId}/images/${imageId}`, {
       withCredentials: true,
     });
   }

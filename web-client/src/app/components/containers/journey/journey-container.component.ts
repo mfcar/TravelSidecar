@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { JourneyService } from '../../../services/journey.service';
 import { JourneyHeaderComponent } from '../../headers/journey-header/journey-header.component';
 import { CreateUpdateJourneyModal } from '../../modals/journeys/create-update-journey/create-update-journey-modal.component';
+import { UploadDeleteJourneyCoverModal } from '../../modals/journeys/upload-delete-journey-cover/upload-delete-journey-cover.modal';
 import { TabLinkItem, TabLinksComponent } from '../../tabs/tab-links/tab-links.component';
 import { StickyListToolsComponent } from '../../tools/sticky-list-tools/sticky-list-tools.component';
 
@@ -54,7 +55,23 @@ export class JourneyContainer {
       }
     });
   }
+
   onAddActivity(): void {
     console.log('Add activity clicked');
+  }
+
+  onChangeImage(): void {
+    const currentJourney = this.journey();
+    if (!currentJourney) return;
+
+    const dialogRef = this.dialog.open(UploadDeleteJourneyCoverModal, {
+      data: { journey: currentJourney },
+    });
+
+    dialogRef.closed.subscribe((result) => {
+      if (result) {
+        this.journeyResource.reload();
+      }
+    });
   }
 }

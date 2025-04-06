@@ -12,6 +12,7 @@ public class JourneyResponse
     public DateTimeOffset LastModifiedAt { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
+    public Guid? CoverImageId { get; set; }
     public Guid? CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
     public int? DaysUntilStart { get; set; }

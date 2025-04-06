@@ -12,15 +12,13 @@ namespace Api.Services.Images;
 public interface IImageProcessingService
 {
     Task<Dictionary<ImageSizeType, (Stream Stream, string ContentType)>> ResizeImageAsync(
-        Stream imageStream, string contentType, FileType fileType);
-    
+        Stream imageStream, string contentType);
+
     Task<Dictionary<ImageSizeType, string>> SaveResizedImagesAsync(
-        Dictionary<ImageSizeType, (Stream Stream, string ContentType)> resizedImages, 
-        string originalFileName, 
+        Dictionary<ImageSizeType, (Stream Stream, string ContentType)> resizedImages,
+        string originalFileName,
         string folderPath);
-    
-    bool ShouldProcessImage(string contentType, FileType fileType);
-    
+
     string GetResizedImagePath(string originalPath, ImageSizeType sizeType);
 }
 
@@ -37,44 +35,36 @@ public class ImageProcessingService : IImageProcessingService
         _fileStorageService = fileStorageService;
     }
 
-    public bool ShouldProcessImage(string contentType, FileType fileType)
-    {
-        if (!contentType.StartsWith("image/"))
-            return false;
-            
-        return fileType switch
-        {
-            FileType.JourneyCover => true,
-            FileType.JourneyActivityImage => true,
-            FileType.BucketListItemImage => true,
-            _ => false
-        };
-    }
-
     public async Task<Dictionary<ImageSizeType, (Stream Stream, string ContentType)>> ResizeImageAsync(
-        Stream imageStream, string contentType, FileType fileType)
+        Stream imageStream, string contentType)
     {
         var result = new Dictionary<ImageSizeType, (Stream Stream, string ContentType)>();
-    
-        if (!ShouldProcessImage(contentType, fileType))
-        {
-            return result;
-        }
-    
+
         try
         {
             if (imageStream.CanSeek)
                 imageStream.Position = 0;
-    
+
             using var image = await Image.LoadAsync(imageStream);
-    
+
             if (imageStream.CanSeek)
                 imageStream.Position = 0;
-    
+
+            var originalMemStream = new MemoryStream();
+            await imageStream.CopyToAsync(originalMemStream);
+            originalMemStream.Position = 0;
+            result[ImageSizeType.Original] = (originalMemStream, contentType);
+
+            if (imageStream.CanSeek)
+                imageStream.Position = 0;
+
             foreach (var sizeType in Enum.GetValues<ImageSizeType>())
             {
+                if (sizeType == ImageSizeType.Original)
+                    continue;
+
                 var maxSize = GetDimensionsForSize(sizeType);
-    
+
                 if (image.Width <= maxSize && image.Height <= maxSize)
                 {
                     var memStream = new MemoryStream();
@@ -82,43 +72,26 @@ public class ImageProcessingService : IImageProcessingService
                     memStream.Position = 0;
                     if (imageStream.CanSeek)
                         imageStream.Position = 0;
-    
+
                     result[sizeType] = (memStream, contentType);
                     continue;
                 }
-    
-                int width, height;
-                var isPortrait = image.Height > image.Width;
-    
-                if (sizeType == ImageSizeType.Normal)
+
+                var resizeOptions = new ResizeOptions
                 {
-                    if (isPortrait) {
-                        height = Math.Min(image.Height, maxSize);
-                        width = 0;
-                    } else {
-                        width = Math.Min(image.Width, maxSize);
-                        height = 0;
-                    }
-                } else {
-                    if (isPortrait)
-                    {
-                        width = Math.Min(image.Width, maxSize);
-                        height = 0;
-                    } else {
-                        height = Math.Min(image.Height, maxSize);
-                        width = 0;
-                    }
-                }
-    
-                using var clonedImage = image.Clone(x => x.Resize(width, height));
-    
+                    Mode = ResizeMode.Max,
+                    Size = new Size(maxSize, maxSize)
+                };
+
+                using var clonedImage = image.Clone(x => x.Resize(resizeOptions));
+
                 var memoryStream = new MemoryStream();
                 await EncodeImageAsync(clonedImage, memoryStream, contentType);
                 memoryStream.Position = 0;
-    
+
                 result[sizeType] = (memoryStream, contentType);
             }
-    
+
             return result;
         }
         catch (Exception ex)
@@ -129,15 +102,15 @@ public class ImageProcessingService : IImageProcessingService
     }
 
     public async Task<Dictionary<ImageSizeType, string>> SaveResizedImagesAsync(
-        Dictionary<ImageSizeType, (Stream Stream, string ContentType)> resizedImages, 
-        string originalFileName, 
+        Dictionary<ImageSizeType, (Stream Stream, string ContentType)> resizedImages,
+        string originalFileName,
         string folderPath)
     {
         var result = new Dictionary<ImageSizeType, string>();
-        
+
         if (resizedImages.Count == 0)
             return result;
-            
+
         try
         {
             foreach (var (sizeType, (stream, contentType)) in resizedImages)
@@ -145,38 +118,38 @@ public class ImageProcessingService : IImageProcessingService
                 var fileNameWithoutExt = Path.GetFileNameWithoutExtension(originalFileName);
                 var extension = Path.GetExtension(originalFileName);
                 var sizedFileName = $"{fileNameWithoutExt}_{sizeType.ToString().ToLowerInvariant()}{extension}";
-                
+
                 if (stream.CanSeek && stream.Position != 0)
                     stream.Position = 0;
-                
+
                 var path = await _fileStorageService.UploadFileAsync(
                     stream,
                     sizedFileName,
                     contentType,
                     folderPath);
-                
+
                 result[sizeType] = path;
             }
-            
+
             return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving resized images for {FileName}: {Message}", 
+            _logger.LogError(ex, "Error saving resized images for {FileName}: {Message}",
                 originalFileName, ex.Message);
             throw;
         }
     }
-    
+
     public string GetResizedImagePath(string originalPath, ImageSizeType sizeType)
     {
         if (string.IsNullOrWhiteSpace(originalPath))
             return originalPath;
-            
+
         var directory = Path.GetDirectoryName(originalPath);
         var fileName = Path.GetFileNameWithoutExtension(originalPath);
         var extension = Path.GetExtension(originalPath);
-        
+
         var sizeSuffix = sizeType switch
         {
             ImageSizeType.Normal => "_normal",
@@ -185,11 +158,11 @@ public class ImageProcessingService : IImageProcessingService
             ImageSizeType.Tiny => "_tiny",
             _ => string.Empty
         };
-        
+
         var newFileName = $"{fileName}{sizeSuffix}{extension}";
         return Path.Combine(directory ?? string.Empty, newFileName).Replace("\\", "/");
     }
-    
+
     private static int GetDimensionsForSize(ImageSizeType sizeType)
     {
         return sizeType switch
@@ -201,7 +174,7 @@ public class ImageProcessingService : IImageProcessingService
             _ => 0
         };
     }
-    
+
     private static async Task EncodeImageAsync(Image image, Stream stream, string contentType)
     {
         IImageEncoder encoder = contentType switch
@@ -211,7 +184,7 @@ public class ImageProcessingService : IImageProcessingService
             "image/webp" => new WebpEncoder { Quality = DefaultProperties.WebpQuality },
             _ => new JpegEncoder { Quality = DefaultProperties.JpegQuality }
         };
-        
+
         await image.SaveAsync(stream, encoder);
     }
 }

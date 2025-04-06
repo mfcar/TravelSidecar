@@ -23,6 +23,7 @@ public class Journey
     public string? Description { get; set; }
     public LocalDate? StartDate { get; set; }
     public LocalDate? EndDate { get; set; }
+    public Guid? CoverImageId { get; set; }
 
     // Tracking properties
     public Instant CreatedAt { get; set; } = Instant.FromDateTimeUtc(DateTime.UtcNow);
