@@ -1,7 +1,7 @@
 using Api.Data.Context;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Api.Services;
+namespace Api.Services.Health;
 
 public class ApplicationHealthCheckService : IHealthCheck
 {

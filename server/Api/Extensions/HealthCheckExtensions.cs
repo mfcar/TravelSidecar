@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Api.DTOs.Config;
 using Api.Services;
+using Api.Services.Health;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
@@ -43,7 +44,10 @@ public static class HealthCheckExtensions
                 tags: Tags)
             .AddCheck<MemoryHealthCheckService>("memory",
                 failureStatus: HealthStatus.Degraded,
-                tags: ["monitoring", "resource"]);
+                tags: ["monitoring", "resource"])
+            .AddCheck<MinioHealthCheckService>("storage",
+                failureStatus: HealthStatus.Degraded,
+                tags: ["ready", "storage"]);;
     }
 
     public static void MapHealthCheckEndpoints(this IEndpointRouteBuilder endpoints)
@@ -78,14 +82,14 @@ public static class HealthCheckExtensions
         {
             jsonWriter.WriteStartObject();
             jsonWriter.WriteString("status", report.Status.ToString());
-            jsonWriter.WriteNumber("totalDuration", report.TotalDuration.TotalMilliseconds);
+            jsonWriter.WriteNumber("totalDuration (ms)", report.TotalDuration.TotalMilliseconds);
 
             jsonWriter.WriteStartObject("checks");
             foreach (var (key, entry) in report.Entries)
             {
                 jsonWriter.WriteStartObject(key);
                 jsonWriter.WriteString("status", entry.Status.ToString());
-                jsonWriter.WriteNumber("duration", entry.Duration.TotalMilliseconds);
+                jsonWriter.WriteNumber("duration (ms)", entry.Duration.TotalMilliseconds);
 
                 if (entry.Description != null)
                 {

@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
-namespace Api.Services;
+namespace Api.Services.Health;
 
 public class MemoryHealthCheckOptions
 {

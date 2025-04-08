@@ -3,11 +3,19 @@ using Minio;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMinio(configureClient => configureClient
-    .WithEndpoint("localhost:9090")
-    .WithCredentials("minio", "minio123")
-    .WithSSL(false)
-    .Build());
+builder.Services.AddMinio(configureClient =>
+{
+    var endpoint = Environment.GetEnvironmentVariable("MINIO_ENDPOINT") ?? "localhost:9090";
+    var user = Environment.GetEnvironmentVariable("MINIO_ROOT_USER") ?? "minio";
+    var password = Environment.GetEnvironmentVariable("MINIO_ROOT_PASSWORD") ?? "minio123";
+    var useSSL = Environment.GetEnvironmentVariable("MINIO_USE_SSL")?.ToLowerInvariant() == "true";
+    
+    configureClient
+        .WithEndpoint(endpoint)
+        .WithCredentials(user, password)
+        .WithSSL(useSSL)
+        .Build();
+});
 
 builder.Services.AddAntiforgery(options => {
     options.HeaderName = "X-CSRF-TOKEN";
