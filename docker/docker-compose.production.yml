@@ -1,9 +1,22 @@
 name: travelsidecar
 
-x-db-config:
+x-config:
+  # Database configuration
   db-name: &db-name travelsidecar
   db-user: &db-user travelsidecaru
-  db-password: &db-password ${DB_PASSWORD:-travelsidecarpw}
+  db-password: &db-password travelsidecarpw
+  db-port: &db-port 55432
+  
+  # MinIO configuration
+  minio-user: &minio-user minio
+  minio-password: &minio-password minio123
+  minio-port: &minio-port 9090
+  minio-console-port: &minio-console-port 9091
+  minio-data-dir: &minio-data-dir /opt/travelsidecar/minio-data
+  
+  # Application configuration
+  app-port: &app-port 8590
+  app-https-port: &app-https-port 8591
 
 services:
   travelsidecar-app:
@@ -11,8 +24,8 @@ services:
     image: travelsidecar/travelsidecar:latest
     restart: unless-stopped
     ports:
-      - "${APP_PORT:-8590}:8080"
-      - "${APP_HTTPS_PORT:-8591}:8081"
+      - "*app-port:8080"
+      - "*app-https-port:8081"
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -20,8 +33,8 @@ services:
       DB_USER: *db-user
       DB_PASSWORD: *db-password
       MINIO_ENDPOINT: minio:9000
-      MINIO_ROOT_USER: ${MINIO_USER:-minio}
-      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-minio123}
+      MINIO_ROOT_USER: *minio-user
+      MINIO_ROOT_PASSWORD: *minio-password
       MINIO_USE_SSL: "false"
     depends_on:
       postgres:
@@ -40,7 +53,7 @@ services:
     image: imresamu/postgis:17-3.5
     restart: unless-stopped
     ports:
-      - "${DB_PORT:-55432}:5432"
+      - "*db-port:5432"
     environment:
       POSTGRES_DB: *db-name
       POSTGRES_USER: *db-user
@@ -61,13 +74,13 @@ services:
     image: minio/minio:latest
     restart: unless-stopped
     ports:
-      - "${MINIO_PORT:-9090}:9000"
-      - "${MINIO_CONSOLE_PORT:-9091}:9001"
+      - "127.0.0.1:*minio-port:9000"
+      - "127.0.0.1:*minio-console-port:9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_USER:-minio}
-      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-minio123}
+      MINIO_ROOT_USER: *minio-user
+      MINIO_ROOT_PASSWORD: *minio-password
     volumes:
-      - travelsidecar-minio-data:/data
+      - *minio-data-dir:/data
     command: server --console-address ":9001" /data
     networks:
       - travelsidecar-network
@@ -80,9 +93,7 @@ services:
 
 volumes:
   travelsidecar-postgres-data:
-    name: travelsidecar-postgres-data
-  travelsidecar-minio-data:
-    name: travelsidecar-minio-data
+    name: travelsidecar-postgres-database
 
 networks:
   travelsidecar-network:
