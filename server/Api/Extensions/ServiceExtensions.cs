@@ -17,7 +17,6 @@ public static class ServiceExtensions
         services.AddScoped<IBucketListService, BucketListService>();
         services.AddScoped<ICurrencyService, CurrencyService>();
         services.AddScoped<IFileService, FileService>();
-        services.AddScoped<IFileStorageService, FileStorageService>();
         services.AddScoped<IFileEncryptionService, FileEncryptionService>();
         services.AddScoped<IImageProcessingService, ImageProcessingService>();
         services.AddScoped<IOidcProviderService, OidcProviderService>();

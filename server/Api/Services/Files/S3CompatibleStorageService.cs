@@ -1,53 +1,51 @@
+using Amazon.S3;
+using Amazon.S3.Model;
 using Api.DTOs.Config.Files;
 using Api.Enums;
 using Microsoft.Extensions.Options;
-using Minio;
-using Minio.DataModel.Args;
 
 namespace Api.Services.Files;
 
-public interface IFileStorageService
+public class S3CompatibleStorageService : IFileStorageService
 {
-    Task<bool> EnsureBucketExistsAsync();
-    Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType, string folderPath);
-    Task<(Stream Stream, string ContentType)> GetFileAsync(string storagePath);
-    Task DeleteFileAsync(string storagePath, bool includeResizedVersions = false);
-    string GetStoragePath(FileType type, Guid userId, Guid? journeyId, string fileName);
-}
-
-public class FileStorageService : IFileStorageService
-{
-    private readonly IMinioClient _minioClient;
+    private readonly IAmazonS3 _s3Client;
     private readonly string _bucketName;
-    private readonly ILogger<FileStorageService> _logger;
+    private readonly ILogger<S3CompatibleStorageService> _logger;
 
-    public FileStorageService(IOptions<FileStorageOptions> fileStorageOptions, ILogger<FileStorageService> logger, IMinioClient minioClient)
+    public S3CompatibleStorageService(
+        IAmazonS3 s3Client,
+        IOptions<FileStorageOptions> fileStorageOptions,
+        ILogger<S3CompatibleStorageService> logger)
     {
-        var fileStorageConfig = fileStorageOptions.Value;
-        
+        _s3Client = s3Client;
+        _bucketName = fileStorageOptions.Value.BucketName;
         _logger = logger;
-        _minioClient = minioClient;
-        _bucketName = fileStorageConfig.BucketName;
     }
 
     public async Task<bool> EnsureBucketExistsAsync()
     {
         try
         {
-            var bucketExistsArgs = new BucketExistsArgs().WithBucket(_bucketName);
-            var found = await _minioClient.BucketExistsAsync(bucketExistsArgs);
-            
-            if (found) return true;
-            
-            var makeBucketArgs = new MakeBucketArgs().WithBucket(_bucketName);
-            await _minioClient.MakeBucketAsync(makeBucketArgs);
-            _logger.LogInformation("Created bucket {BucketName}", _bucketName);
-            
+            await _s3Client.GetBucketLocationAsync(_bucketName);
             return true;
+        }
+        catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            try
+            {
+                await _s3Client.PutBucketAsync(_bucketName);
+                _logger.LogInformation("Created bucket {BucketName}", _bucketName);
+                return true;
+            }
+            catch (Exception createEx)
+            {
+                _logger.LogError(createEx, "Failed to create bucket {BucketName}. Error: {Message}", _bucketName, createEx.Message);
+                return false;
+            }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to ensure bucket exists. Error: {Message}", ex.Message);
+            _logger.LogError(ex, "Failed to check if bucket exists. Error: {Message}", ex.Message);
             return false;
         }
     }
@@ -73,16 +71,18 @@ public class FileStorageService : IFileStorageService
             if (fileStream.CanSeek && fileStream.Position != 0)
                 fileStream.Position = 0;
 
-            var putObjectArgs = new PutObjectArgs()
-                .WithBucket(_bucketName)
-                .WithObject(key)
-                .WithStreamData(fileStream)
-                .WithObjectSize(fileStream.Length)
-                .WithContentType(contentType);
+            var request = new PutObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = key,
+                InputStream = fileStream,
+                ContentType = contentType,
+                ServerSideEncryptionMethod = ServerSideEncryptionMethod.None
+            };
 
-            var response = await _minioClient.PutObjectAsync(putObjectArgs);
+            var response = await _s3Client.PutObjectAsync(request);
         
-            if (string.IsNullOrEmpty(response.Etag))
+            if (string.IsNullOrEmpty(response.ETag))
             {
                 throw new InvalidOperationException($"Upload failed for file {fileName}. No ETag returned.");
             }
@@ -100,25 +100,19 @@ public class FileStorageService : IFileStorageService
     {
         try
         {
-            var statObjectArgs = new StatObjectArgs()
-                .WithBucket(_bucketName)
-                .WithObject(storagePath);
+            var request = new GetObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = storagePath
+            };
 
-            var objectStat = await _minioClient.StatObjectAsync(statObjectArgs);
-
+            var response = await _s3Client.GetObjectAsync(request);
+            
             var memoryStream = new MemoryStream();
-            var getObjectArgs = new GetObjectArgs()
-                .WithBucket(_bucketName)
-                .WithObject(storagePath)
-                .WithCallbackStream(stream =>
-                {
-                    stream.CopyTo(memoryStream);
-                    memoryStream.Position = 0;
-                });
+            await response.ResponseStream.CopyToAsync(memoryStream);
+            memoryStream.Position = 0;
 
-            await _minioClient.GetObjectAsync(getObjectArgs);
-
-            return (memoryStream, objectStat.ContentType);
+            return (memoryStream, response.Headers.ContentType);
         }
         catch (Exception ex)
         {
@@ -127,7 +121,7 @@ public class FileStorageService : IFileStorageService
         }
     }
 
-     public async Task DeleteFileAsync(string storagePath, bool includeResizedVersions = false)
+    public async Task DeleteFileAsync(string storagePath, bool includeResizedVersions = false)
     {
         try
         {
@@ -140,34 +134,38 @@ public class FileStorageService : IFileStorageService
                     ? fileNameWithoutExt 
                     : $"{directory}/{fileNameWithoutExt}";
                 
-                var listObjectsArgs = new ListObjectsArgs()
-                    .WithBucket(_bucketName)
-                    .WithPrefix(prefix)
-                    .WithRecursive(true);
+                var listRequest = new ListObjectsV2Request
+                {
+                    BucketName = _bucketName,
+                    Prefix = prefix,
+                    MaxKeys = 1000
+                };
                 
                 var objectsToDelete = new List<string>();
                 
-                // var items = await _minioClient.ListObjectsAsync(listObjectsArgs).ToListAsync();
-                // foreach (var item in items)
-                // {
-                //     if (item.Key == storagePath || 
-                //         item.Key.EndsWith($"_normal{extension}") ||
-                //         item.Key.EndsWith($"_medium{extension}") ||
-                //         item.Key.EndsWith($"_small{extension}") ||
-                //         item.Key.EndsWith($"_smallest{extension}"))
-                //     {
-                //         objectsToDelete.Add(item.Key);
-                //     }
-                // }
+                var response = await _s3Client.ListObjectsV2Async(listRequest);
+                foreach (var obj in response.S3Objects)
+                {
+                    if (obj.Key == storagePath || 
+                        obj.Key.EndsWith($"_normal{extension}") ||
+                        obj.Key.EndsWith($"_medium{extension}") ||
+                        obj.Key.EndsWith($"_small{extension}") ||
+                        obj.Key.EndsWith($"_smallest{extension}"))
+                    {
+                        objectsToDelete.Add(obj.Key);
+                    }
+                }
                 
                 var deleteTasks = objectsToDelete.Select(async key => {
                     try
                     {
-                        var removeObjectArgs = new RemoveObjectArgs()
-                            .WithBucket(_bucketName)
-                            .WithObject(key);
+                        var deleteRequest = new DeleteObjectRequest
+                        {
+                            BucketName = _bucketName,
+                            Key = key
+                        };
                         
-                        await _minioClient.RemoveObjectAsync(removeObjectArgs);
+                        await _s3Client.DeleteObjectAsync(deleteRequest);
                         _logger.LogInformation("Deleted file {Path}", key);
                     }
                     catch (Exception ex)
@@ -180,11 +178,13 @@ public class FileStorageService : IFileStorageService
             }
             else
             {
-                var removeObjectArgs = new RemoveObjectArgs()
-                    .WithBucket(_bucketName)
-                    .WithObject(storagePath);
+                var deleteRequest = new DeleteObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = storagePath
+                };
 
-                await _minioClient.RemoveObjectAsync(removeObjectArgs);
+                await _s3Client.DeleteObjectAsync(deleteRequest);
                 _logger.LogInformation("Deleted file {Path}", storagePath);
             }
         }

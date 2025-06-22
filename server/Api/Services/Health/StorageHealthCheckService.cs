@@ -4,14 +4,14 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Api.Services.Health;
 
-public class MinioHealthCheckService : IHealthCheck
+public class StorageHealthCheckService : IHealthCheck
 {
     private readonly IFileStorageService _fileStorageService;
-    private readonly ILogger<MinioHealthCheckService> _logger;
+    private readonly ILogger<StorageHealthCheckService> _logger;
 
-    public MinioHealthCheckService(
+    public StorageHealthCheckService(
         IFileStorageService fileStorageService,
-        ILogger<MinioHealthCheckService> logger)
+        ILogger<StorageHealthCheckService> logger)
     {
         _fileStorageService = fileStorageService;
         _logger = logger;

@@ -212,7 +212,23 @@ public static class JourneyImageEndpoints
             var filePath = fileRecord.StoragePath;
             if (parsedSize != ImageSizeType.Original)
             {
-                filePath = imageProcessingService.GetResizedImagePath(fileRecord.StoragePath, parsedSize);
+                var directory = Path.GetDirectoryName(fileRecord.StoragePath)?.Replace("\\", "/") ?? "";
+                var fileName = Path.GetFileNameWithoutExtension(fileRecord.StoragePath);
+                var extension = Path.GetExtension(fileRecord.StoragePath);
+                
+                var sizeSuffix = parsedSize switch
+                {
+                    ImageSizeType.Normal => "_normal",
+                    ImageSizeType.Medium => "_medium", 
+                    ImageSizeType.Small => "_small",
+                    ImageSizeType.Tiny => "_tiny",
+                    _ => string.Empty
+                };
+                
+                var resizedFileName = $"{fileName}{sizeSuffix}{extension}";
+                filePath = string.IsNullOrEmpty(directory) 
+                    ? resizedFileName 
+                    : $"{directory}/{resizedFileName}";
             }
 
             var etagValue = GenerateETag(fileRecord.Id, parsedSize, fileRecord.LastModifiedAt);
@@ -223,11 +239,6 @@ public static class JourneyImageEndpoints
             {
                 return TypedResults.StatusCode(StatusCodes.Status304NotModified);
             }
-
-            var headers = new Dictionary<string, string>
-            {
-                ["Cache-Control"] = "public,max-age=31536000"
-            };
 
             try
             {

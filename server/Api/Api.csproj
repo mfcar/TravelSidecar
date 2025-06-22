@@ -19,7 +19,8 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Minio" />
+        <PackageReference Include="AWSSDK.S3" />
+        <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />
         <PackageReference Include="NodaTime" />
         <PackageReference Include="NodaTime.Serialization.SystemTextJson" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />

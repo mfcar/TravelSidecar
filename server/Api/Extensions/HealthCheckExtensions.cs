@@ -29,7 +29,7 @@ public static class HealthCheckExtensions
 
                     var host = Environment.GetEnvironmentVariable("DB_HOST") ?? dbConfig.Host;
                     var port = Environment.GetEnvironmentVariable("DB_PORT") != null
-                        ? int.Parse(Environment.GetEnvironmentVariable("DB_PORT"))
+                        ? int.Parse(Environment.GetEnvironmentVariable("DB_PORT")!)
                         : dbConfig.Port;
                     var database = Environment.GetEnvironmentVariable("DB_NAME") ?? dbConfig.Name;
                     var username = Environment.GetEnvironmentVariable("DB_USER") ?? dbConfig.User;
@@ -45,9 +45,9 @@ public static class HealthCheckExtensions
             .AddCheck<MemoryHealthCheckService>("memory",
                 failureStatus: HealthStatus.Degraded,
                 tags: ["monitoring", "resource"])
-            .AddCheck<MinioHealthCheckService>("storage",
+            .AddCheck<StorageHealthCheckService>("storage",
                 failureStatus: HealthStatus.Degraded,
-                tags: ["ready", "storage"]);;
+                tags: ["ready", "storage"]);
     }
 
     public static void MapHealthCheckEndpoints(this IEndpointRouteBuilder endpoints)
