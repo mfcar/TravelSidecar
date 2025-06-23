@@ -7,6 +7,7 @@ import { JourneyCategoryService } from '../../../../services/journey-category.se
 import { JourneyService } from '../../../../services/journey.service';
 import { ToastService, ToastType } from '../../../../services/toast.service';
 import { ButtonComponent } from '../../../buttons/button/button.component';
+import { DateOnlyInputComponent } from '../../../forms/date-only-input/date-only-input.component';
 import { GenericSelectorInputComponent } from '../../../forms/generic-selector-input/generic-selector-input.component';
 import { TagsSelectorInputComponent } from '../../../forms/tags-selector-input/tags-selector-input.component';
 import { TextInputComponent } from '../../../forms/text-input/text-input.component';
@@ -26,6 +27,7 @@ import { CreateUpdateJourneyCategoryModal } from '../../journeyCategories/create
     TagsSelectorInputComponent,
     BaseModalComponent,
     GenericSelectorInputComponent,
+    DateOnlyInputComponent,
   ],
   templateUrl: './create-update-journey-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,6 +43,8 @@ export class CreateUpdateJourneyModal implements OnInit {
   private journeyCategoryService = inject(JourneyCategoryService);
   private dialog = inject(Dialog);
   categories = signal<JourneyCategory[]>([]);
+  minEndDate = signal<string | null>(null);
+  maxStartDate = signal<string | null>(null);
 
   form: FormGroup;
   isUpdateMode = false;
@@ -51,8 +55,27 @@ export class CreateUpdateJourneyModal implements OnInit {
       name: ['', [Validators.required, Validators.maxLength(120)]],
       description: [''],
       categoryId: [''],
+      startDate: [null],
+      endDate: [null],
       tagIds: [[]],
     });
+
+    this.form.get('startDate')?.valueChanges.subscribe((date) => {
+      if (date) {
+        this.minEndDate.set(date);
+      } else {
+        this.minEndDate.set(null);
+      }
+    });
+
+    this.form.get('endDate')?.valueChanges.subscribe((date) => {
+      if (date) {
+        this.maxStartDate.set(date);
+      } else {
+        this.maxStartDate.set(null);
+      }
+    });
+
     this.loadCategories();
   }
 
@@ -62,10 +85,19 @@ export class CreateUpdateJourneyModal implements OnInit {
       this.journey = this.dialogData.journey;
 
       if (this.journey) {
+        const startDate = this.journey.startDate
+          ? new Date(this.journey.startDate).toISOString().split('T')[0]
+          : null;
+        const endDate = this.journey.endDate
+          ? new Date(this.journey.endDate).toISOString().split('T')[0]
+          : null;
+
         this.form.patchValue({
           name: this.journey.name,
           description: this.journey.description,
           categoryId: this.journey.categoryId,
+          startDate: startDate,
+          endDate: endDate,
         });
 
         if (this.journey.tags && Array.isArray(this.journey.tags)) {
@@ -93,11 +125,28 @@ export class CreateUpdateJourneyModal implements OnInit {
   onSubmit() {
     if (this.form.valid) {
       this.isLoading.set(true);
-      const request: CreateUpdateJourneyRequest = this.form.value;
+
+      const formValue = this.form.value;
+
+      const request: CreateUpdateJourneyRequest = {
+        name: formValue.name,
+        description: formValue.description,
+        categoryId: formValue.categoryId || undefined,
+        tagIds: formValue.tagIds || [],
+        startDate: formValue.startDate || null,
+        endDate: formValue.endDate || null,
+      };
+
+      if (request.startDate === undefined) {
+        request.startDate = null;
+      }
+      if (request.endDate === undefined) {
+        request.endDate = null;
+      }
 
       if (this.isUpdateMode && this.journey) {
         this.journeyService.updateJourney(this.journey.id, request).subscribe({
-          next: (response) => {
+          next: () => {
             this.dialogRef.close(true);
             this.toastsService.show({
               message: 'Journey updated successfully',

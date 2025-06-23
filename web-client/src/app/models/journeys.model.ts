@@ -33,12 +33,8 @@ export interface JourneyImage {
 export interface CreateUpdateJourneyRequest {
   name: string;
   description?: string;
-  startDay: number;
-  startMonth: number;
-  startYear: number;
-  endDay: number;
-  endMonth: number;
-  endYear: number;
+  startDate?: string | null; // ISO date format: YYYY-MM-DD
+  endDate?: string | null; // ISO date format: YYYY-MM-DD
   categoryId?: string;
   tagIds?: string[];
 }

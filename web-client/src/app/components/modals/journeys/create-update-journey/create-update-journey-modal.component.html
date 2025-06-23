@@ -24,6 +24,26 @@
           />
             <ts-text-input formControlName="name" label="Name" placeholder="Enter name" [showRequiredIndicator]="true"/>
             <ts-textarea-input formControlName="description" label="Description" placeholder="Enter description"/>
+            
+            <div class="flex flex-col md:flex-row gap-4">
+              <div class="flex-1">
+                <ts-date-only-input 
+                  formControlName="startDate" 
+                  label="Start Date" 
+                  helpText="Journey start date (optional)"
+                  [maxDate]="maxStartDate()" 
+                />
+              </div>
+              <div class="flex-1">
+                <ts-date-only-input 
+                  formControlName="endDate" 
+                  label="End Date" 
+                  helpText="Journey end date (optional)"
+                  [minDate]="minEndDate()"
+                />
+              </div>
+            </div>
+            
             <ts-tags-selector-input formControlName="tagIds" label="Tags"/>
       
         </form>

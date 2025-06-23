@@ -17,6 +17,8 @@ import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { debounceTime, Subject, take } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { JourneyDurationBadgeComponent } from '../../../components/badges/journey-duration-badge/journey-duration-badge.component';
+import { JourneyTimingBadgeComponent } from '../../../components/badges/journey-timing-badge/journey-timing-badge.component';
 import { TagBadgeComponent } from '../../../components/badges/tag-badge/tag-badge.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import { ListFilterTextInputComponent } from '../../../components/forms/list-filter-text-input/list-filter-text-input.component';
@@ -56,6 +58,8 @@ import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe'
     UserDateFormatPipe,
     StackListViewMode,
     TagBadgeComponent,
+    JourneyTimingBadgeComponent,
+    JourneyDurationBadgeComponent,
     StickyListToolsComponent,
     PaginationComponent,
     RouterLink,
@@ -79,7 +83,7 @@ export class JourneysListPage implements OnInit, OnDestroy {
   selectedSortBy = signal<string>('name');
   selectedSortOrder = signal<'asc' | 'desc'>('asc');
   selectedViewMode = signal<ListViewMode>(ListViewMode.Table);
-  selectedFields = signal<Set<string>>(new Set(['name', 'description', 'categoryName']));
+  selectedFields = signal<Set<string>>(new Set(['name', 'description', 'status', 'categoryName']));
   // displayedItems = signal<Journey[]>([]);
   pageSize = signal<number>(25);
   // totalCount = signal<number>(0);
@@ -91,6 +95,7 @@ export class JourneysListPage implements OnInit, OnDestroy {
   fieldOptions = [
     { id: 'name', label: 'Name' },
     { id: 'description', label: 'Description' },
+    { id: 'status', label: 'Status' },
     { id: 'categoryName', label: 'Category' },
     { id: 'tags', label: 'Tags' },
     { id: 'createdAt', label: 'Created Date' },
@@ -125,6 +130,8 @@ export class JourneysListPage implements OnInit, OnDestroy {
   categoryAtStackCell = viewChild<TemplateRef<Journey>>('categoryAtStackCell');
   nameCell = viewChild<TemplateRef<Journey>>('nameCell');
   nameStackCell = viewChild<TemplateRef<Journey>>('nameStackCell');
+  timingCell = viewChild<TemplateRef<Journey>>('timingCell');
+  timingStackCell = viewChild<TemplateRef<Journey>>('timingStackCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -166,6 +173,14 @@ export class JourneysListPage implements OnInit, OnDestroy {
         stackLabelTemplate: this.nameStackCell(),
       },
       { key: 'description', header: 'Description', sortable: false },
+      {
+        key: 'status',
+        header: 'Status',
+        sortable: false,
+        cellTemplate: this.timingCell(),
+        stackLabelTemplate: this.timingStackCell(),
+        gridLabelTemplate: this.timingStackCell(),
+      },
       {
         key: 'categoryName',
         header: 'Category',

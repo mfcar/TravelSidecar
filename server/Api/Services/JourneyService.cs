@@ -8,7 +8,7 @@ public interface IJourneyService
     int? CalculateDaysUntilStartJourney(LocalDate? startDate);
     int? CalculateJourneyDurationInDays(LocalDate? startDate, LocalDate? endDate);
     JourneyStatus CalculateStatus(LocalDate? startDate, LocalDate? endDate);
-    (LocalDate? StartDate, LocalDate? EndDate, string? Error) ValidateAndParseDates(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay);
+    (LocalDate? StartDate, LocalDate? EndDate, string? Error) ValidateAndParseDates(DateOnly? startDate, DateOnly? endDate);
 }
 
 public class JourneyService : IJourneyService
@@ -69,30 +69,29 @@ public class JourneyService : IJourneyService
     }
 
     public (LocalDate? StartDate, LocalDate? EndDate, string? Error) ValidateAndParseDates(
-        int startYear, int startMonth, int startDay, 
-        int endYear, int endMonth, int endDay)
+        DateOnly? startDate, DateOnly? endDate)
     {
-        LocalDate? startDate = null;
-        LocalDate? endDate = null;
+        LocalDate? startLocalDate = null;
+        LocalDate? endLocalDate = null;
 
-        if (startYear != 0 && startMonth != 0 && startDay != 0)
+        if (startDate.HasValue)
         {
-            startDate = new LocalDate(startYear, startMonth, startDay);
+            startLocalDate = LocalDate.FromDateOnly(startDate.Value);
         }
 
-        if (endYear != 0 && endMonth != 0 && endDay != 0)
+        if (endDate.HasValue)
         {
-            endDate = new LocalDate(endYear, endMonth, endDay);
+            endLocalDate = LocalDate.FromDateOnly(endDate.Value);
         }
 
-        if (endDate.HasValue && startDate.HasValue)
+        if (endLocalDate.HasValue && startLocalDate.HasValue)
         {
-            if (endDate < startDate)
+            if (endLocalDate < startLocalDate)
             {
                 return (null, null, "End date cannot be before the Start date.");
             }
         }
 
-        return (startDate, endDate, null);
+        return (startLocalDate, endLocalDate, null);
     }
 }

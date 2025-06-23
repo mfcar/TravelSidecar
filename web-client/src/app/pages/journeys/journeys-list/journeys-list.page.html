@@ -157,3 +157,17 @@
       {{ item.name }}
     </a>
   </ng-template>
+  
+  <ng-template #timingCell let-item>
+    <div class="flex items-center gap-2">
+      <ts-journey-timing-badge [journey]="item" />
+      <ts-journey-duration-badge [journey]="item" />
+    </div>
+  </ng-template>
+  
+  <ng-template #timingStackCell let-item>
+    <div class="flex items-center gap-2 flex-wrap">
+      <ts-journey-timing-badge [journey]="item" />
+      <ts-journey-duration-badge [journey]="item" />
+    </div>
+  </ng-template>

@@ -35,8 +35,7 @@ public static partial class JourneyEndpoints
         }
 
         var (startDate, endDate, dateError) = journeyService.ValidateAndParseDates(
-            req.StartYear, req.StartMonth, req.StartDay,
-            req.EndYear, req.EndMonth, req.EndDay);
+            req.StartDate, req.EndDate);
 
         if (dateError != null)
         {

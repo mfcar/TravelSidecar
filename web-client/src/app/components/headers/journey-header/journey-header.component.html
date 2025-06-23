@@ -20,26 +20,30 @@
         <h1 class="truncate text-2xl font-bold text-gray-900 dark:text-white">
           Journey: {{ journey()?.name || 'Loading...' }}
         </h1>
-        
-        @if (journey()?.categoryId && journey()?.categoryName) {
-          <div class="mt-2">
-            <ts-category-badge 
-              [name]="journey()!.categoryName" 
-              [clickable]="true" 
-              [categoryId]="journey()!.categoryId" 
-              [showIcon]="true" 
-            />
+
+        @if (journey()) {
+          <div class="mt-3 mb-2 flex items-center gap-2 flex-wrap">
+            @if (journey()!.categoryId && journey()!.categoryName) {
+              <ts-category-badge
+                [name]="journey()!.categoryName"
+                [clickable]="true"
+                [categoryId]="journey()!.categoryId"
+                [showIcon]="true"
+              />
+            }
+            <ts-journey-timing-badge [journey]="journey()!" />
+            <ts-journey-duration-badge [journey]="journey()!" />
           </div>
         }
-        
+
         @if (journey()?.tags && journey()?.tags?.length) {
           <div class="flex flex-wrap gap-2 mt-2">
             @for (tag of journey()!.tags; track tag.id) {
-              <ts-tag-badge 
-                [label]="tag.name" 
-                [color]="tag.color!" 
-                [clickable]="true" 
-                [tagId]="tag.id" 
+              <ts-tag-badge
+                [label]="tag.name"
+                [color]="tag.color!"
+                [clickable]="true"
+                [tagId]="tag.id"
                 [showIcon]="true"
               />
             }

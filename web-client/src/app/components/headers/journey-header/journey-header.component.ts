@@ -2,12 +2,20 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { environment } from '../../../../environments/environment';
 import { Journey } from '../../../models/journeys.model';
 import { CategoryBadgeComponent } from '../../badges/category-badge/category-badge.component';
+import { JourneyDurationBadgeComponent } from '../../badges/journey-duration-badge/journey-duration-badge.component';
+import { JourneyTimingBadgeComponent } from '../../badges/journey-timing-badge/journey-timing-badge.component';
 import { TagBadgeComponent } from '../../badges/tag-badge/tag-badge.component';
 import { ButtonComponent } from '../../buttons/button/button.component';
 
 @Component({
   selector: 'ts-journey-header',
-  imports: [ButtonComponent, TagBadgeComponent, CategoryBadgeComponent],
+  imports: [
+    ButtonComponent,
+    TagBadgeComponent,
+    CategoryBadgeComponent,
+    JourneyTimingBadgeComponent,
+    JourneyDurationBadgeComponent,
+  ],
   templateUrl: './journey-header.component.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
