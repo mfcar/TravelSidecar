@@ -40,6 +40,7 @@ export interface CreateUpdateJourneyRequest {
   endMonth: number;
   endYear: number;
   categoryId?: string;
+  tagIds?: string[];
 }
 
 export interface JourneysFilterRequest {

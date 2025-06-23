@@ -1,6 +1,7 @@
 using Api.Data.Context;
 using Api.Data.Entities;
 using Api.DTOs.Journeys;
+using Api.DTOs.Tags;
 using Api.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,7 @@ public static partial class JourneyEndpoints
         var journey = await context.Journeys
             .AsNoTracking()
             .Include(j => j.JourneyCategory)
+            .Include(j => j.Tags)
             .Where(j => j.UserId == authenticatedUser.Id && j.Id == journeyId)
             .FirstOrDefaultAsync(ct);
 
@@ -49,7 +51,13 @@ public static partial class JourneyEndpoints
             CategoryName = journey.JourneyCategory?.Name ?? string.Empty,
             DaysUntilStart = journeyService.CalculateDaysUntilStartJourney(journey.StartDate),
             JourneyDurationInDays = journeyService.CalculateJourneyDurationInDays(journey.StartDate, journey.EndDate),
-            Status = journeyService.CalculateStatus(journey.StartDate, journey.EndDate)
+            Status = journeyService.CalculateStatus(journey.StartDate, journey.EndDate),
+            Tags = journey.Tags.Select(t => new TagDto
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Color = t.Color
+            }).ToList()
         });
     }
 }

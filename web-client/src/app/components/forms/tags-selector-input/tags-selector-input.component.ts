@@ -29,7 +29,6 @@ import {
   distinctUntilChanged,
   map,
   Observable,
-  ReplaySubject,
   shareReplay,
   Subject,
   switchMap,
@@ -87,7 +86,6 @@ export class TagsSelectorInputComponent implements ControlValueAccessor, OnDestr
   private refreshTrigger = new BehaviorSubject<boolean>(true);
   protected allTags$: Observable<Tag[]>;
   protected filteredTags$: Observable<Tag[]>;
-  private pendingSelection = new ReplaySubject<string[]>(1);
 
   // References
   protected trigger = viewChild.required<ElementRef>('trigger');
@@ -125,13 +123,13 @@ export class TagsSelectorInputComponent implements ControlValueAccessor, OnDestr
     );
 
     this.allTags$.pipe(takeUntil(this.destroy$)).subscribe((tags) => {
-      this.pendingSelection.pipe(take(1)).subscribe((tagIds) => {
-        if (tagIds && tagIds.length > 0) {
-          const selectedTags = tags.filter((tag) => tagIds.includes(tag.id));
-          this.selectedTagIds.set(tagIds);
+      const currentTagIds = this.selectedTagIds();
+      if (currentTagIds && currentTagIds.length > 0) {
+        const selectedTags = tags.filter((tag) => currentTagIds.includes(tag.id));
+        if (selectedTags.length !== this.selectedTags().length) {
           this.selectedTags.set(selectedTags);
         }
-      });
+      }
     });
 
     this.filteredTags$ = this.createFilteredTagsObservable(this.allTags$);
@@ -372,8 +370,7 @@ export class TagsSelectorInputComponent implements ControlValueAccessor, OnDestr
     if (value && Array.isArray(value)) {
       this.selectedTagIds.set(value);
 
-      this.pendingSelection.next(value);
-
+      // Try to apply the selection immediately if tags are already loaded
       this.allTags$.pipe(take(1), takeUntil(this.destroy$)).subscribe((tags) => {
         const selectedTags = tags.filter((tag) => value.includes(tag.id));
         this.selectedTags.set(selectedTags);
@@ -381,7 +378,6 @@ export class TagsSelectorInputComponent implements ControlValueAccessor, OnDestr
     } else {
       this.selectedTagIds.set([]);
       this.selectedTags.set([]);
-      this.pendingSelection.next([]);
     }
   }
 
@@ -417,7 +413,6 @@ export class TagsSelectorInputComponent implements ControlValueAccessor, OnDestr
     this.destroy$.next();
     this.destroy$.complete();
     this.searchTerms.complete();
-    this.pendingSelection.complete();
 
     if (this.scrollTimeout) {
       window.clearTimeout(this.scrollTimeout);

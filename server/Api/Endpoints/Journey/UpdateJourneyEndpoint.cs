@@ -15,6 +15,7 @@ public static partial class JourneyEndpoints
         IAuthenticatedUserService authenticatedUserService,
         IJourneyService journeyService,
         IJourneyCategoryService journeyCategoryService,
+        ITagService tagService,
         CancellationToken ct)
     {
         var authenticatedUser = await authenticatedUserService.GetUserAsync();
@@ -24,6 +25,7 @@ public static partial class JourneyEndpoints
         }
 
         var journey = await context.Journeys
+            .Include(j => j.Tags)
             .Where(j => j.UserId == authenticatedUser.Id && j.Id == journeyId)
             .FirstOrDefaultAsync(ct);
 
@@ -49,12 +51,21 @@ public static partial class JourneyEndpoints
             return TypedResults.BadRequest(new { Error = categoryError });
         }
 
+        var validTags = await tagService.ValidateAndGetTagsAsync(
+            req.TagIds, authenticatedUser.Id, ct);
+
         journey.Name = req.Name;
         journey.Description = req.Description;
         journey.StartDate = startDate;
         journey.EndDate = endDate;
         journey.JourneyCategoryId = category?.Id;
         journey.LastModifiedAt = Instant.FromDateTimeUtc(DateTime.UtcNow);
+
+        journey.Tags.Clear();
+        foreach (var tag in validTags)
+        {
+            journey.Tags.Add(tag);
+        }
 
         context.Journeys.Update(journey);
         await context.SaveChangesAsync(ct);
