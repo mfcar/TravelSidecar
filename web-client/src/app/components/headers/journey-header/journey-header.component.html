@@ -20,6 +20,19 @@
         <h1 class="truncate text-2xl font-bold text-gray-900 dark:text-white">
           Journey: {{ journey()?.name || 'Loading...' }}
         </h1>
+        
+        @if (journey()?.tags && journey()?.tags?.length) {
+          <div class="flex flex-wrap gap-2 mt-2">
+            @for (tag of journey()!.tags; track tag.id) {
+              <ts-tag-badge 
+                [label]="tag.name" 
+                [color]="tag.color!" 
+                [clickable]="true" 
+                [tagId]="tag.id" 
+              />
+            }
+          </div>
+        }
       </div>
 
       <div
