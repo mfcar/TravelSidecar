@@ -21,6 +21,17 @@
           Journey: {{ journey()?.name || 'Loading...' }}
         </h1>
         
+        @if (journey()?.categoryId && journey()?.categoryName) {
+          <div class="mt-2">
+            <ts-category-badge 
+              [name]="journey()!.categoryName" 
+              [clickable]="true" 
+              [categoryId]="journey()!.categoryId" 
+              [showIcon]="true" 
+            />
+          </div>
+        }
+        
         @if (journey()?.tags && journey()?.tags?.length) {
           <div class="flex flex-wrap gap-2 mt-2">
             @for (tag of journey()!.tags; track tag.id) {
@@ -29,6 +40,7 @@
                 [color]="tag.color!" 
                 [clickable]="true" 
                 [tagId]="tag.id" 
+                [showIcon]="true"
               />
             }
           </div>

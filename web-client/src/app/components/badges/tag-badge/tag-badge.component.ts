@@ -1,14 +1,16 @@
 import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faTags } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'ts-tag-badge',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, FontAwesomeModule],
   template: `
     <span
-      class="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
+      class="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset transition-colors duration-200"
       [ngClass]="[
         lightClasses().bg,
         lightClasses().text,
@@ -16,6 +18,8 @@ import { Router } from '@angular/router';
         darkClasses().bg,
         darkClasses().text,
         darkClasses().ring,
+        hoverClasses().bg,
+        hoverClasses().ring,
         cursorClass(),
       ]"
       [attr.role]="clickable() ? 'button' : undefined"
@@ -23,6 +27,9 @@ import { Router } from '@angular/router';
       (click)="navigateToTagDetails()"
       (keydown.enter)="navigateToTagDetails()"
     >
+      @if (showIcon()) {
+        <fa-icon class="h-3 w-3" [icon]="faTags" />
+      }
       {{ label() }}
     </span>
   `,
@@ -33,6 +40,9 @@ export class TagBadgeComponent {
   color = input.required<string>();
   clickable = input<boolean>(false);
   tagId = input<string | undefined>(undefined);
+  showIcon = input<boolean>(false);
+
+  faTags = faTags;
 
   router = inject(Router);
 
@@ -348,6 +358,142 @@ export class TagBadgeComponent {
           bg: 'dark:bg-gray-400/10',
           text: 'dark:text-gray-400',
           ring: 'dark:ring-gray-400/20',
+        };
+    }
+  });
+
+  hoverClasses = computed(() => {
+    if (!this.clickable()) {
+      return {
+        bg: '',
+        ring: '',
+      };
+    }
+
+    const colorName = this.color();
+
+    if (!colorName) {
+      return {
+        bg: 'hover:bg-gray-100 dark:hover:bg-gray-500/20',
+        ring: 'hover:ring-gray-600/20 dark:hover:ring-gray-400/30',
+      };
+    }
+
+    switch (colorName) {
+      case 'red':
+        return {
+          bg: 'hover:bg-red-100 dark:hover:bg-red-500/20',
+          ring: 'hover:ring-red-700/20 dark:hover:ring-red-400/30',
+        };
+      case 'orange':
+        return {
+          bg: 'hover:bg-orange-100 dark:hover:bg-orange-500/20',
+          ring: 'hover:ring-orange-700/20 dark:hover:ring-orange-400/30',
+        };
+      case 'amber':
+        return {
+          bg: 'hover:bg-amber-100 dark:hover:bg-amber-500/20',
+          ring: 'hover:ring-amber-700/20 dark:hover:ring-amber-400/30',
+        };
+      case 'yellow':
+        return {
+          bg: 'hover:bg-yellow-100 dark:hover:bg-yellow-500/20',
+          ring: 'hover:ring-yellow-700/20 dark:hover:ring-yellow-400/30',
+        };
+      case 'lime':
+        return {
+          bg: 'hover:bg-lime-100 dark:hover:bg-lime-500/20',
+          ring: 'hover:ring-lime-700/20 dark:hover:ring-lime-400/30',
+        };
+      case 'green':
+        return {
+          bg: 'hover:bg-green-100 dark:hover:bg-green-600/20',
+          ring: 'hover:ring-green-700/20 dark:hover:ring-green-500/30',
+        };
+      case 'emerald':
+        return {
+          bg: 'hover:bg-emerald-100 dark:hover:bg-emerald-500/20',
+          ring: 'hover:ring-emerald-700/20 dark:hover:ring-emerald-400/30',
+        };
+      case 'teal':
+        return {
+          bg: 'hover:bg-teal-100 dark:hover:bg-teal-500/20',
+          ring: 'hover:ring-teal-700/20 dark:hover:ring-teal-400/30',
+        };
+      case 'cyan':
+        return {
+          bg: 'hover:bg-cyan-100 dark:hover:bg-cyan-500/20',
+          ring: 'hover:ring-cyan-700/20 dark:hover:ring-cyan-400/30',
+        };
+      case 'sky':
+        return {
+          bg: 'hover:bg-sky-100 dark:hover:bg-sky-500/20',
+          ring: 'hover:ring-sky-700/20 dark:hover:ring-sky-400/30',
+        };
+      case 'blue':
+        return {
+          bg: 'hover:bg-blue-100 dark:hover:bg-blue-500/20',
+          ring: 'hover:ring-blue-700/20 dark:hover:ring-blue-400/40',
+        };
+      case 'indigo':
+        return {
+          bg: 'hover:bg-indigo-100 dark:hover:bg-indigo-500/20',
+          ring: 'hover:ring-indigo-700/20 dark:hover:ring-indigo-400/40',
+        };
+      case 'violet':
+        return {
+          bg: 'hover:bg-violet-100 dark:hover:bg-violet-500/20',
+          ring: 'hover:ring-violet-700/20 dark:hover:ring-violet-400/40',
+        };
+      case 'purple':
+        return {
+          bg: 'hover:bg-purple-100 dark:hover:bg-purple-500/20',
+          ring: 'hover:ring-purple-700/20 dark:hover:ring-purple-400/40',
+        };
+      case 'fuchsia':
+        return {
+          bg: 'hover:bg-fuchsia-100 dark:hover:bg-fuchsia-500/20',
+          ring: 'hover:ring-fuchsia-700/20 dark:hover:ring-fuchsia-400/30',
+        };
+      case 'pink':
+        return {
+          bg: 'hover:bg-pink-100 dark:hover:bg-pink-500/20',
+          ring: 'hover:ring-pink-700/20 dark:hover:ring-pink-400/30',
+        };
+      case 'rose':
+        return {
+          bg: 'hover:bg-rose-100 dark:hover:bg-rose-500/20',
+          ring: 'hover:ring-rose-700/20 dark:hover:ring-rose-400/30',
+        };
+      case 'slate':
+        return {
+          bg: 'hover:bg-slate-100 dark:hover:bg-slate-500/20',
+          ring: 'hover:ring-slate-700/20 dark:hover:ring-slate-400/30',
+        };
+      case 'gray':
+        return {
+          bg: 'hover:bg-gray-100 dark:hover:bg-gray-500/20',
+          ring: 'hover:ring-gray-700/20 dark:hover:ring-gray-400/30',
+        };
+      case 'zinc':
+        return {
+          bg: 'hover:bg-zinc-100 dark:hover:bg-zinc-500/20',
+          ring: 'hover:ring-zinc-700/20 dark:hover:ring-zinc-400/30',
+        };
+      case 'neutral':
+        return {
+          bg: 'hover:bg-neutral-100 dark:hover:bg-neutral-500/20',
+          ring: 'hover:ring-neutral-700/20 dark:hover:ring-neutral-400/30',
+        };
+      case 'stone':
+        return {
+          bg: 'hover:bg-stone-100 dark:hover:bg-stone-500/20',
+          ring: 'hover:ring-stone-700/20 dark:hover:ring-stone-400/30',
+        };
+      default:
+        return {
+          bg: 'hover:bg-gray-100 dark:hover:bg-gray-500/20',
+          ring: 'hover:ring-gray-600/20 dark:hover:ring-gray-400/30',
         };
     }
   });
