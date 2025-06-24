@@ -1,0 +1,99 @@
+<div class="space-y-4">
+  <div class="flex items-center justify-between">
+    <button
+      type="button"
+      class="p-1 text-gray-500 hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400 disabled:opacity-50 disabled:cursor-not-allowed"
+      (click)="onPreviousPage()"
+      [disabled]="!canGoToPrevious()"
+      i18n-aria-label="@@activityPagination.previousPage"
+      aria-label="Previous page"
+    >
+      <fa-icon [icon]="['fas', 'chevron-left']" class="h-5 w-5" />
+    </button>
+    
+    <div class="text-center">
+      <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        {{ selectedDayLabel() }}
+      </h2>
+    </div>
+    
+    <button
+      type="button"
+      class="p-1 text-gray-500 hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400 disabled:opacity-50 disabled:cursor-not-allowed"
+      (click)="onNextPage()"
+      [disabled]="!canGoToNext()"
+      i18n-aria-label="@@activityPagination.nextPage"
+      aria-label="Next page"
+    >
+      <fa-icon [icon]="['fas', 'chevron-right']" class="h-5 w-5" />
+    </button>
+  </div>
+
+  <div class="grid grid-cols-7 text-xs leading-6 text-gray-500 dark:text-gray-400">
+    @for (day of weekDays(); track $index) {
+      <div class="text-center font-medium">{{ day }}</div>
+    }
+  </div>
+
+  <div class="grid grid-cols-7 gap-1">
+    @for (day of visibleDays(); track day.date?.getTime() || day.dayIndex) {
+      <button
+        type="button"
+        class="relative p-3 text-xs rounded-lg transition-colors duration-200 border"
+        [ngClass]="{
+          'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700': !day.isWeekend && !day.isInJourneyRange && !day.isSelected,
+          'bg-sky-50 dark:bg-sky-900/20 border-sky-200 dark:border-sky-700': !day.isWeekend && day.isInJourneyRange && !day.isSelected,
+          'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600': day.isWeekend && !day.isInJourneyRange && !day.isSelected,
+          'bg-sky-100 dark:bg-sky-800/30 border-sky-300 dark:border-sky-600': day.isWeekend && day.isInJourneyRange && !day.isSelected,
+          'bg-sky-600 dark:bg-sky-500 border-sky-600 dark:border-sky-500 text-white': day.isSelected,
+          'text-gray-900 dark:text-gray-100': !day.isSelected && !day.isToday,
+          'text-indigo-600 dark:text-indigo-400 font-semibold': day.isToday && !day.isSelected,
+          'hover:bg-gray-50 dark:hover:bg-gray-750': !day.isSelected,
+          'hover:bg-sky-700 dark:hover:bg-sky-600': day.isSelected
+        }"
+        (click)="onDayClick(day)"
+        [attr.aria-label]="'Select ' + day.label"
+      >
+        @if (day.isJourneyStartDate) {
+          <div 
+            class="absolute top-0 left-0 w-0 h-0 border-l-[6px] border-t-[6px] border-l-green-500 border-t-green-500 border-r-[6px] border-b-[6px] border-r-transparent border-b-transparent"
+            i18n-title="@@activityPagination.journeyStartDate"
+            title="Journey start date"
+          ></div>
+        }
+        
+        @if (day.isJourneyEndDate) {
+          <div 
+            class="absolute bottom-0 right-0 w-0 h-0 border-r-[6px] border-b-[6px] border-r-red-500 border-b-red-500 border-l-[6px] border-t-[6px] border-l-transparent border-t-transparent"
+            i18n-title="@@activityPagination.journeyEndDate"
+            title="Journey end date"
+          ></div>
+        }
+
+        <div class="relative text-center flex flex-col items-center justify-center h-full">
+          @if (day.weekdayLabel) {
+            <div class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase mb-1">
+              {{ day.weekdayLabel }}
+            </div>
+          }
+          <div class="text-sm font-semibold">
+            {{ day.label }}
+          </div>
+          
+          @if (day.hasActivities && !day.isSelected && !day.isToday) {
+            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+          }
+          
+          @if (day.isToday && !day.isSelected && !day.hasActivities) {
+            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+          }
+          
+          @if (day.isToday && day.hasActivities && !day.isSelected) {
+            <div class="absolute bottom-0 left-1/2 transform -translate-x-2 translate-y-1 w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+            <div class="absolute bottom-0 left-1/2 transform translate-x-0.5 translate-y-1 w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+          }
+        </div>
+      </button>
+    }
+  </div>
+</div>

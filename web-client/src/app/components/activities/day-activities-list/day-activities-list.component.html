@@ -1,0 +1,90 @@
+<div class="space-y-3">
+  @if (isLoading()) {
+    <div class="flex items-center justify-center py-8">
+      <div class="animate-pulse text-center">
+        <fa-icon [icon]="['fas', 'spinner']" class="h-6 w-6 text-blue-500 animate-spin" />
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Loading activities...</p>
+      </div>
+    </div>
+  } @else if (activities().length === 0) {
+    <div class="text-center py-8">
+      <fa-icon [icon]="['fas', 'calendar-plus']" class="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+      <p class="text-sm text-gray-500 dark:text-gray-400">No activities for this day</p>
+      <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Add your first activity to get started</p>
+    </div>
+  } @else {
+    <div class="space-y-2">
+      @for (activity of activities(); track activity.id) {
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+          <div class="flex items-start justify-between">
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                {{ activity.name }}
+              </h4>
+              
+              @if (activity.description) {
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                  {{ activity.description }}
+                </p>
+              }
+            </div>
+            
+            <div class="flex items-center gap-1 ml-2">
+              <button
+                type="button"
+                class="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                (click)="onEditActivity(activity)"
+                title="Edit activity"
+              >
+                <fa-icon [icon]="['fas', 'pencil']" class="h-3 w-3" />
+              </button>
+              
+              <button
+                type="button"
+                class="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                (click)="onDeleteActivity(activity.id)"
+                title="Delete activity"
+              >
+                <fa-icon [icon]="['fas', 'trash']" class="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+          
+          <div class="mt-2 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+            @if (activity.startDateTime) {
+              <div class="flex items-center gap-1">
+                <fa-icon [icon]="['fas', 'clock']" class="h-3 w-3" />
+                <span>{{ formatTime(activity.startDateTime) }}</span>
+                @if (activity.endDateTime) {
+                  <span> - {{ formatTime(activity.endDateTime) }}</span>
+                }
+              </div>
+            }
+            
+            @if (activity.location) {
+              <div class="flex items-center gap-1">
+                <fa-icon [icon]="['fas', 'map-marker-alt']" class="h-3 w-3" />
+                <span class="truncate">{{ activity.location }}</span>
+              </div>
+            }
+            
+            @if (activity.cost && activity.cost > 0) {
+              <div class="flex items-center gap-1">
+                <fa-icon [icon]="['fas', 'dollar-sign']" class="h-3 w-3" />
+                <span>{{ formatCost(activity.cost, activity.currencyCode) }}</span>
+              </div>
+            }
+          </div>
+          
+          @if (viewMode() === ActivitiesViewMode.Manual) {
+            <div class="mt-2 flex justify-center">
+              <div class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <fa-icon [icon]="['fas', 'grip-lines']" class="h-3 w-3" />
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

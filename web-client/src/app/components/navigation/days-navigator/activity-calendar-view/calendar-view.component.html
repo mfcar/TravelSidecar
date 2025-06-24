@@ -1,0 +1,119 @@
+<div class="space-y-4">
+  <div class="flex items-center justify-between">
+    <button
+      class="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
+      type="button"
+      (click)="onPreviousMonth()"
+      i18n-aria-label="@@activityCalendar.previousMonth"
+      aria-label="Previous month"
+    >
+      <span class="sr-only" i18n="@@activityCalendar.previousMonth">Previous month</span>
+      <fa-icon class="h-5 w-5" [icon]="['fas', 'chevron-left']" />
+    </button>
+
+    <div class="flex-auto text-center">
+      <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        {{ currentMonthLabel() }}
+      </h2>
+    </div>
+
+    <button
+      class="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
+      type="button"
+      (click)="onNextMonth()"
+      i18n-aria-label="@@activityCalendar.nextMonth"
+      aria-label="Next month"
+    >
+      <span class="sr-only" i18n="@@activityCalendar.nextMonth">Next month</span>
+      <fa-icon class="h-5 w-5" [icon]="['fas', 'chevron-right']" />
+    </button>
+  </div>
+
+  <div class="grid grid-cols-7 text-xs leading-6 text-gray-500 dark:text-gray-400">
+    @for (day of weekDays(); track $index) {
+      <div class="text-center font-medium">{{ day }}</div>
+    }
+  </div>
+
+  <div
+    class="isolate grid grid-cols-7 gap-px rounded-lg bg-gray-200 dark:bg-gray-700 text-sm shadow ring-1 ring-gray-200 dark:ring-gray-600"
+  >
+    @for (day of calendarDays(); track day.date.getTime()) {
+      <button
+        class="py-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 focus:z-10 transition-colors relative"
+        type="button"
+        [ngClass]="{
+          'bg-white dark:bg-gray-800':
+            day.isCurrentMonth && !day.isWeekend && !day.isInJourneyRange,
+          'bg-sky-50 dark:bg-sky-900/20':
+            day.isCurrentMonth && !day.isWeekend && day.isInJourneyRange,
+          'bg-gray-100 dark:bg-gray-700':
+            day.isCurrentMonth && day.isWeekend && !day.isInJourneyRange,
+          'bg-sky-100 dark:bg-sky-800/30':
+            day.isCurrentMonth && day.isWeekend && day.isInJourneyRange,
+          'bg-gray-50 dark:bg-gray-600': !day.isCurrentMonth,
+          'font-semibold': day.isSelected || day.isToday,
+          'text-white bg-sky-600 hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-600':
+            day.isSelected,
+          'text-gray-900 dark:text-gray-100': !day.isSelected && !day.isToday && day.isCurrentMonth,
+          'text-gray-400 dark:text-gray-500':
+            !day.isSelected && !day.isToday && !day.isCurrentMonth,
+          'text-indigo-600 dark:text-indigo-400': day.isToday && !day.isSelected,
+          'rounded-tl-lg': $index === 0,
+          'rounded-tr-lg': $index === 6,
+          'rounded-bl-lg': $index === 35,
+          'rounded-br-lg': $index === 41,
+        }"
+        (click)="onDayClick(day)"
+        [attr.aria-label]="'Select ' + day.date.toLocaleDateString()"
+      >
+        @if (day.isJourneyStartDate) {
+          <div
+            class="absolute top-0 left-0 w-0 h-0 border-l-[8px] border-t-[8px] border-l-green-500 border-t-green-500 border-r-[8px] border-b-[8px] border-r-transparent border-b-transparent"
+            i18n-title="@@calendar.journeyStartDate"
+            title="Journey start date"
+          ></div>
+        }
+
+        @if (day.isJourneyEndDate) {
+          <div
+            class="absolute bottom-0 right-0 w-0 h-0 border-r-[8px] border-b-[8px] border-r-red-500 border-b-red-500 border-l-[8px] border-t-[8px] border-l-transparent border-t-transparent"
+            i18n-title="@@calendar.journeyEndDate"
+            title="Journey end date"
+          ></div>
+        }
+
+        <time
+          class="mx-auto flex h-7 w-7 items-center justify-center rounded-full relative"
+          [attr.datetime]="day.date.toISOString().split('T')[0]"
+          [ngClass]="{
+            'bg-sky-600 text-white dark:bg-sky-500': day.isSelected,
+          }"
+        >
+          {{ day.dayNumber }}
+
+          @if (day.hasActivities && !day.isSelected && !day.isToday) {
+            <div
+              class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full"
+            ></div>
+          }
+
+          @if (day.isToday && !day.isSelected && !day.hasActivities) {
+            <div
+              class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-0.5 w-1.5 h-1.5 bg-indigo-500 rounded-full"
+            ></div>
+          }
+
+          @if (day.isToday && day.hasActivities && !day.isSelected) {
+            <div
+              class="absolute bottom-0 left-1/2 transform -translate-x-2 translate-y-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full"
+            ></div>
+            <div
+              class="absolute bottom-0 left-1/2 transform translate-x-0.5 translate-y-0.5 w-1.5 h-1.5 bg-indigo-500 rounded-full"
+            ></div>
+          }
+        </time>
+      </button>
+    }
+  </div>
+</div>
