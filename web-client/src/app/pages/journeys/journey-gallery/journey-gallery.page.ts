@@ -5,8 +5,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   imports: [],
   templateUrl: './journey-gallery.page.html',
   styles: ``,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class JourneyGalleryPage {
-
-}
+export class JourneyGalleryPage {}

@@ -8,7 +8,7 @@
           type="button"
           class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors duration-200"
           [ngClass]="{
-            'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm': viewMode() === DayNavigatorMode.Pagination,
+            'bg-white dark:bg-gray-700 text-sky-600 dark:text-sky-400 shadow-sm': viewMode() === DayNavigatorMode.Pagination,
             'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200': viewMode() !== DayNavigatorMode.Pagination
           }"
           (click)="onToggleViewMode(DayNavigatorMode.Pagination)"
@@ -22,7 +22,7 @@
           type="button"
           class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors duration-200"
           [ngClass]="{
-            'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm': viewMode() === DayNavigatorMode.Calendar,
+            'bg-white dark:bg-gray-700 text-sky-600 dark:text-sky-400 shadow-sm': viewMode() === DayNavigatorMode.Calendar,
             'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200': viewMode() !== DayNavigatorMode.Calendar
           }"
           (click)="onToggleViewMode(DayNavigatorMode.Calendar)"

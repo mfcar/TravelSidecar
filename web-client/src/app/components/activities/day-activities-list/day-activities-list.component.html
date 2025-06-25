@@ -2,7 +2,7 @@
   @if (isLoading()) {
     <div class="flex items-center justify-center py-8">
       <div class="animate-pulse text-center">
-        <fa-icon [icon]="['fas', 'spinner']" class="h-6 w-6 text-blue-500 animate-spin" />
+        <fa-icon [icon]="['fas', 'spinner']" class="h-6 w-6 text-sky-500 animate-spin" />
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Loading activities...</p>
       </div>
     </div>
@@ -32,7 +32,7 @@
             <div class="flex items-center gap-1 ml-2">
               <button
                 type="button"
-                class="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                class="p-1 text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
                 (click)="onEditActivity(activity)"
                 title="Edit activity"
               >
