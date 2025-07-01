@@ -57,7 +57,9 @@ export class JwtService {
     if (idToken) {
       try {
         return this.jwtHelper.decodeToken(idToken);
-      } catch {}
+      } catch {
+        /* empty */
+      }
     }
 
     const accessToken = this.getAccessToken();

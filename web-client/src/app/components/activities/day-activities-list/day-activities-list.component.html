@@ -1,4 +1,4 @@
-<div class="space-y-3">
+<div class="space-y-3 min-h-0">
   @if (isLoading()) {
     <div class="flex items-center justify-center py-8">
       <div class="animate-pulse text-center">
@@ -13,75 +13,153 @@
       <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Add your first activity to get started</p>
     </div>
   } @else {
-    <div class="space-y-2">
+    <div class="space-y-2 overflow-y-auto">
       @for (activity of activities(); track activity.id) {
-        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-          <div class="flex items-start justify-between">
-            <div class="flex-1 min-w-0">
-              <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                {{ activity.name }}
-              </h4>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200">
+          <!-- Main activity card - clickable to expand -->
+          <button 
+            type="button"
+            class="w-full p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-inset"
+            (click)="onToggleActivityDetails(activity.id)"
+            [attr.aria-expanded]="isActivityExpanded(activity.id)"
+            [attr.aria-label]="'Toggle details for ' + activity.name"
+          >
+            <div class="flex items-start justify-between">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                    {{ activity.name }}
+                  </h4>
+                  
+                  <!-- Expand/collapse indicator -->
+                  <fa-icon 
+                    [icon]="['fas', isActivityExpanded(activity.id) ? 'chevron-up' : 'chevron-down']" 
+                    class="h-3 w-3 text-gray-400 flex-shrink-0 transition-transform duration-200"
+                  />
+                </div>
+                
+                @if (activity.description && !isActivityExpanded(activity.id)) {
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
+                    {{ activity.description }}
+                  </p>
+                }
+              </div>
               
+              <!-- Action buttons - prevent click propagation -->
+              <div class="flex items-center gap-1 ml-2">
+                <button
+                  type="button"
+                  class="p-1 text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1"
+                  (click)="$event.stopPropagation(); onEditActivity(activity)"
+                  title="Edit activity"
+                  aria-label="Edit activity"
+                >
+                  <fa-icon [icon]="['fas', 'pencil']" class="h-3 w-3" />
+                </button>
+                
+                <button
+                  type="button"
+                  class="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+                  (click)="$event.stopPropagation(); onDeleteActivity(activity.id)"
+                  title="Delete activity"
+                  aria-label="Delete activity"
+                >
+                  <fa-icon [icon]="['fas', 'trash']" class="h-3 w-3" />
+                </button>
+              </div>
+            </div>
+          </button>
+          
+          <!-- Expanded details section -->
+          @if (isActivityExpanded(activity.id)) {
+            <div class="px-3 pb-3 border-t border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-750">
               @if (activity.description) {
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-                  {{ activity.description }}
-                </p>
+                <div class="mt-3">
+                  <h5 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Description</h5>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">
+                    {{ activity.description }}
+                  </p>
+                </div>
+              }
+              
+              <div class="mt-3 space-y-2">
+                @if (activity.startDateTime) {
+                  <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <fa-icon [icon]="['fas', 'clock']" class="h-3 w-3 text-gray-500" />
+                    <span class="font-medium">Time:</span>
+                    <span>{{ formatTime(activity.startDateTime) }}</span>
+                    @if (activity.endDateTime) {
+                      <span> - {{ formatTime(activity.endDateTime) }}</span>
+                    }
+                  </div>
+                }
+                
+                @if (activity.location) {
+                  <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <fa-icon [icon]="['fas', 'map-marker-alt']" class="h-3 w-3 text-gray-500" />
+                    <span class="font-medium">Location:</span>
+                    <span>{{ activity.location }}</span>
+                  </div>
+                }
+                
+                @if (activity.cost && activity.cost > 0) {
+                  <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <fa-icon [icon]="['fas', 'dollar-sign']" class="h-3 w-3 text-gray-500" />
+                    <span class="font-medium">Cost:</span>
+                    <span>{{ formatCost(activity.cost, activity.currencyCode) }}</span>
+                  </div>
+                }
+                
+                <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <fa-icon [icon]="['fas', 'calendar']" class="h-3 w-3 text-gray-500" />
+                  <span class="font-medium">Created:</span>
+                  <span>{{ activity.createdAt.toLocaleDateString() }}</span>
+                </div>
+              </div>
+              
+              @if (viewMode() === ActivitiesViewMode.Manual) {
+                <div class="mt-3 flex justify-center">
+                  <div class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <fa-icon [icon]="['fas', 'grip-lines']" class="h-3 w-3" />
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <!-- Compact info row when collapsed -->
+            <div class="px-3 pb-3 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+              @if (activity.startDateTime) {
+                <div class="flex items-center gap-1">
+                  <fa-icon [icon]="['fas', 'clock']" class="h-3 w-3" />
+                  <span>{{ formatTime(activity.startDateTime) }}</span>
+                  @if (activity.endDateTime) {
+                    <span> - {{ formatTime(activity.endDateTime) }}</span>
+                  }
+                </div>
+              }
+              
+              @if (activity.location) {
+                <div class="flex items-center gap-1">
+                  <fa-icon [icon]="['fas', 'map-marker-alt']" class="h-3 w-3" />
+                  <span class="truncate">{{ activity.location }}</span>
+                </div>
+              }
+              
+              @if (activity.cost && activity.cost > 0) {
+                <div class="flex items-center gap-1">
+                  <fa-icon [icon]="['fas', 'dollar-sign']" class="h-3 w-3" />
+                  <span>{{ formatCost(activity.cost, activity.currencyCode) }}</span>
+                </div>
               }
             </div>
             
-            <div class="flex items-center gap-1 ml-2">
-              <button
-                type="button"
-                class="p-1 text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
-                (click)="onEditActivity(activity)"
-                title="Edit activity"
-              >
-                <fa-icon [icon]="['fas', 'pencil']" class="h-3 w-3" />
-              </button>
-              
-              <button
-                type="button"
-                class="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                (click)="onDeleteActivity(activity.id)"
-                title="Delete activity"
-              >
-                <fa-icon [icon]="['fas', 'trash']" class="h-3 w-3" />
-              </button>
-            </div>
-          </div>
-          
-          <div class="mt-2 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-            @if (activity.startDateTime) {
-              <div class="flex items-center gap-1">
-                <fa-icon [icon]="['fas', 'clock']" class="h-3 w-3" />
-                <span>{{ formatTime(activity.startDateTime) }}</span>
-                @if (activity.endDateTime) {
-                  <span> - {{ formatTime(activity.endDateTime) }}</span>
-                }
+            @if (viewMode() === ActivitiesViewMode.Manual) {
+              <div class="px-3 pb-3 flex justify-center">
+                <div class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                  <fa-icon [icon]="['fas', 'grip-lines']" class="h-3 w-3" />
+                </div>
               </div>
             }
-            
-            @if (activity.location) {
-              <div class="flex items-center gap-1">
-                <fa-icon [icon]="['fas', 'map-marker-alt']" class="h-3 w-3" />
-                <span class="truncate">{{ activity.location }}</span>
-              </div>
-            }
-            
-            @if (activity.cost && activity.cost > 0) {
-              <div class="flex items-center gap-1">
-                <fa-icon [icon]="['fas', 'dollar-sign']" class="h-3 w-3" />
-                <span>{{ formatCost(activity.cost, activity.currencyCode) }}</span>
-              </div>
-            }
-          </div>
-          
-          @if (viewMode() === ActivitiesViewMode.Manual) {
-            <div class="mt-2 flex justify-center">
-              <div class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                <fa-icon [icon]="['fas', 'grip-lines']" class="h-3 w-3" />
-              </div>
-            </div>
           }
         </div>
       }

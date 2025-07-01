@@ -1,5 +1,7 @@
-<div class="flex h-screen-minus-navbar gap-4">
-  <div class="w-96 flex flex-col bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+<div class="flex flex-col lg:flex-row h-screen-minus-navbar gap-4">
+  <!-- Activities Panel -->
+  <div class="w-full lg:w-96 flex flex-col bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+    <!-- Days Navigator -->
     <div class="border-b border-gray-200 dark:border-gray-700 p-4">
       <ts-days-navigator
         [journey]="journey() || null"
@@ -12,6 +14,7 @@
       />
     </div>
 
+    <!-- Activities View Toggle -->
     <div class="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
       <ts-activities-view-toggle
         [viewMode]="activitiesViewMode()"
@@ -19,23 +22,27 @@
       />
     </div>
 
-    <div class="flex-1 overflow-y-auto p-4">
-      <ts-day-activities-list
-        [activities]="currentDayActivities()"
-        [viewMode]="activitiesViewMode()"
-        [isLoading]="isLoadingActivities()"
-        (editActivity)="onEditActivity($event)"
-        (deleteActivity)="onDeleteActivity($event)"
-        (reorderActivities)="onReorderActivities($event)"
-      />
+    <!-- Activities List -->
+    <div class="flex-1 min-h-0 overflow-hidden">
+      <div class="h-full p-4 overflow-y-auto">
+        <ts-day-activities-list
+          [activities]="currentDayActivities()"
+          [viewMode]="activitiesViewMode()"
+          [isLoading]="isLoadingActivities()"
+          (editActivity)="onEditActivity($event)"
+          (deleteActivity)="onDeleteActivity($event)"
+          (reorderActivities)="onReorderActivities($event)"
+        />
+      </div>
     </div>
   </div>
 
-  <div class="flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+  <!-- Map Panel - Responsive: below activities on small screens, beside on large screens -->
+  <div class="order-last lg:order-none flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center min-h-64 lg:min-h-0">
     <div class="text-center text-gray-500 dark:text-gray-400">
       <fa-icon class="h-16 w-16 mx-auto mb-4" [icon]="['fas', 'map']" />
-      <h3 class="text-lg font-semibold mb-2">Map</h3>
-      <p class="text-sm">Map will be implemented in the future</p>
+      <h3 class="text-lg font-semibold mb-2" i18n="@@journeyActivities.map.title">Map</h3>
+      <p class="text-sm" i18n="@@journeyActivities.map.description">Map will be implemented in the future</p>
     </div>
   </div>
 </div>

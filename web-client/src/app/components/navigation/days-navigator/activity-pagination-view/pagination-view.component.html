@@ -29,12 +29,6 @@
     </button>
   </div>
 
-  <div class="grid grid-cols-7 text-xs leading-6 text-gray-500 dark:text-gray-400">
-    @for (day of weekDays(); track $index) {
-      <div class="text-center font-medium">{{ day }}</div>
-    }
-  </div>
-
   <div class="grid grid-cols-7 gap-1">
     @for (day of visibleDays(); track day.date?.getTime() || day.dayIndex) {
       <button
@@ -48,8 +42,8 @@
           'bg-sky-600 dark:bg-sky-500 border-sky-600 dark:border-sky-500 text-white': day.isSelected,
           'text-gray-900 dark:text-gray-100': !day.isSelected && !day.isToday,
           'text-indigo-600 dark:text-indigo-400 font-semibold': day.isToday && !day.isSelected,
-          'hover:bg-gray-50 dark:hover:bg-gray-750': !day.isSelected,
-          'hover:bg-sky-700 dark:hover:bg-sky-600': day.isSelected
+          'hover:bg-gray-100 dark:hover:bg-gray-700': !day.isSelected,
+          'hover:bg-sky-800 dark:hover:bg-sky-700': day.isSelected
         }"
         (click)="onDayClick(day)"
         [attr.aria-label]="'Select ' + day.label"
@@ -72,7 +66,7 @@
 
         <div class="relative text-center flex flex-col items-center justify-center h-full">
           @if (day.weekdayLabel) {
-            <div class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase mb-1">
+            <div class="text-xs font-medium uppercase mb-1">
               {{ day.weekdayLabel }}
             </div>
           }
@@ -80,17 +74,33 @@
             {{ day.label }}
           </div>
           
-          @if (day.hasActivities && !day.isSelected && !day.isToday) {
-            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+          @if (day.hasActivities && !day.isToday) {
+            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-1.5 h-1.5 rounded-full"
+                 [ngClass]="{
+                   'bg-orange-500': !day.isSelected,
+                   'bg-orange-200 dark:bg-orange-300': day.isSelected
+                 }"></div>
           }
           
-          @if (day.isToday && !day.isSelected && !day.hasActivities) {
-            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+          @if (day.isToday && !day.hasActivities) {
+            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-1.5 h-1.5 rounded-full"
+                 [ngClass]="{
+                   'bg-indigo-500': !day.isSelected,
+                   'bg-indigo-200 dark:bg-indigo-300': day.isSelected
+                 }"></div>
           }
           
-          @if (day.isToday && day.hasActivities && !day.isSelected) {
-            <div class="absolute bottom-0 left-1/2 transform -translate-x-2 translate-y-1 w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-            <div class="absolute bottom-0 left-1/2 transform translate-x-0.5 translate-y-1 w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+          @if (day.isToday && day.hasActivities) {
+            <div class="absolute bottom-0 left-1/2 transform -translate-x-2 translate-y-1 w-1.5 h-1.5 rounded-full"
+                 [ngClass]="{
+                   'bg-orange-500': !day.isSelected,
+                   'bg-orange-200 dark:bg-orange-300': day.isSelected
+                 }"></div>
+            <div class="absolute bottom-0 left-1/2 transform translate-x-0.5 translate-y-1 w-1.5 h-1.5 rounded-full"
+                 [ngClass]="{
+                   'bg-indigo-500': !day.isSelected,
+                   'bg-indigo-200 dark:bg-indigo-300': day.isSelected
+                 }"></div>
           }
         </div>
       </button>

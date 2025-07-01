@@ -1,7 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { of } from 'rxjs';
 import {
   ActivitiesViewMode,
   ActivitiesViewToggleComponent,
@@ -15,6 +23,7 @@ import {
   DaysNavigatorComponent,
 } from '../../../components/navigation/days-navigator/days-navigator.component';
 import { UserFirstDayOfWeek } from '../../../models/enums/user-preferences.enum';
+import { JourneyActivityService } from '../../../services/journey-activity.service';
 import { JourneyService } from '../../../services/journey.service';
 import { UserPreferencesService } from '../../../services/user-preferences.service';
 
@@ -37,6 +46,7 @@ import { UserPreferencesService } from '../../../services/user-preferences.servi
 export class JourneyActivitiesPage {
   private route = inject(ActivatedRoute);
   private journeyService = inject(JourneyService);
+  private journeyActivityService = inject(JourneyActivityService);
   private userPreferencesService = inject(UserPreferencesService);
 
   journeyId = computed(() => this.route.parent?.snapshot.paramMap.get('id'));
@@ -55,16 +65,61 @@ export class JourneyActivitiesPage {
   activitiesViewMode = signal<ActivitiesViewMode>(ActivitiesViewMode.ByTime);
   firstDayOfWeek = signal<UserFirstDayOfWeek>(UserFirstDayOfWeek.Monday);
 
-  currentDayActivities = signal<JourneyActivity[]>([]);
   allActivities = signal<JourneyActivity[]>([]);
   isLoadingActivities = signal<boolean>(false);
+
+  activitiesResource = rxResource({
+    request: () => ({ journeyId: this.journeyId(), journey: this.journey() }),
+    loader: ({ request }) => {
+      if (!request.journeyId) {
+        return of([]);
+      }
+      return this.journeyActivityService.getJourneyActivities(request.journeyId, request.journey);
+    },
+  });
+
+  dayActivitiesResource = rxResource({
+    request: () => ({
+      journeyId: this.journeyId(),
+      day: this.selectedDay(),
+      journey: this.journey(),
+    }),
+    loader: ({ request }) => {
+      if (!request.journeyId) {
+        return of([]);
+      }
+      return this.journeyActivityService.getActivitiesForDay(
+        request.journeyId,
+        request.day,
+        request.journey,
+      );
+    },
+  });
+
+  currentDayActivities = computed(() => {
+    return this.dayActivitiesResource.value() || [];
+  });
 
   constructor() {
     this.loadUserPreferences();
 
-    this.setInitialSelectedDay();
+    effect(() => {
+      const journey = this.journey();
+      if (journey) {
+        this.setInitialSelectedDay();
+      }
+    });
 
-    this.loadMockActivities();
+    effect(() => {
+      const activities = this.activitiesResource.value();
+      if (activities && Array.isArray(activities)) {
+        this.allActivities.set(activities);
+      }
+    });
+
+    effect(() => {
+      this.isLoadingActivities.set(this.dayActivitiesResource.isLoading());
+    });
   }
 
   private loadUserPreferences(): void {
@@ -92,46 +147,6 @@ export class JourneyActivitiesPage {
     ) {
       this.firstDayOfWeek.set(Number(savedFirstDayOfWeek) as UserFirstDayOfWeek);
     }
-  }
-
-  private loadMockActivities(): void {
-    const j = this.journey();
-    if (!j?.startDate) return;
-
-    const mockActivities: JourneyActivity[] = [
-      {
-        id: '1',
-        name: 'Get Thailand Visa',
-        description: 'Apply for Thailand visa at embassy',
-        startDateTime: new Date('2025-11-20T10:00:00'),
-        location: 'Thai Embassy',
-        createdAt: new Date(),
-        lastModifiedAt: new Date(),
-      },
-      {
-        id: '2',
-        name: 'Flight to Bangkok',
-        description: 'Arrive in Bangkok',
-        startDateTime: new Date(j.startDate),
-        endDateTime: new Date(new Date(j.startDate).getTime() + 4 * 60 * 60 * 1000),
-        location: 'Suvarnabhumi Airport',
-        createdAt: new Date(),
-        lastModifiedAt: new Date(),
-      },
-      {
-        id: '3',
-        name: 'Temple Visit',
-        description: 'Visit Wat Pho Temple',
-        startDateTime: new Date(new Date(j.startDate).getTime() + 24 * 60 * 60 * 1000),
-        location: 'Wat Pho Temple',
-        cost: 100,
-        currencyCode: 'THB',
-        createdAt: new Date(),
-        lastModifiedAt: new Date(),
-      },
-    ];
-
-    this.allActivities.set(mockActivities);
   }
 
   private setInitialSelectedDay(): void {

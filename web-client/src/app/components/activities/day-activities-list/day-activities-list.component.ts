@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 export enum ActivitiesViewMode {
@@ -35,12 +35,26 @@ export class DayActivitiesListComponent {
   deleteActivity = output<string>();
   reorderActivities = output<JourneyActivity[]>();
 
+  expandedActivityId = signal<string | null>(null);
+
   onEditActivity(activity: JourneyActivity): void {
     this.editActivity.emit(activity);
   }
 
   onDeleteActivity(activityId: string): void {
     this.deleteActivity.emit(activityId);
+  }
+
+  onToggleActivityDetails(activityId: string): void {
+    if (this.expandedActivityId() === activityId) {
+      this.expandedActivityId.set(null);
+    } else {
+      this.expandedActivityId.set(activityId);
+    }
+  }
+
+  isActivityExpanded(activityId: string): boolean {
+    return this.expandedActivityId() === activityId;
   }
 
   formatTime(date?: Date): string {
