@@ -1,4 +1,5 @@
 using Api.Endpoints.Account;
+using Api.Endpoints.Activities;
 using Api.Endpoints.Auth;
 using Api.Endpoints.BucketListItem;
 using Api.Endpoints.Currency;
@@ -11,6 +12,7 @@ using Api.Endpoints.Tags;
 using Api.Endpoints.Timezone;
 using Api.Endpoints.User;
 using Api.Helpers;
+using Api.Services;
 using JourneyCategoryEndpoints = Api.Endpoints.JourneyCategory.JourneyCategoryEndpoints;
 
 namespace Api.Extensions;
@@ -90,6 +92,29 @@ public static class EndpointExtensions
             .AllowAnonymous();
         journeysEndpoint.MapDelete("/{journeyId:guid}/images/{imageId:guid}",
             JourneyImageEndpoints.DeleteJourneyCoverImageAsync);
+
+        var activitiesEndpoints = apiGroup.MapGroup(Routes.Activities.Base)
+            .WithTags("Journey Activities")
+            .RequireAuthorization()
+            .RequireRateLimiting(RateLimitExtensions.DefaultPolicy);
+        activitiesEndpoints.MapGet("/", (Guid journeyId, string sortMode = "manual", 
+            IActivityService activityService = null!, IAuthenticatedUserService authenticatedUserService = null!, 
+            CancellationToken ct = default) => 
+            ActivityEndpoints.GetActivitiesAsync(journeyId, sortMode, activityService, authenticatedUserService, ct));
+        activitiesEndpoints.MapGet("/day/{dayNumber:int}", (Guid journeyId, int dayNumber, string sortMode = "manual",
+            IActivityService activityService = null!, IAuthenticatedUserService authenticatedUserService = null!,
+            CancellationToken ct = default) =>
+            ActivityEndpoints.GetActivitiesByDayAsync(journeyId, dayNumber, sortMode, activityService, authenticatedUserService, ct));
+        activitiesEndpoints.MapGet("/date/{date}", (Guid journeyId, DateOnly date, string sortMode = "manual",
+            IActivityService activityService = null!, IAuthenticatedUserService authenticatedUserService = null!,
+            CancellationToken ct = default) =>
+            ActivityEndpoints.GetActivitiesByDateAsync(journeyId, date, sortMode, activityService, authenticatedUserService, ct));
+        activitiesEndpoints.MapGet("/{activityId:guid}", ActivityEndpoints.GetActivityByIdAsync);
+        activitiesEndpoints.MapPost("/", ActivityEndpoints.CreateActivityAsync);
+        activitiesEndpoints.MapPut("/{activityId:guid}", ActivityEndpoints.UpdateActivityAsync);
+        activitiesEndpoints.MapDelete("/{activityId:guid}", ActivityEndpoints.DeleteActivityAsync);
+        activitiesEndpoints.MapPut("/reorder", ActivityEndpoints.ReorderActivitiesAsync);
+        activitiesEndpoints.MapGet("/calendar-summary", ActivityEndpoints.GetCalendarSummaryAsync);
 
         var journeyCategoryEndpoints = apiGroup.MapGroup(Routes.JourneyCategories.Base)
             .WithTags("Journey Categories")

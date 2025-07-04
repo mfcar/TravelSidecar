@@ -64,4 +64,9 @@ public static class Routes
     {
         public const string Base = "/users";
     }
+
+    public static class Activities
+    {
+        public const string Base = "/journeys/{journeyId:guid}/activities";
+    }
 }

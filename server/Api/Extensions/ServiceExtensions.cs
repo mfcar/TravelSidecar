@@ -26,5 +26,6 @@ public static class ServiceExtensions
         services.AddScoped<ITimezoneService, TimezoneService>();
         services.AddScoped<IUserPreferencesService, UserPreferencesService>();
         services.AddScoped<IVersionHistoryService, VersionHistoryService>();
+        services.AddScoped<IActivityService, ActivityService>();
     }
 }
