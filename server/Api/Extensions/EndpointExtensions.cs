@@ -41,6 +41,7 @@ public static class EndpointExtensions
         bucketListItemEndpoints.MapPost("/filter", BucketListItemEndpoints.FilterBucketListItemsAsync);
         bucketListItemEndpoints.MapPost("/", BucketListItemEndpoints.CreateBucketListItemAsync);
         bucketListItemEndpoints.MapPut("/{bucketListItemId:guid}", BucketListItemEndpoints.UpdateBucketListItemAsync);
+        bucketListItemEndpoints.MapPost("/copy-to-journey", BucketListItemEndpoints.CopyToJourneyAsync);
         
         var currencyEndpoints = apiGroup.MapGroup(Routes.Currency.Base)
             .WithTags("Currencies")

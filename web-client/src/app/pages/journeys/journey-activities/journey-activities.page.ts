@@ -33,6 +33,8 @@ import {
   BucketListPickerResult
 } from '../../../components/forms/bucket-list-picker/bucket-list-picker.component';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
+import { BucketListService } from '../../../services/bucket-list.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'ts-journey-activities',
@@ -57,6 +59,8 @@ export class JourneyActivitiesPage {
   private journeyActivityService = inject(JourneyActivityService);
   private userPreferencesService = inject(UserPreferencesService);
   private dialog = inject(Dialog);
+  private bucketListService = inject(BucketListService);
+  private toastService = inject(ToastService);
 
   journeyId = computed(() => this.route.parent?.snapshot.paramMap.get('id'));
 
@@ -238,9 +242,25 @@ export class JourneyActivitiesPage {
 
     dialogRef.closed.subscribe((result) => {
       if (result) {
-        console.log('Selected items:', result.items);
-        console.log('Action:', result.action);
-        // TODO: Create activities from selected bucket list items
+        const itemIds = result.items.map(item => item.id);
+        
+        this.bucketListService.copyToJourney(itemIds, journeyId, result.action).subscribe({
+          next: (response) => {
+            this.toastService.showSuccess(
+              `Successfully ${result.action === 'move' ? 'moved' : 'copied'} ${result.items.length} items to journey`
+            );
+            
+            // Refresh activities
+            this.activitiesResource.reload();
+            this.dayActivitiesResource.reload();
+          },
+          error: (error) => {
+            console.error('Error copying/moving items:', error);
+            this.toastService.showError(
+              `Failed to ${result.action} items to journey. Please try again.`
+            );
+          }
+        });
       }
     });
   }

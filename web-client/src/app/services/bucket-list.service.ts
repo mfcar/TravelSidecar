@@ -44,4 +44,12 @@ export class BucketListService {
   ): Observable<BucketListItem> {
     return this.httpClient.put<BucketListItem>(`${this.apiUrl}/${id}`, request);
   }
+
+  copyToJourney(itemIds: string[], journeyId: string, action: 'copy' | 'move'): Observable<any> {
+    return this.httpClient.post(`${this.apiUrl}/copy-to-journey`, {
+      itemIds,
+      journeyId,
+      action: action === 'copy' ? 0 : 1, // Map to enum values
+    });
+  }
 }
