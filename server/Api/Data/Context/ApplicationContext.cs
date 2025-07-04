@@ -16,6 +16,8 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options)
     public DbSet<OidcProvider> OidcProviders { get; init; } = null!;
     public DbSet<JourneyCategory> JourneyCategories { get; init; } = null!;
     public DbSet<Journey> Journeys { get; init; } = null!;
+    public DbSet<JourneyActivity> JourneyActivities { get; init; } = null!;
+    public DbSet<ActivityAttachment> ActivityAttachments { get; init; } = null!;
     public DbSet<Tag> Tags { get; init; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -224,6 +226,71 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options)
                 entity.HasIndex(x => x.UserId);
             });
 
+        modelBuilder
+            .Entity<JourneyActivity>(entity =>
+            {
+                entity.Property(x => x.Id)
+                    .HasValueGenerator<NpgsqlSequentialGuidValueGenerator>();
+
+                entity.HasOne(x => x.Journey)
+                    .WithMany()
+                    .HasForeignKey(x => x.JourneyId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(x => x.User)
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(x => x.CreatedByUser)
+                    .WithMany()
+                    .HasForeignKey(x => x.CreatedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.LastModifiedByUser)
+                    .WithMany()
+                    .HasForeignKey(x => x.LastModifiedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Currency)
+                    .WithMany()
+                    .HasForeignKey(x => x.CurrencyCode)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                // Configure the existing Files relationship
+                entity.HasMany(x => x.Files)
+                    .WithOne()
+                    .HasForeignKey(f => f.ActivityId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasIndex(x => x.JourneyId);
+                entity.HasIndex(x => x.UserId);
+                entity.HasIndex(x => new { x.JourneyId, x.StartDateTime, x.ManualSortOrder });
+                entity.HasIndex(x => new { x.JourneyId, x.DayNumber, x.ManualSortOrder });
+
+                entity.HasQueryFilter(x => !x.IsDeleted);
+            });
+
+        modelBuilder
+            .Entity<ActivityAttachment>(entity =>
+            {
+                entity.Property(x => x.Id)
+                    .HasValueGenerator<NpgsqlSequentialGuidValueGenerator>();
+
+                entity.HasOne(x => x.Activity)
+                    .WithMany(a => a.Attachments)
+                    .HasForeignKey(x => x.ActivityId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(x => x.FileMetadata)
+                    .WithMany()
+                    .HasForeignKey(x => x.FileMetadataId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(x => x.ActivityId);
+                entity.HasIndex(x => new { x.ActivityId, x.SortOrder });
+            });
 
         base.OnModelCreating(modelBuilder);
     }

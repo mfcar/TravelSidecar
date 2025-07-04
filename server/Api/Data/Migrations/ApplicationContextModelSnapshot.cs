@@ -18,11 +18,47 @@ namespace Api.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.3")
+                .HasAnnotation("ProductVersion", "9.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Api.Data.Entities.ActivityAttachment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ActivityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Instant>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("FileMetadataId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Instant>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("FileMetadataId");
+
+                    b.HasIndex("ActivityId", "SortOrder");
+
+                    b.ToTable("ActivityAttachments");
+                });
 
             modelBuilder.Entity("Api.Data.Entities.ApplicationRole", b =>
                 {
@@ -382,9 +418,6 @@ namespace Api.Data.Migrations
                     b.Property<bool>("IsEncrypted")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid?>("JourneyActivityId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid?>("JourneyId")
                         .HasColumnType("uuid");
 
@@ -418,8 +451,6 @@ namespace Api.Data.Migrations
                         .IsUnique();
 
                     b.HasIndex("Category");
-
-                    b.HasIndex("JourneyActivityId");
 
                     b.HasIndex("JourneyId");
 
@@ -518,14 +549,31 @@ namespace Api.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("ActivityType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<decimal?>("Cost")
                         .HasColumnType("numeric");
 
                     b.Property<Instant>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("CurrencyCode")
+                        .HasMaxLength(3)
                         .HasColumnType("character varying(3)");
+
+                    b.Property<string>("CurrencyCode1")
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<int?>("DayNumber")
+                        .HasColumnType("integer");
 
                     b.Property<Instant?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -537,6 +585,14 @@ namespace Api.Data.Migrations
                     b.Property<LocalDateTime?>("EndDateTime")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("EndLocation")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("EndTimezone")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -546,34 +602,69 @@ namespace Api.Data.Migrations
                     b.Property<Instant>("LastModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Location")
-                        .HasColumnType("text");
+                    b.Property<Guid?>("LastModifiedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ManualSortOrder")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)
                         .HasColumnType("character varying(120)");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<LocalDateTime?>("StartDateTime")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("StartLocation")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("StartTimezone")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<Guid?>("TagId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("TypeSpecificData")
+                        .HasColumnType("jsonb");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Website")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("CurrencyCode");
 
+                    b.HasIndex("CurrencyCode1");
+
                     b.HasIndex("JourneyId");
+
+                    b.HasIndex("LastModifiedByUserId");
 
                     b.HasIndex("TagId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("JourneyActivity");
+                    b.HasIndex("JourneyId", "DayNumber", "ManualSortOrder");
+
+                    b.HasIndex("JourneyId", "StartDateTime", "ManualSortOrder");
+
+                    b.ToTable("JourneyActivities");
                 });
 
             modelBuilder.Entity("Api.Data.Entities.JourneyCategory", b =>
@@ -1064,6 +1155,25 @@ namespace Api.Data.Migrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Api.Data.Entities.ActivityAttachment", b =>
+                {
+                    b.HasOne("Api.Data.Entities.JourneyActivity", "Activity")
+                        .WithMany("Attachments")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Api.Data.Entities.FileMetadata", "FileMetadata")
+                        .WithMany()
+                        .HasForeignKey("FileMetadataId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Activity");
+
+                    b.Navigation("FileMetadata");
+                });
+
             modelBuilder.Entity("Api.Data.Entities.BucketList", b =>
                 {
                     b.HasOne("Api.Data.Entities.ApplicationUser", "User")
@@ -1099,6 +1209,11 @@ namespace Api.Data.Migrations
 
             modelBuilder.Entity("Api.Data.Entities.FileMetadata", b =>
                 {
+                    b.HasOne("Api.Data.Entities.JourneyActivity", null)
+                        .WithMany("Files")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Api.Data.Entities.ApplicationUser", null)
                         .WithMany("Files")
                         .HasForeignKey("ApplicationUserId");
@@ -1107,10 +1222,6 @@ namespace Api.Data.Migrations
                         .WithOne("Image")
                         .HasForeignKey("Api.Data.Entities.FileMetadata", "BucketListItemId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Api.Data.Entities.JourneyActivity", null)
-                        .WithMany("Files")
-                        .HasForeignKey("JourneyActivityId");
 
                     b.HasOne("Api.Data.Entities.Journey", null)
                         .WithMany("Files")
@@ -1132,15 +1243,31 @@ namespace Api.Data.Migrations
 
             modelBuilder.Entity("Api.Data.Entities.JourneyActivity", b =>
                 {
+                    b.HasOne("Api.Data.Entities.ApplicationUser", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Api.Data.Entities.Currency", "Currency")
+                        .WithMany()
+                        .HasForeignKey("CurrencyCode")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Api.Data.Entities.Currency", null)
                         .WithMany("Activities")
-                        .HasForeignKey("CurrencyCode");
+                        .HasForeignKey("CurrencyCode1");
 
                     b.HasOne("Api.Data.Entities.Journey", "Journey")
                         .WithMany()
                         .HasForeignKey("JourneyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Api.Data.Entities.ApplicationUser", "LastModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("LastModifiedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Api.Data.Entities.Tag", null)
                         .WithMany("JourneyActivities")
@@ -1152,9 +1279,13 @@ namespace Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("CreatedByUser");
+
                     b.Navigation("Currency");
 
                     b.Navigation("Journey");
+
+                    b.Navigation("LastModifiedByUser");
 
                     b.Navigation("User");
                 });
@@ -1325,6 +1456,8 @@ namespace Api.Data.Migrations
 
             modelBuilder.Entity("Api.Data.Entities.JourneyActivity", b =>
                 {
+                    b.Navigation("Attachments");
+
                     b.Navigation("Files");
                 });
 
