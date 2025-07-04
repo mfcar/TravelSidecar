@@ -10,6 +10,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { of } from 'rxjs';
+import { Dialog } from '@angular/cdk/dialog';
 import {
   ActivitiesViewMode,
   ActivitiesViewToggleComponent,
@@ -26,6 +27,12 @@ import { UserFirstDayOfWeek } from '../../../models/enums/user-preferences.enum'
 import { JourneyActivityService } from '../../../services/journey-activity.service';
 import { JourneyService } from '../../../services/journey.service';
 import { UserPreferencesService } from '../../../services/user-preferences.service';
+import { 
+  BucketListPickerComponent,
+  BucketListPickerConfig,
+  BucketListPickerResult
+} from '../../../components/forms/bucket-list-picker/bucket-list-picker.component';
+import { ButtonComponent } from '../../../components/buttons/button/button.component';
 
 @Component({
   selector: 'ts-journey-activities',
@@ -34,6 +41,7 @@ import { UserPreferencesService } from '../../../services/user-preferences.servi
     DaysNavigatorComponent,
     ActivitiesViewToggleComponent,
     DayActivitiesListComponent,
+    ButtonComponent,
   ],
   templateUrl: './journey-activities.page.html',
   styles: `
@@ -48,6 +56,7 @@ export class JourneyActivitiesPage {
   private journeyService = inject(JourneyService);
   private journeyActivityService = inject(JourneyActivityService);
   private userPreferencesService = inject(UserPreferencesService);
+  private dialog = inject(Dialog);
 
   journeyId = computed(() => this.route.parent?.snapshot.paramMap.get('id'));
 
@@ -207,5 +216,32 @@ export class JourneyActivitiesPage {
 
   onReorderActivities(activities: JourneyActivity[]): void {
     console.log('Reorder activities:', activities);
+  }
+
+  openBucketListPicker(): void {
+    const journeyId = this.journeyId();
+    if (!journeyId) return;
+
+    const config: BucketListPickerConfig = {
+      mode: 'copy',
+      allowMultiple: true,
+      journeyId: journeyId
+    };
+
+    const dialogRef = this.dialog.open<BucketListPickerResult>(BucketListPickerComponent, {
+      data: config,
+      width: '900px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'bucket-list-picker-dialog',
+    });
+
+    dialogRef.closed.subscribe((result) => {
+      if (result) {
+        console.log('Selected items:', result.items);
+        console.log('Action:', result.action);
+        // TODO: Create activities from selected bucket list items
+      }
+    });
   }
 }

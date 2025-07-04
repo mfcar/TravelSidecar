@@ -16,10 +16,20 @@
 
     <!-- Activities View Toggle -->
     <div class="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-      <ts-activities-view-toggle
-        [viewMode]="activitiesViewMode()"
-        (viewModeChange)="onActivitiesViewModeChange($event)"
-      />
+      <div class="flex items-center justify-between">
+        <ts-activities-view-toggle
+          [viewMode]="activitiesViewMode()"
+          (viewModeChange)="onActivitiesViewModeChange($event)"
+        />
+        <ts-button
+          type="button"
+          variant="secondary"
+          size="sm"
+          [label]="'Add from Bucket List'"
+          icon="bucket"
+          (buttonAction)="openBucketListPicker()"
+        />
+      </div>
     </div>
 
     <!-- Activities List -->
