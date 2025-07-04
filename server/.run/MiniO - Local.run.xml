@@ -3,7 +3,8 @@
     <deployment type="docker-image">
       <settings>
         <option name="imageTag" value="quay.io/minio/minio:latest" />
-        <option name="command" value="console-address &quot;:9001&quot;" />
+<!--        <option name="command" value="console-address &quot;:9001&quot;" />-->
+        <option name="args" value="server /data --console-address &quot;:9001&quot;" />
         <option name="containerName" value="minio-local" />
         <option name="envVars">
           <list>

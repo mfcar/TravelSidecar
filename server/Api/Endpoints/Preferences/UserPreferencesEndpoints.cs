@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Api.DTOs.Preferences;
 using Api.Services;
 

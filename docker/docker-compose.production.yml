@@ -1,22 +1,9 @@
 name: travelsidecar
 
-x-config:
-  # Database configuration
+x-db-config:
   db-name: &db-name travelsidecar
   db-user: &db-user travelsidecaru
-  db-password: &db-password travelsidecarpw
-  db-port: &db-port 55432
-  
-  # MinIO configuration
-  minio-user: &minio-user minio
-  minio-password: &minio-password minio123
-  minio-port: &minio-port 9090
-  minio-console-port: &minio-console-port 9091
-  minio-data-dir: &minio-data-dir /opt/travelsidecar/minio-data
-  
-  # Application configuration
-  app-port: &app-port 8590
-  app-https-port: &app-https-port 8591
+  db-password: &db-password ${DB_PASSWORD:-travelsidecarpw}
 
 services:
   travelsidecar-app:
@@ -24,18 +11,14 @@ services:
     image: travelsidecar/travelsidecar:latest
     restart: unless-stopped
     ports:
-      - "*app-port:8080"
-      - "*app-https-port:8081"
+      - "${APP_PORT:-8590}:8080"
+      - "${APP_HTTPS_PORT:-8591}:8081"
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: *db-name
       DB_USER: *db-user
       DB_PASSWORD: *db-password
-      MINIO_ENDPOINT: minio:9000
-      MINIO_ROOT_USER: *minio-user
-      MINIO_ROOT_PASSWORD: *minio-password
-      MINIO_USE_SSL: "false"
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,7 +36,7 @@ services:
     image: imresamu/postgis:17-3.5
     restart: unless-stopped
     ports:
-      - "*db-port:5432"
+      - "${DB_PORT:-55432}:5432"
     environment:
       POSTGRES_DB: *db-name
       POSTGRES_USER: *db-user
@@ -63,7 +46,7 @@ services:
     networks:
       - travelsidecar-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
       interval: 10s
       retries: 5
       start_period: 30s
@@ -71,17 +54,17 @@ services:
 
   minio:
     container_name: travelsidecar-storage
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     restart: unless-stopped
     ports:
-      - "127.0.0.1:*minio-port:9000"
-      - "127.0.0.1:*minio-console-port:9001"
+      - "${MINIO_API_PORT:-9000}:9000"    # S3 API
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"    # Web Console
     environment:
-      MINIO_ROOT_USER: *minio-user
-      MINIO_ROOT_PASSWORD: *minio-password
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123}
+    command: server /data --console-address ":9001"
     volumes:
-      - *minio-data-dir:/data
-    command: server --console-address ":9001" /data
+      - travelsidecar-minio-data:/data
     networks:
       - travelsidecar-network
     healthcheck:
@@ -93,7 +76,9 @@ services:
 
 volumes:
   travelsidecar-postgres-data:
-    name: travelsidecar-postgres-database
+    name: travelsidecar-postgres-data
+  travelsidecar-minio-data:
+    name: travelsidecar-minio-data
 
 networks:
   travelsidecar-network:

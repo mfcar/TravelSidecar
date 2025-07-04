@@ -37,10 +37,10 @@ DB_PORT=55432
 DB_PASSWORD=your_password_here
 
 # Blog Storage (MinIO)
-MINIO_PORT=9000
+MINIO_API_PORT=9000
 MINIO_CONSOLE_PORT=9001
-MINIO_USER=your_minio_username
-MINIO_PASSWORD=your_secure_minio_password
+MINIO_ROOT_USER=minio
+MINIO_ROOT_PASSWORD=your_password_here
 ```
 
 ## For Developers

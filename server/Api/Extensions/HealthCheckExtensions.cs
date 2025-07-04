@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Api.DTOs.Config;
-using Api.Services;
 using Api.Services.Health;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
