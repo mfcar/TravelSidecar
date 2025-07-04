@@ -45,7 +45,6 @@ public class JourneyActivity
     [MaxLength(500)]
     public string? Address { get; set; }
     
-    // Contact & Web
     [MaxLength(20)]
     public string? PhoneNumber { get; set; }
     [MaxLength(200)]
@@ -58,7 +57,7 @@ public class JourneyActivity
     
     // Content
     [Column(TypeName = "text")]
-    public string? Notes { get; set; } // Markdown supported
+    public string? Notes { get; set; }
     
     // Sorting
     public int ManualSortOrder { get; set; } = 0;
@@ -73,7 +72,7 @@ public class JourneyActivity
     public bool IsDeleted { get; set; }
     public Instant? DeletedAt { get; set; }
     
-    // Audit fields (for future journey sharing)
+    // Audit fields (journey sharing)
     public Guid CreatedByUserId { get; set; }
     public Guid? LastModifiedByUserId { get; set; }
     

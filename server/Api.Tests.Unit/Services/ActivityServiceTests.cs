@@ -22,7 +22,10 @@ public class ActivityServiceTests : IDisposable
 
     public ActivityServiceTests()
     {
-        _context = TestDbContextFactory.Create();
+        var options = new DbContextOptionsBuilder<ApplicationContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+        _context = new ApplicationContext(options);
         _logger = Substitute.For<ILogger<ActivityService>>();
         _activityService = new ActivityService(_context, _logger);
     }
@@ -43,7 +46,7 @@ public class ActivityServiceTests : IDisposable
         var activity1 = CreateTestActivity(journey.Id, userId, "Activity 1", 0);
         var activity2 = CreateTestActivity(journey.Id, userId, "Activity 2", 1);
         _context.Set<JourneyActivity>().AddRange(activity1, activity2);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _activityService.GetActivitiesByJourneyIdAsync(journey.Id, "manual", CancellationToken.None);
@@ -69,7 +72,7 @@ public class ActivityServiceTests : IDisposable
         activity2.StartDateTime = new LocalDateTime(2024, 7, 15, 10, 0);
         
         _context.Set<JourneyActivity>().AddRange(activity1, activity2);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _activityService.GetActivitiesByJourneyIdAsync(journey.Id, "time", CancellationToken.None);
@@ -94,7 +97,7 @@ public class ActivityServiceTests : IDisposable
         activity2.DeletedAt = Instant.FromDateTimeUtc(DateTime.UtcNow);
         
         _context.Set<JourneyActivity>().AddRange(activity1, activity2);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _activityService.GetActivitiesByJourneyIdAsync(journey.Id, "manual", CancellationToken.None);
@@ -119,7 +122,7 @@ public class ActivityServiceTests : IDisposable
         activity2.DayNumber = 2;
         
         _context.Set<JourneyActivity>().AddRange(activity1, activity2);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _activityService.GetActivitiesByDayNumberAsync(journey.Id, 1, "manual", CancellationToken.None);
@@ -139,7 +142,7 @@ public class ActivityServiceTests : IDisposable
 
         var activity = CreateTestActivity(journey.Id, userId, "Test Activity", 0);
         _context.Set<JourneyActivity>().Add(activity);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _activityService.GetActivityByIdAsync(journey.Id, activity.Id, CancellationToken.None);
@@ -170,7 +173,7 @@ public class ActivityServiceTests : IDisposable
         var userId = Guid.NewGuid();
         var journey = TestDataBuilder.CreateJourney(userId, "Test Journey");
         _context.Set<Journey>().Add(journey);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var request = new CreateUpdateActivityRequest
         {
@@ -196,7 +199,7 @@ public class ActivityServiceTests : IDisposable
         result.EndTimezone.Should().Be("Europe/London");
 
         var savedActivity = await _context.Set<JourneyActivity>()
-            .FirstOrDefaultAsync(a => a.Id == result.Id);
+            .FirstOrDefaultAsync(a => a.Id == result.Id, TestContext.Current.CancellationToken);
         savedActivity.Should().NotBeNull();
     }
 
@@ -208,7 +211,7 @@ public class ActivityServiceTests : IDisposable
         var journey = TestDataBuilder.CreateJourney(userId, "Test Journey", 
             startDate: new LocalDate(2024, 7, 10));
         _context.Set<Journey>().Add(journey);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var request = new CreateUpdateActivityRequest
         {
@@ -235,7 +238,7 @@ public class ActivityServiceTests : IDisposable
 
         var activity = CreateTestActivity(journey.Id, userId, "Original Name", 0);
         _context.Set<JourneyActivity>().Add(activity);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var request = new CreateUpdateActivityRequest
         {
@@ -268,16 +271,22 @@ public class ActivityServiceTests : IDisposable
 
         var activity = CreateTestActivity(journey.Id, userId, "To Delete", 0);
         _context.Set<JourneyActivity>().Add(activity);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var activityId = activity.Id;
 
         // Act
-        var result = await _activityService.DeleteActivityAsync(journey.Id, activity.Id, CancellationToken.None);
+        var result = await _activityService.DeleteActivityAsync(journey.Id, activityId, CancellationToken.None);
 
         // Assert
         result.Should().BeTrue();
-        
+
+        _context.ChangeTracker.Clear();
         var deletedActivity = await _context.Set<JourneyActivity>()
-            .FirstOrDefaultAsync(a => a.Id == activity.Id);
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(a => a.Id == activityId, TestContext.Current.CancellationToken);
+
+        deletedActivity.Should().NotBeNull();
         deletedActivity!.IsDeleted.Should().BeTrue();
         deletedActivity.DeletedAt.Should().NotBeNull();
     }
@@ -293,7 +302,7 @@ public class ActivityServiceTests : IDisposable
         var activity1 = CreateTestActivity(journey.Id, userId, "Activity 1", 0);
         var activity2 = CreateTestActivity(journey.Id, userId, "Activity 2", 1);
         _context.Set<JourneyActivity>().AddRange(activity1, activity2);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var reorderRequest = new List<ActivityOrderItem>
         {
@@ -307,8 +316,8 @@ public class ActivityServiceTests : IDisposable
         // Assert
         result.Should().BeTrue();
 
-        var reorderedActivity1 = await _context.Set<JourneyActivity>().FindAsync(activity1.Id);
-        var reorderedActivity2 = await _context.Set<JourneyActivity>().FindAsync(activity2.Id);
+        var reorderedActivity1 = await _context.Set<JourneyActivity>().FindAsync([activity1.Id], TestContext.Current.CancellationToken);
+        var reorderedActivity2 = await _context.Set<JourneyActivity>().FindAsync([activity2.Id], TestContext.Current.CancellationToken);
         
         reorderedActivity1!.ManualSortOrder.Should().Be(1);
         reorderedActivity2!.ManualSortOrder.Should().Be(0);
@@ -355,7 +364,7 @@ public class ActivityServiceTests : IDisposable
         var userId = Guid.NewGuid();
         var journey = TestDataBuilder.CreateJourney(userId, "Test Journey");
         _context.Set<Journey>().Add(journey);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _activityService.ValidateJourneyAccessAsync(journey.Id, userId, CancellationToken.None);
@@ -372,7 +381,7 @@ public class ActivityServiceTests : IDisposable
         var otherUserId = Guid.NewGuid();
         var journey = TestDataBuilder.CreateJourney(ownerId, "Test Journey");
         _context.Set<Journey>().Add(journey);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _activityService.ValidateJourneyAccessAsync(journey.Id, otherUserId, CancellationToken.None);
