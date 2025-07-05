@@ -1,23 +1,10 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { JourneyActivity } from '../../../models/activities.model';
 
 export enum ActivitiesViewMode {
   ByTime = 'byTime',
   Manual = 'manual',
-}
-
-export interface JourneyActivity {
-  id: string;
-  name: string;
-  description?: string;
-  startDateTime?: Date;
-  endDateTime?: Date;
-  location?: string;
-  cost?: number;
-  currencyCode?: string;
-  dayIndex?: number;
-  createdAt: Date;
-  lastModifiedAt: Date;
 }
 
 @Component({
@@ -57,13 +44,18 @@ export class DayActivitiesListComponent {
     return this.expandedActivityId() === activityId;
   }
 
-  formatTime(date?: Date): string {
-    if (!date) return '';
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
+  formatTime(dateTime?: string): string {
+    if (!dateTime) return '';
+    try {
+      const date = new Date(dateTime);
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    } catch {
+      return '';
+    }
   }
 
   formatCost(cost?: number, currencyCode?: string): string {

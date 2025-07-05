@@ -1,39 +1,31 @@
-import { Injectable } from '@angular/core';
-import { Observable, delay, of } from 'rxjs';
-import { JourneyActivity } from '../components/activities/day-activities-list/day-activities-list.component';
-import { generateMockActivities, getActivityDates } from '../mocks/journey-activities.mock';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable, map } from 'rxjs';
+import { environment } from '../../environments/environment.development';
+import {
+  JourneyActivity,
+  ActivityOrderItem,
+  CreateUpdateActivityRequest,
+  CalendarSummaryResponse,
+  ActivityDay,
+} from '../models/activities.model';
 import { Journey } from '../models/journeys.model';
-
-export interface ActivityDay {
-  date: Date;
-  hasActivities: boolean;
-}
 
 @Injectable({
   providedIn: 'root',
 })
 export class JourneyActivityService {
-  private mockActivitiesCache = new Map<string, JourneyActivity[]>();
+  private httpClient = inject(HttpClient);
+  private apiUrl = `${environment.apiBaseUrl}/journeys`;
 
   /**
    * Get all activities for a specific journey
    */
-  getJourneyActivities(journeyId: string, journey?: Journey): Observable<JourneyActivity[]> {
-    if (this.mockActivitiesCache.has(journeyId)) {
-      return of(this.mockActivitiesCache.get(journeyId)!).pipe(delay(300));
-    }
-
-    let activities: JourneyActivity[] = [];
-
-    if (journey?.startDate) {
-      activities = generateMockActivities(new Date(journey.startDate));
-    } else {
-      activities = generateMockActivities(new Date());
-    }
-
-    this.mockActivitiesCache.set(journeyId, activities);
-
-    return of(activities).pipe(delay(300));
+  getJourneyActivities(journeyId: string, sortMode: 'time' | 'manual' = 'manual'): Observable<JourneyActivity[]> {
+    return this.httpClient.get<JourneyActivity[]>(
+      `${this.apiUrl}/${journeyId}/activities?sort=${sortMode}`,
+      { withCredentials: true }
+    );
   }
 
   /**
@@ -42,15 +34,32 @@ export class JourneyActivityService {
   getActivitiesForDay(
     journeyId: string,
     day: Date | number,
-    journey?: Journey,
+    sortMode: 'time' | 'manual' = 'manual'
   ): Observable<JourneyActivity[]> {
-    return new Observable((observer) => {
-      this.getJourneyActivities(journeyId, journey).subscribe((allActivities) => {
-        const dayActivities = this.filterActivitiesByDay(allActivities, day);
-        observer.next(dayActivities);
-        observer.complete();
-      });
-    });
+    if (typeof day === 'number') {
+      // Day number (for journeys without dates)
+      return this.httpClient.get<JourneyActivity[]>(
+        `${this.apiUrl}/${journeyId}/activities/day/${day}?sort=${sortMode}`,
+        { withCredentials: true }
+      );
+    } else {
+      // Specific date (for dated journeys)
+      const dateStr = day.toISOString().split('T')[0];
+      return this.httpClient.get<JourneyActivity[]>(
+        `${this.apiUrl}/${journeyId}/activities/date/${dateStr}?sort=${sortMode}`,
+        { withCredentials: true }
+      );
+    }
+  }
+
+  /**
+   * Get calendar summary for a journey
+   */
+  getCalendarSummary(journeyId: string): Observable<CalendarSummaryResponse> {
+    return this.httpClient.get<CalendarSummaryResponse>(
+      `${this.apiUrl}/${journeyId}/activities/calendar-summary`,
+      { withCredentials: true }
+    );
   }
 
   /**
@@ -60,127 +69,152 @@ export class JourneyActivityService {
     journeyId: string,
     journey?: Journey,
     startDate?: Date,
-    endDate?: Date,
+    endDate?: Date
   ): Observable<ActivityDay[]> {
-    return new Observable((observer) => {
-      this.getJourneyActivities(journeyId, journey).subscribe((allActivities) => {
-        const activityDates = getActivityDates(allActivities);
+    return this.getCalendarSummary(journeyId).pipe(
+      map((summary) => {
+        const days: ActivityDay[] = [];
 
-        if (startDate && endDate) {
-          const days: ActivityDay[] = [];
+        if (summary.daysWithActivities && startDate && endDate) {
+          // For dated journeys with date range
           const current = new Date(startDate);
-
+          
           while (current <= endDate) {
-            const hasActivities = activityDates.some((activityDate) =>
-              this.isSameDay(activityDate, current),
-            );
-
+            const dateStr = current.toISOString().split('T')[0];
+            const dayData = summary.daysWithActivities.find(d => d.date === dateStr);
+            
             days.push({
               date: new Date(current),
-              hasActivities,
+              hasActivities: dayData ? dayData.activityCount > 0 : false
             });
-
+            
             current.setDate(current.getDate() + 1);
           }
-
-          observer.next(days);
-        } else {
-          const days: ActivityDay[] = activityDates.map((date) => ({
-            date,
-            hasActivities: true,
-          }));
-
-          observer.next(days);
+        } else if (summary.daysWithActivities) {
+          // For dated journeys without specific range
+          days.push(...summary.daysWithActivities.map(d => ({
+            date: new Date(d.date),
+            hasActivities: d.activityCount > 0
+          })));
+        } else if (summary.daysWithActivitiesIndexed) {
+          // For undated journeys
+          days.push(...summary.daysWithActivitiesIndexed.map(d => ({
+            date: new Date(), // Placeholder date
+            hasActivities: d.activityCount > 0,
+            dayNumber: d.dayNumber
+          })));
         }
 
-        observer.complete();
-      });
-    });
+        return days;
+      })
+    );
   }
 
   /**
-   * Get activity summary for a date range (useful for calendar and pagination views)
+   * Get activity summary for a date range
    */
   getActivitySummary(
     journeyId: string,
     startDate: Date,
-    endDate: Date,
-    journey?: Journey,
+    endDate: Date
   ): Observable<Map<string, number>> {
-    return new Observable((observer) => {
-      this.getJourneyActivities(journeyId, journey).subscribe((allActivities) => {
-        const summary = new Map<string, number>();
+    return this.getCalendarSummary(journeyId).pipe(
+      map((summary) => {
+        const result = new Map<string, number>();
 
-        allActivities
-          .filter((activity) => {
-            if (!activity.startDateTime) return false;
-            const activityDate = new Date(activity.startDateTime);
-            return activityDate >= startDate && activityDate <= endDate;
-          })
-          .forEach((activity) => {
-            const dayKey = this.formatDateKey(new Date(activity.startDateTime!));
-            summary.set(dayKey, (summary.get(dayKey) || 0) + 1);
-          });
+        if (summary.daysWithActivities) {
+          summary.daysWithActivities
+            .filter((day) => {
+              const dayDate = new Date(day.date);
+              return dayDate >= startDate && dayDate <= endDate;
+            })
+            .forEach((day) => {
+              result.set(day.date, day.activityCount);
+            });
+        }
 
-        observer.next(summary);
-        observer.complete();
-      });
-    });
+        return result;
+      })
+    );
   }
 
   /**
-   * Filter activities by a specific day
+   * Get a single activity by ID
    */
-  private filterActivitiesByDay(
-    activities: JourneyActivity[],
-    day: Date | number,
-  ): JourneyActivity[] {
-    if (day instanceof Date) {
-      const targetDate = new Date(day);
-      targetDate.setHours(0, 0, 0, 0);
-
-      return activities.filter((activity) => {
-        if (!activity.startDateTime) return false;
-
-        const activityDate = new Date(activity.startDateTime);
-        activityDate.setHours(0, 0, 0, 0);
-
-        return activityDate.getTime() === targetDate.getTime();
-      });
-    }
-
-    return [];
+  getActivityById(journeyId: string, activityId: string): Observable<JourneyActivity> {
+    return this.httpClient.get<JourneyActivity>(
+      `${this.apiUrl}/${journeyId}/activities/${activityId}`,
+      { withCredentials: true }
+    );
   }
 
   /**
-   * Check if two dates are the same day
+   * Create a new activity
    */
-  private isSameDay(date1: Date, date2: Date): boolean {
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
-    d1.setHours(0, 0, 0, 0);
-    d2.setHours(0, 0, 0, 0);
-    return d1.getTime() === d2.getTime();
+  createActivity(journeyId: string, request: CreateUpdateActivityRequest): Observable<JourneyActivity> {
+    return this.httpClient.post<JourneyActivity>(
+      `${this.apiUrl}/${journeyId}/activities`,
+      request,
+      { withCredentials: true }
+    );
   }
 
   /**
-   * Format date as YYYY-MM-DD for use as map key
+   * Update an existing activity
+   */
+  updateActivity(
+    journeyId: string,
+    activityId: string,
+    request: CreateUpdateActivityRequest
+  ): Observable<JourneyActivity> {
+    return this.httpClient.put<JourneyActivity>(
+      `${this.apiUrl}/${journeyId}/activities/${activityId}`,
+      request,
+      { withCredentials: true }
+    );
+  }
+
+  /**
+   * Delete an activity
+   */
+  deleteActivity(journeyId: string, activityId: string): Observable<boolean> {
+    return this.httpClient.delete<boolean>(
+      `${this.apiUrl}/${journeyId}/activities/${activityId}`,
+      { withCredentials: true }
+    );
+  }
+
+  /**
+   * Reorder activities
+   */
+  reorderActivities(journeyId: string, activities: ActivityOrderItem[]): Observable<boolean> {
+    return this.httpClient.put<boolean>(
+      `${this.apiUrl}/${journeyId}/activities/reorder`,
+      activities,
+      { withCredentials: true }
+    );
+  }
+
+  /**
+   * Create activity from bucket list item
+   */
+  createActivityFromBucketListItem(
+    journeyId: string,
+    bucketListItemId: string,
+    action: 'move' | 'duplicate',
+    additionalData?: Partial<CreateUpdateActivityRequest>
+  ): Observable<JourneyActivity> {
+    return this.httpClient.post<JourneyActivity>(
+      `${this.apiUrl}/${journeyId}/activities/from-bucket-list/${bucketListItemId}?action=${action}`,
+      additionalData || {},
+      { withCredentials: true }
+    );
+  }
+
+  /**
+   * Helper to format date as YYYY-MM-DD
    */
   private formatDateKey(date: Date): string {
     return date.toISOString().split('T')[0];
-  }
-
-  /**
-   * Clear cache for a journey (useful when activities are updated)
-   */
-  clearJourneyCache(journeyId: string): void {
-    this.mockActivitiesCache.delete(journeyId);
-  }
-
-  /**
-   * Clear all cache
-   */
-  clearAllCache(): void {
-    this.mockActivitiesCache.clear();
   }
 }
