@@ -121,7 +121,7 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
   createdAtCell = viewChild<TemplateRef<{ $implicit: BucketListItem }>>('createdAtCell');
   startDateAtCell = viewChild<TemplateRef<{ $implicit: BucketListItem }>>('startDateAtCell');
   endDateAtCell = viewChild<TemplateRef<{ $implicit: BucketListItem }>>('endDateAtCell');
-  tagsAtCell = viewChild<TemplateRef<{ $implicit: BucketListItem }>>('tagstACell');
+  tagsAtCell = viewChild<TemplateRef<{ $implicit: BucketListItem }>>('tagsAtCell');
 
   createdAtStackLabel =
     viewChild<TemplateRef<{ $implicit: BucketListItem }>>('createdAtStackLabel');
