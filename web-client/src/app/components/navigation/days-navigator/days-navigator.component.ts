@@ -1,9 +1,9 @@
 import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { JourneyActivity } from '../../../models/activities.model';
 import { UserFirstDayOfWeek } from '../../../models/enums/user-preferences.enum';
 import { Journey } from '../../../models/journeys.model';
-import { JourneyActivity } from '../../../models/activities.model';
 import { ActivityCalendarViewComponent } from './activity-calendar-view/calendar-view.component';
 import { ActivityPaginationViewComponent } from './activity-pagination-view/pagination-view.component';
 
@@ -39,6 +39,7 @@ export class DaysNavigatorComponent {
   selectedDay = input<Date | number>(1);
   viewMode = input<DayNavigatorMode>(DayNavigatorMode.Pagination);
   activities = input<JourneyActivity[]>([]);
+  activitySummary = input<Map<string, number>>(new Map());
   firstDayOfWeek = input<UserFirstDayOfWeek>(UserFirstDayOfWeek.Monday);
 
   dayChange = output<Date | number>();
@@ -295,15 +296,17 @@ export class DaysNavigatorComponent {
   }
 
   private checkHasActivities(date: Date, activities: JourneyActivity[]): boolean {
-    return activities.some((activity) => {
-      if (!activity.startDateTime) return false;
+    const summary = this.activitySummary();
+    const dateStr = this.formatDateKey(date);
+    const count = summary.get(dateStr);
+    return (count ?? 0) > 0;
+  }
 
-      const activityDate = new Date(activity.startDateTime);
-      activityDate.setHours(0, 0, 0, 0);
-      const targetDate = new Date(date);
-      targetDate.setHours(0, 0, 0, 0);
-      return activityDate.getTime() === targetDate.getTime();
-    });
+  private formatDateKey(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private checkHasActivitiesForDay(/* dayIndex: number, activities: JourneyActivity[] */): boolean {

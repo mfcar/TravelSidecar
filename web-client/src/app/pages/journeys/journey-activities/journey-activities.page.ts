@@ -16,7 +16,6 @@ import {
   ActivitiesViewToggleComponent,
 } from '../../../components/activities/activities-view-toggle/activities-view-toggle.component';
 import { DayActivitiesListComponent } from '../../../components/activities/day-activities-list/day-activities-list.component';
-import { JourneyActivity } from '../../../models/activities.model';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import {
   BucketListPickerComponent,
@@ -24,9 +23,14 @@ import {
   BucketListPickerResult,
 } from '../../../components/forms/bucket-list-picker/bucket-list-picker.component';
 import {
+  ActivityModalComponent,
+  ActivityModalData,
+} from '../../../components/modals/activities/activity-modal.component';
+import {
   DayNavigatorMode,
   DaysNavigatorComponent,
 } from '../../../components/navigation/days-navigator/days-navigator.component';
+import { JourneyActivity } from '../../../models/activities.model';
 import { UserFirstDayOfWeek } from '../../../models/enums/user-preferences.enum';
 import { BucketListService } from '../../../services/bucket-list.service';
 import { JourneyActivityService } from '../../../services/journey-activity.service';
@@ -78,6 +82,7 @@ export class JourneyActivitiesPage {
 
   allActivities = signal<JourneyActivity[]>([]);
   isLoadingActivities = signal<boolean>(false);
+  activitySummary = signal<Map<string, number>>(new Map());
 
   activitiesResource = rxResource({
     request: () => ({ journeyId: this.journeyId(), journey: this.journey() }),
@@ -86,6 +91,16 @@ export class JourneyActivitiesPage {
         return of([]);
       }
       return this.journeyActivityService.getJourneyActivities(request.journeyId);
+    },
+  });
+
+  calendarSummaryResource = rxResource({
+    request: () => this.journeyId(),
+    loader: ({ request }) => {
+      if (!request) {
+        return of({ daysWithActivities: [], daysWithActivitiesIndexed: [] });
+      }
+      return this.journeyActivityService.getCalendarSummary(request);
     },
   });
 
@@ -99,10 +114,7 @@ export class JourneyActivitiesPage {
       if (!request.journeyId) {
         return of([]);
       }
-      return this.journeyActivityService.getActivitiesForDay(
-        request.journeyId,
-        request.day
-      );
+      return this.journeyActivityService.getActivitiesForDay(request.journeyId, request.day);
     },
   });
 
@@ -129,6 +141,19 @@ export class JourneyActivitiesPage {
 
     effect(() => {
       this.isLoadingActivities.set(this.dayActivitiesResource.isLoading());
+    });
+
+    effect(() => {
+      const summary = this.calendarSummaryResource.value();
+      if (summary) {
+        const summaryMap = new Map<string, number>();
+        if (summary.daysWithActivities) {
+          summary.daysWithActivities.forEach((day) => {
+            summaryMap.set(day.date, day.activityCount);
+          });
+        }
+        this.activitySummary.set(summaryMap);
+      }
     });
   }
 
@@ -208,15 +233,84 @@ export class JourneyActivitiesPage {
   }
 
   onEditActivity(activity: JourneyActivity): void {
-    console.log('Edit activity:', activity);
+    const journeyId = this.journeyId();
+    if (!journeyId) return;
+
+    const modalData: ActivityModalData = {
+      journeyId,
+      activity,
+      mode: 'edit',
+    };
+
+    const dialogRef = this.dialog.open<JourneyActivity>(ActivityModalComponent, {
+      data: modalData,
+      width: '700px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'activity-modal-dialog',
+    });
+
+    dialogRef.closed.subscribe((result) => {
+      if (result) {
+        // Refresh activities
+        this.activitiesResource.reload();
+        this.dayActivitiesResource.reload();
+        this.calendarSummaryResource.reload();
+      }
+    });
   }
 
   onDeleteActivity(activityId: string): void {
-    console.log('Delete activity:', activityId);
+    const journeyId = this.journeyId();
+    if (!journeyId) return;
+
+    if (confirm('Are you sure you want to delete this activity?')) {
+      this.journeyActivityService.deleteActivity(journeyId, activityId).subscribe({
+        next: () => {
+          this.toastService.showSuccess('Activity deleted successfully');
+          // Refresh activities
+          this.activitiesResource.reload();
+          this.dayActivitiesResource.reload();
+          this.calendarSummaryResource.reload();
+        },
+        error: (error) => {
+          console.error('Error deleting activity:', error);
+          this.toastService.showError('Failed to delete activity. Please try again.');
+        },
+      });
+    }
   }
 
   onReorderActivities(activities: JourneyActivity[]): void {
     console.log('Reorder activities:', activities);
+  }
+
+  openAddActivityModal(): void {
+    const journeyId = this.journeyId();
+    if (!journeyId) return;
+
+    const modalData: ActivityModalData = {
+      journeyId,
+      selectedDay: this.selectedDay(),
+      mode: 'create',
+    };
+
+    const dialogRef = this.dialog.open<JourneyActivity>(ActivityModalComponent, {
+      data: modalData,
+      width: '700px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'activity-modal-dialog',
+    });
+
+    dialogRef.closed.subscribe((result) => {
+      if (result) {
+        // Refresh activities
+        this.activitiesResource.reload();
+        this.dayActivitiesResource.reload();
+        this.calendarSummaryResource.reload();
+      }
+    });
   }
 
   openBucketListPicker(): void {

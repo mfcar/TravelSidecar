@@ -8,6 +8,7 @@
         [selectedDay]="selectedDay()"
         [viewMode]="dayNavigatorMode()"
         [activities]="allActivities()"
+        [activitySummary]="activitySummary()"
         [firstDayOfWeek]="firstDayOfWeek()"
         (dayChange)="onDayChange($event)"
         (viewModeChange)="onDayNavigatorModeChange($event)"
@@ -21,14 +22,24 @@
           [viewMode]="activitiesViewMode()"
           (viewModeChange)="onActivitiesViewModeChange($event)"
         />
-        <ts-button
-          type="button"
-          variant="secondary"
-          size="sm"
-          [label]="'Add from Bucket List'"
-          icon="bucket"
-          (buttonAction)="openBucketListPicker()"
-        />
+        <div class="flex gap-2">
+          <ts-button
+            type="button"
+            variant="primary"
+            size="sm"
+            [label]="'Add Activity'"
+            icon="plus"
+            (buttonAction)="openAddActivityModal()"
+          />
+          <ts-button
+            type="button"
+            variant="secondary"
+            size="sm"
+            [label]="'From Bucket List'"
+            icon="bucket"
+            (buttonAction)="openBucketListPicker()"
+          />
+        </div>
       </div>
     </div>
 

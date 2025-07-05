@@ -10,7 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { JourneyActivity, ActivityOrderItem } from '../../../models/activities.model';
+import { ActivityOrderItem, JourneyActivity } from '../../../models/activities.model';
 import { UserPreferences, UserTimeFormat } from '../../../models/user.model';
 import { UserPreferencesService } from '../../../services/user-preferences.service';
 import { ActivityTypeUtils } from '../../../utils/activity-type.utils';

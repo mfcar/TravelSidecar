@@ -7,7 +7,7 @@ using NodaTime;
 namespace Api.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class EnhanceActivitySchema : Migration
+    public partial class EnhanceActivitySchemaFixed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -91,8 +91,7 @@ namespace Api.Data.Migrations
                 name: "CreatedByUserId",
                 table: "JourneyActivities",
                 type: "uuid",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+                nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "CurrencyCode1",
@@ -200,6 +199,22 @@ namespace Api.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            // Update existing activities to set CreatedByUserId from UserId
+            migrationBuilder.Sql(@"
+                UPDATE ""JourneyActivities"" 
+                SET ""CreatedByUserId"" = ""UserId"" 
+                WHERE ""CreatedByUserId"" IS NULL");
+
+            // Now make CreatedByUserId non-nullable
+            migrationBuilder.AlterColumn<Guid>(
+                name: "CreatedByUserId",
+                table: "JourneyActivities",
+                type: "uuid",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uuid",
+                oldNullable: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_JourneyActivities_CreatedByUserId",

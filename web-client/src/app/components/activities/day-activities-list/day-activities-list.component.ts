@@ -36,7 +36,7 @@ export class DayActivitiesListComponent {
 
   onToggleActivityDetails(activityId: string | undefined): void {
     if (!activityId) return;
-    
+
     if (this.expandedActivityId() === activityId) {
       this.expandedActivityId.set(null);
     } else {

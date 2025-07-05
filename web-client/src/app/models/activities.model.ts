@@ -190,4 +190,3 @@ export interface ActivityDay {
   hasActivities: boolean;
   dayNumber?: number;
 }
-

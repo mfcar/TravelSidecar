@@ -10,9 +10,9 @@
     <ts-generic-selector-input
       formControlName="activityType"
       label="Activity Type"
-      [options]="activityTypes()"
-      [getOptionLabel]="(type: any) => type.name"
-      [getOptionValue]="(type: any) => type.type"
+      [items]="activityTypes()"
+      [itemLabelKey]="'name'"
+      [itemValueKey]="'type'"
       [showRequiredIndicator]="true"
       placeholder="Select activity type"
     />
@@ -28,7 +28,6 @@
       formControlName="description"
       label="Description"
       placeholder="Enter activity description"
-      [rows]="3"
     />
   </div>
 
@@ -309,7 +308,6 @@
       formControlName="notes"
       label="Notes"
       placeholder="Add any additional notes..."
-      [rows]="4"
     />
   </div>
 
@@ -317,19 +315,17 @@
   <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
     <ts-button
       type="button"
-      variant="ghost"
+      variant="secondary"
+      [label]="'Cancel'"
       (click)="onCancel()"
       [disabled]="isLoading()"
-    >
-      Cancel
-    </ts-button>
+    />
 
     <ts-button
       type="submit"
+      [label]="isUpdateMode() ? 'Update Activity' : 'Create Activity'"
       [disabled]="form.invalid || isLoading()"
       [isLoading]="isLoading()"
-    >
-      {{ isUpdateMode() ? 'Update' : 'Create' }} Activity
-    </ts-button>
+    />
   </div>
 </form>

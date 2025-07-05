@@ -307,4 +307,3 @@ export class ActivityTypeUtils {
     ].includes(type);
   }
 }
-

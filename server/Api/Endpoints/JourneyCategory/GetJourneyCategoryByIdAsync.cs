@@ -51,7 +51,7 @@ public static partial class JourneyCategoryEndpoints
                 LastModifiedAt = j.LastModifiedAt.ToDateTimeOffset(),
                 CategoryId = j.JourneyCategoryId,
                 CategoryName = journeyCategory.Name,
-                Tags = j.Tags?.Select(t => new Api.DTOs.Tags.TagDto
+                Tags = j.Tags?.Select(t => new DTOs.Tags.TagDto
                 {
                     Id = t.Id,
                     Name = t.Name,

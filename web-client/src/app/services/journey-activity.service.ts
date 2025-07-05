@@ -47,7 +47,9 @@ export class JourneyActivityService {
       );
     } else {
       // Specific date (for dated journeys)
-      const dateStr = day.toISOString().split('T')[0];
+      // Create a new date to avoid timezone issues
+      const localDate = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+      const dateStr = localDate.toISOString().split('T')[0];
       return this.httpClient.get<JourneyActivity[]>(
         `${this.apiUrl}/${journeyId}/activities/date/${dateStr}?sort=${sortMode}`,
         { withCredentials: true },

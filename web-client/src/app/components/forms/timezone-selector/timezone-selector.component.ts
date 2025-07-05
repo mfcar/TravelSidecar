@@ -4,6 +4,7 @@ import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   ElementRef,
   HostListener,
   inject,
@@ -14,7 +15,6 @@ import {
   TemplateRef,
   viewChild,
   ViewContainerRef,
-  computed,
 } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -62,9 +62,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnDestro
     if (!search) return tzList;
 
     return tzList.filter(
-      (tz) =>
-        tz.id.toLowerCase().includes(search) ||
-        tz.gmtOffset.toLowerCase().includes(search),
+      (tz) => tz.id.toLowerCase().includes(search) || tz.gmtOffset.toLowerCase().includes(search),
     );
   });
 
@@ -81,6 +79,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnDestro
   protected inputId = `timezone-select-${this.uniqueId}`;
   protected listboxId = `timezone-listbox-${this.uniqueId}`;
   protected searchId = `timezone-search-${this.uniqueId}`;
+  protected errorId = `timezone-error-${this.uniqueId}`;
 
   // Callbacks for ControlValueAccessor
   private onChange: (value: string | null) => void = () => {};
@@ -104,13 +103,12 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnDestro
   onClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
     const triggerElement = this.triggerEl()?.nativeElement;
-    
+
     if (this.overlayRef) {
       const overlayElement = this.overlayRef.overlayElement;
-      const clickedInside = 
-        triggerElement?.contains(targetElement) || 
-        overlayElement?.contains(targetElement);
-      
+      const clickedInside =
+        triggerElement?.contains(targetElement) || overlayElement?.contains(targetElement);
+
       if (!clickedInside && this.isOpen()) {
         this.close();
       }

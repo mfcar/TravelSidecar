@@ -3,7 +3,6 @@ import {
   Component,
   computed,
   effect,
-  EventEmitter,
   inject,
   input,
   OnInit,
@@ -128,6 +127,9 @@ export class ActivityFormComponent implements OnInit {
     this.loadTags();
   }
 
+  getActivityTypeLabel = (type: any): string => type.name;
+  getActivityTypeValue = (type: any): number => type.type;
+
   private initializeForm(): void {
     const activity = this.data().activity;
     this.isUpdateMode.set(!!activity);
@@ -204,7 +206,7 @@ export class ActivityFormComponent implements OnInit {
   }
 
   private loadTags(): void {
-    this.tagService.getAllTags().subscribe((response) => {
+    this.tagService.getTags().subscribe((response) => {
       this.tags.set(response.items);
     });
   }

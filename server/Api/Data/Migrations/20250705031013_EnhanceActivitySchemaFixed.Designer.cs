@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250704194340_EnhanceActivitySchema")]
-    partial class EnhanceActivitySchema
+    [Migration("20250705031013_EnhanceActivitySchemaFixed")]
+    partial class EnhanceActivitySchemaFixed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

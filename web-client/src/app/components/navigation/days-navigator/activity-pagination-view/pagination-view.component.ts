@@ -9,9 +9,9 @@ import {
   signal,
 } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { JourneyActivity } from '../../../../models/activities.model';
 import { UserFirstDayOfWeek } from '../../../../models/enums/user-preferences.enum';
 import { Journey } from '../../../../models/journeys.model';
-import { JourneyActivity } from '../../../../models/activities.model';
 
 export interface ActivityPaginationDay {
   date?: Date;
