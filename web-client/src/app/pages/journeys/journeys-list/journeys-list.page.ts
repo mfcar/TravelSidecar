@@ -108,7 +108,7 @@ export class JourneysListPage implements OnInit, OnDestroy {
     { field: 'lastModifiedAt', name: 'Last Modified Date', type: 'number' },
   ];
 
-  columns: ColumnConfig[] = [];
+  columns: ColumnConfig<Journey>[] = [];
 
   itemsCount = linkedSignal(() => Number(this.journeysResource.value().items.length || 0));
   activeFilters = computed(() => this.searchTerm().trim().length > 0);
@@ -122,16 +122,16 @@ export class JourneysListPage implements OnInit, OnDestroy {
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<Journey>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<Journey>>('lastModifiedAtCell');
-  tagsAtCell = viewChild<TemplateRef<Journey>>('tagsAtCell');
-  tagsAtStackCell = viewChild<TemplateRef<Journey>>('tagsAtStackCell');
-  categoryAtCell = viewChild<TemplateRef<Journey>>('categoryAtCell');
-  categoryAtStackCell = viewChild<TemplateRef<Journey>>('categoryAtStackCell');
-  nameCell = viewChild<TemplateRef<Journey>>('nameCell');
-  nameStackCell = viewChild<TemplateRef<Journey>>('nameStackCell');
-  timingCell = viewChild<TemplateRef<Journey>>('timingCell');
-  timingStackCell = viewChild<TemplateRef<Journey>>('timingStackCell');
+  createdAtCell = viewChild<TemplateRef<{ $implicit: Journey }>>('createdAtCell');
+  lastModifiedAtCell = viewChild<TemplateRef<{ $implicit: Journey }>>('lastModifiedAtCell');
+  tagsAtCell = viewChild<TemplateRef<{ $implicit: Journey }>>('tagsAtCell');
+  tagsAtStackCell = viewChild<TemplateRef<{ $implicit: Journey }>>('tagsAtStackCell');
+  categoryAtCell = viewChild<TemplateRef<{ $implicit: Journey }>>('categoryAtCell');
+  categoryAtStackCell = viewChild<TemplateRef<{ $implicit: Journey }>>('categoryAtStackCell');
+  nameCell = viewChild<TemplateRef<{ $implicit: Journey }>>('nameCell');
+  nameStackCell = viewChild<TemplateRef<{ $implicit: Journey }>>('nameStackCell');
+  timingCell = viewChild<TemplateRef<{ $implicit: Journey }>>('timingCell');
+  timingStackCell = viewChild<TemplateRef<{ $implicit: Journey }>>('timingStackCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -155,10 +155,7 @@ export class JourneysListPage implements OnInit, OnDestroy {
     const resource = this.journeysResource.value();
     if (!resource || this.journeysResource.isLoading()) return [];
 
-    return resource.items.map((item) => ({
-      ...item,
-      imageUrl: this.getJourneyImageUrl(item),
-    }));
+    return resource.items;
   });
 
   totalCount = computed(() => this.journeysResource.value()?.totalCount || 0);
@@ -171,8 +168,14 @@ export class JourneysListPage implements OnInit, OnDestroy {
         header: 'Name',
         cellTemplate: this.nameCell(),
         stackLabelTemplate: this.nameStackCell(),
+        getValue: (item) => item.name,
       },
-      { key: 'description', header: 'Description', sortable: false },
+      {
+        key: 'description',
+        header: 'Description',
+        sortable: false,
+        getValue: (item) => item.description,
+      },
       {
         key: 'status',
         header: 'Status',
@@ -189,12 +192,24 @@ export class JourneysListPage implements OnInit, OnDestroy {
         stackLabelTemplate: this.categoryAtStackCell(),
         gridLabelTemplate: this.categoryAtStackCell(),
       },
-      { key: 'tags', header: 'Tags', sortable: false, cellTemplate: this.tagsAtCell() },
-      { key: 'createdAt', header: 'Created At', cellTemplate: this.createdAtCell() },
+      {
+        key: 'tags',
+        header: 'Tags',
+        sortable: false,
+        cellTemplate: this.tagsAtCell(),
+        getValue: (item) => item.tags,
+      },
+      {
+        key: 'createdAt',
+        header: 'Created At',
+        cellTemplate: this.createdAtCell(),
+        getValue: (item) => item.createdAt,
+      },
       {
         key: 'lastModifiedAt',
         header: 'Last Modified At',
         cellTemplate: this.lastModifiedAtCell(),
+        getValue: (item) => item.lastModifiedAt,
       },
     ];
 
@@ -226,17 +241,17 @@ export class JourneysListPage implements OnInit, OnDestroy {
     };
   }
 
-  private getJourneyImageUrl(journey: Journey): string {
-    if (!journey.coverImageId) {
-      return '/images/placeholders/JourneyPlaceholder.png';
-    }
-    return `${environment.apiBaseUrl}/journeys/${journey.id}/cover/${journey.coverImageId}/Small`;
-  }
-
   // ─── Public Event Handlers ──────────────────────────────────────────────────────
   onFilterInputChange(filterValue: string): void {
     this.filterInput$.next(filterValue);
   }
+
+  getJourneyImageUrl = (journey: Journey): string => {
+    if (!journey.coverImageId) {
+      return '/images/placeholders/JourneyPlaceholder.png';
+    }
+    return `${environment.apiBaseUrl}/journeys/${journey.id}/cover/${journey.coverImageId}/Small`;
+  };
 
   onSortChange(event: { sortBy: string; sortDirection?: 'asc' | 'desc' }): void {
     let sortDirection: 'asc' | 'desc';

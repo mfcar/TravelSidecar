@@ -18,10 +18,11 @@ import { ColumnConfig } from '../table-list/table-list.view-mode';
 })
 export class GridListViewMode<T> {
   items = input<T[]>([]);
-  columns = input<ColumnConfig[]>([]);
+  columns = input<ColumnConfig<T>[]>([]);
   selectedFields = input.required<Set<string>>();
   hasImage = input<boolean>(false);
   placeholderImage = input<string | undefined | null>(null);
+  imageUrlGetter = input<((item: T) => string | null | undefined) | undefined>();
 
   editButtonClicked = output<T>();
   deleteButtonClicked = output<T>();
@@ -39,21 +40,36 @@ export class GridListViewMode<T> {
     this.editButtonClicked.emit(item);
   }
 
-  getCellTemplate(column: ColumnConfig): TemplateRef<unknown> | null {
+  getCellTemplate(column: ColumnConfig<T>): TemplateRef<{ $implicit: T }> | null {
     return column.gridLabelTemplate || column.stackLabelTemplate || column.cellTemplate || null;
   }
 
-  hasValue(item: T, key: string): boolean {
-    // Type-safe property access for dynamic keys
-    const value = this.getItemProperty(item, key);
-    if (key === 'tags') {
+  hasValue(item: T, column: ColumnConfig<T>): boolean {
+    if (!column.getValue) {
+      return false;
+    }
+    const value = column.getValue(item);
+    if (column.key === 'tags') {
       return Array.isArray(value) && value.length > 0;
     }
-    return value !== null && value !== undefined && value !== '';
+    return value != null && String(value) !== '';
   }
 
-  private getItemProperty(item: T, key: string): unknown {
-    // Safe property access with proper typing
-    return (item as Record<string, unknown>)[key];
+  getColumnValue(item: T, column: ColumnConfig<T>): string {
+    if (column.getValue) {
+      const value = column.getValue(item);
+      return value != null ? String(value) : '';
+    }
+    console.warn(`Column '${column.key}' has no getValue function and no template`);
+    return '';
+  }
+
+  getImageUrl(item: T): string {
+    const getter = this.imageUrlGetter();
+    if (getter) {
+      const url = getter(item);
+      return url || '';
+    }
+    return '';
   }
 }

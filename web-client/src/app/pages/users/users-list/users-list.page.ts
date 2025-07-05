@@ -101,7 +101,7 @@ export class UsersListPage implements OnInit, OnDestroy {
     { field: 'lastActiveAt', name: 'Last Active Date', type: 'number' },
   ];
 
-  columns: ColumnConfig[] = [];
+  columns: ColumnConfig<User>[] = [];
 
   itemsCount = linkedSignal(() => Number(this.usersResource.value()?.items?.length || 0));
   activeFilters = computed(() => this.searchTerm().trim().length > 0);
@@ -118,11 +118,11 @@ export class UsersListPage implements OnInit, OnDestroy {
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<User>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<User>>('lastModifiedAtCell');
-  lastActiveAtCell = viewChild<TemplateRef<User>>('lastActiveAtCell');
-  usernameAtCell = viewChild<TemplateRef<User>>('usernameAtCell');
-  usernameAtStackCell = viewChild<TemplateRef<User>>('usernameAtStackCell');
+  createdAtCell = viewChild<TemplateRef<{ $implicit: User }>>('createdAtCell');
+  lastModifiedAtCell = viewChild<TemplateRef<{ $implicit: User }>>('lastModifiedAtCell');
+  lastActiveAtCell = viewChild<TemplateRef<{ $implicit: User }>>('lastActiveAtCell');
+  usernameAtCell = viewChild<TemplateRef<{ $implicit: User }>>('usernameAtCell');
+  usernameAtStackCell = viewChild<TemplateRef<{ $implicit: User }>>('usernameAtStackCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -158,15 +158,27 @@ export class UsersListPage implements OnInit, OnDestroy {
         header: 'Username',
         cellTemplate: this.usernameAtCell(),
         stackLabelTemplate: this.usernameAtStackCell(),
+        getValue: (item) => item.username,
       },
-      { key: 'email', header: 'Email' },
-      { key: 'createdAt', header: 'Created At', cellTemplate: this.createdAtCell() },
+      { key: 'email', header: 'Email', getValue: (item) => item.email },
+      {
+        key: 'createdAt',
+        header: 'Created At',
+        cellTemplate: this.createdAtCell(),
+        getValue: (item) => item.createdAt,
+      },
       {
         key: 'lastModifiedAt',
         header: 'Last Modified At',
         cellTemplate: this.lastModifiedAtCell(),
+        getValue: (item) => item.lastModifiedAt,
       },
-      { key: 'lastActiveAt', header: 'Last Active At', cellTemplate: this.lastActiveAtCell() },
+      {
+        key: 'lastActiveAt',
+        header: 'Last Active At',
+        cellTemplate: this.lastActiveAtCell(),
+        getValue: (item) => item.lastActiveAt,
+      },
     ];
 
     this.userPrefService

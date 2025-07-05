@@ -3,13 +3,14 @@ import { ChangeDetectionStrategy, Component, input, output, TemplateRef } from '
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ButtonComponent } from '../../buttons/button/button.component';
 
-export interface ColumnConfig {
+export interface ColumnConfig<T = unknown> {
   key: string;
   header: string;
-  cellTemplate?: TemplateRef<unknown>;
-  stackLabelTemplate?: TemplateRef<unknown>;
-  gridLabelTemplate?: TemplateRef<unknown>;
+  cellTemplate?: TemplateRef<{ $implicit: T }>;
+  stackLabelTemplate?: TemplateRef<{ $implicit: T }>;
+  gridLabelTemplate?: TemplateRef<{ $implicit: T }>;
   sortable?: boolean;
+  getValue?: (item: T) => unknown;
 }
 
 @Component({
@@ -19,8 +20,16 @@ export interface ColumnConfig {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableListViewMode<T> {
+  getColumnValue(item: T, column: ColumnConfig<T>): string {
+    if (column.getValue) {
+      const value = column.getValue(item);
+      return value != null ? String(value) : '';
+    }
+    console.warn(`Column '${column.key}' has no getValue function and no template`);
+    return '';
+  }
   items = input<T[]>([]);
-  columns = input<ColumnConfig[]>([]);
+  columns = input<ColumnConfig<T>[]>([]);
   sortBy = input<string>('');
   sortDirection = input<'asc' | 'desc'>('asc');
   selectedFields = input.required<Set<string>>();
@@ -37,7 +46,7 @@ export class TableListViewMode<T> {
     this.deleteButtonClicked.emit(item);
   }
 
-  onHeaderClicked(column: ColumnConfig) {
+  onHeaderClicked(column: ColumnConfig<T>) {
     if (column.sortable === false) {
       return;
     }
@@ -48,7 +57,7 @@ export class TableListViewMode<T> {
     this.sortChanged.emit({ sortBy: column.key, sortDirection: newDirection });
   }
 
-  getSortAriaLabel(column: ColumnConfig): string {
+  getSortAriaLabel(column: ColumnConfig<T>): string {
     if (this.sortBy() === column.key) {
       return this.sortDirection() === 'asc'
         ? $localize`:@@sortDescendingAriaLabel:Sort ${column.header} descending`

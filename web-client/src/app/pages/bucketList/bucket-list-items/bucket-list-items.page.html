@@ -89,6 +89,7 @@
       (editButtonClicked)="showUpdateModal($event)"
       (deleteButtonClicked)="showDeleteModal()"
       [hasImage]="true"
+      [imageUrlGetter]="getBucketListImageUrl"
       placeholderImage="/images/placeholders/BucketListItemPlaceholder.png"
   />
 } @else if (selectedViewMode() === ListViewMode.Grid && displayedItems().length > 0) {
@@ -98,13 +99,13 @@
       [selectedFields]="selectedFields()"
       (editButtonClicked)="showUpdateModal($event)"
       [hasImage]="true"
+      [imageUrlGetter]="getBucketListImageUrl"
       placeholderImage="/images/placeholders/BucketListItemPlaceholder.png"
   />
 }
 
 <!-- ─── CUSTOM TEMPLATE DEFINITIONS FOR TABLE CELLS ────────────────────────── -->
 <ng-template #createdAtCell let-item><span>{{ item.createdAt | userDateFormat }}</span></ng-template>
-<ng-template #lastModifiedAtCell let-item><span>{{ item.lastModifiedAt | userDateFormat }}</span></ng-template>
 <ng-template #startDateAtCell let-item><span>{{ item.startDate | userDateFormat:'date' }}</span></ng-template>
 <ng-template #endDateAtCell let-item><span>{{ item.endDate | userDateFormat:'date' }}</span></ng-template>
 <ng-template #tagsAtCell let-item>
@@ -122,11 +123,6 @@
   }
 </ng-template>
 
-<ng-template #lastModifiedAtStackLabel let-item>
-  @if (item.lastModifiedAt) {
-    <span>Last modified at {{ item.lastModifiedAt | userDateFormat }}</span>
-  }
-</ng-template>
 
 <ng-template #startDateAtStackLabel let-item>
   @if (item.startDate) {

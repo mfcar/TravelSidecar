@@ -46,7 +46,7 @@
                   @if (column.cellTemplate) {
                     <ng-container *ngTemplateOutlet="column.cellTemplate; context: {$implicit: item}" />
                   } @else { 
-                    {{ $any(item)[column.key] }}
+                    {{ getColumnValue(item, column) }}
                   }
                 </dd>
               </div>
@@ -59,7 +59,7 @@
             <td class="hidden sm:table-cell px-3 py-4 text-sm text-gray-500 dark:text-gray-300">
                 @if (column.cellTemplate) {
                 <ng-container *ngTemplateOutlet="column.cellTemplate; context: {$implicit: item}" />
-                } @else { {{ $any(item)[column.key] }} }
+                } @else { {{ getColumnValue(item, column) }} }
             </td>
         }
       }

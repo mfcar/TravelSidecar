@@ -89,6 +89,7 @@
         (editButtonClicked)="showUpdateModal($event)"
         (deleteButtonClicked)="showDeleteModal()"
         [hasImage]="true"
+        [imageUrlGetter]="getJourneyImageUrl"
         placeholderImage="/images/placeholders/JourneyPlaceholder.png"
     />
   } @else if (selectedViewMode() === ListViewMode.Grid && displayedItems().length > 0) {
@@ -98,6 +99,7 @@
         [selectedFields]="selectedFields()"
         (editButtonClicked)="showUpdateModal($event)"
         [hasImage]="true"
+        [imageUrlGetter]="getJourneyImageUrl"
         placeholderImage="/images/placeholders/JourneyPlaceholder.png"
     />
   }

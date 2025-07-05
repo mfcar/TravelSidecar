@@ -92,7 +92,6 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
     { id: 'startDate', label: 'Start Date' },
     { id: 'endDate', label: 'End Date' },
     { id: 'createdAt', label: 'Created Date' },
-    { id: 'lastModifiedAt', label: 'Last Modified Date' },
   ];
 
   sortFields: SortField[] = [
@@ -100,10 +99,9 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
     { field: 'startDate', name: 'Start Date', type: 'text' },
     { field: 'endDate', name: 'End Date', type: 'text' },
     { field: 'createdAt', name: 'Created Date', type: 'number' },
-    { field: 'lastModifiedAt', name: 'Last Modified Date', type: 'number' },
   ];
 
-  columns: ColumnConfig[] = [];
+  columns: ColumnConfig<BucketListItem>[] = [];
 
   itemsCount = linkedSignal(() => Number(this.bucketListResource.value()?.items?.length || 0));
   activeFilters = computed(() => this.searchTerm().trim().length > 0);
@@ -120,17 +118,18 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<BucketListItem>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<BucketListItem>>('lastModifiedAtCell');
-  startDateAtCell = viewChild<TemplateRef<BucketListItem>>('startDateAtCell');
-  endDateAtCell = viewChild<TemplateRef<BucketListItem>>('endDateAtCell');
-  tagsAtCell = viewChild<TemplateRef<BucketListItem>>('tagstACell');
+  createdAtCell = viewChild<TemplateRef<{ $implicit: BucketListItem }>>('createdAtCell');
+  startDateAtCell = viewChild<TemplateRef<{ $implicit: BucketListItem }>>('startDateAtCell');
+  endDateAtCell = viewChild<TemplateRef<{ $implicit: BucketListItem }>>('endDateAtCell');
+  tagsAtCell = viewChild<TemplateRef<{ $implicit: BucketListItem }>>('tagstACell');
 
-  createdAtStackLabel = viewChild<TemplateRef<BucketListItem>>('createdAtStackLabel');
-  lastModifiedAtStackLabel = viewChild<TemplateRef<BucketListItem>>('lastModifiedAtStackLabel');
-  startDateAtStackLabel = viewChild<TemplateRef<BucketListItem>>('startDateAtStackLabel');
-  endDateAtStackLabel = viewChild<TemplateRef<BucketListItem>>('endDateAtStackLabel');
-  tagsAtStackCell = viewChild<TemplateRef<BucketListItem>>('tagsAtStackCell');
+  createdAtStackLabel =
+    viewChild<TemplateRef<{ $implicit: BucketListItem }>>('createdAtStackLabel');
+  startDateAtStackLabel =
+    viewChild<TemplateRef<{ $implicit: BucketListItem }>>('startDateAtStackLabel');
+  endDateAtStackLabel =
+    viewChild<TemplateRef<{ $implicit: BucketListItem }>>('endDateAtStackLabel');
+  tagsAtStackCell = viewChild<TemplateRef<{ $implicit: BucketListItem }>>('tagsAtStackCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -161,14 +160,20 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────
   ngOnInit(): void {
     this.columns = [
-      { key: 'name', header: 'Name' },
-      { key: 'description', header: 'Description', sortable: false },
+      { key: 'name', header: 'Name', getValue: (item) => item.name },
+      {
+        key: 'description',
+        header: 'Description',
+        sortable: false,
+        getValue: (item) => item.description,
+      },
       {
         key: 'tags',
         header: 'Tags',
         sortable: false,
         cellTemplate: this.tagsAtCell(),
         stackLabelTemplate: this.tagsAtStackCell(),
+        getValue: (item) => item.tags,
       },
       {
         key: 'startDate',
@@ -176,6 +181,7 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
         sortable: true,
         cellTemplate: this.startDateAtCell(),
         stackLabelTemplate: this.startDateAtStackLabel(),
+        getValue: (item) => item.startDate,
       },
       {
         key: 'endDate',
@@ -183,18 +189,14 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
         sortable: true,
         cellTemplate: this.endDateAtCell(),
         stackLabelTemplate: this.endDateAtStackLabel(),
+        getValue: (item) => item.endDate,
       },
       {
         key: 'createdAt',
         header: 'Created At',
         cellTemplate: this.createdAtCell(),
         stackLabelTemplate: this.createdAtStackLabel(),
-      },
-      {
-        key: 'lastModifiedAt',
-        header: 'Last Modified At',
-        cellTemplate: this.lastModifiedAtCell(),
-        stackLabelTemplate: this.lastModifiedAtStackLabel(),
+        getValue: (item) => item.createdAt,
       },
     ];
 
@@ -230,6 +232,12 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
   onFilterInputChange(filterValue: string): void {
     this.filterInput$.next(filterValue);
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getBucketListImageUrl = (_item: BucketListItem): string | null => {
+    // BucketListItem doesn't have imageUrl property currently
+    return null;
+  };
 
   onSortChange(event: { sortBy: string; sortDirection?: 'asc' | 'desc' }): void {
     let sortDirection: 'asc' | 'desc';

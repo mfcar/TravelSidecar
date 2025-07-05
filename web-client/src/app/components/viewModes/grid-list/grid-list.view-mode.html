@@ -6,7 +6,7 @@
             <div class="mx-auto w-full flex-shrink-0 rounded-xl flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 overflow-hidden aspect-[3/2]">
               <img 
                   class="h-full w-full object-cover" 
-                  [ngSrc]="$any(item)['imageUrl'] || placeholderImage() || '/assets/placeholder.png'" 
+                  [ngSrc]="getImageUrl(item) || placeholderImage() || '/assets/placeholder.png'" 
                   [width]="600"
                   [height]="400"
                   priority="low"
@@ -21,7 +21,7 @@
                 @if (column.gridLabelTemplate || column.stackLabelTemplate || column.cellTemplate) {
                   <ng-container *ngTemplateOutlet="getCellTemplate(column); context: {$implicit: item}" />
                 } @else {
-                  {{ $any(item)[column.key] }}
+                  {{ getColumnValue(item, column) }}
                 }
               </h3>
             }
@@ -29,14 +29,14 @@
           
           <dl class="mt-1 flex flex-grow flex-col justify-between">
             @for(column of columns(); track column.key) {
-              @if (selectedFields().has(column.key) && column.key !== primaryField() && hasValue(item, column.key)) {
+              @if (selectedFields().has(column.key) && column.key !== primaryField() && hasValue(item, column)) {
                 <div class="mt-2 text-xs text-gray-500 dark:text-gray-400 px-4 text-left">
                     @if (column.gridLabelTemplate || column.stackLabelTemplate || column.cellTemplate) {
                       <ng-container *ngTemplateOutlet="getCellTemplate(column); context: {$implicit: item}" />
                     } @else {
-                      @if ($any(item)[column.key]) {
+                      @if (getColumnValue(item, column)) {
                         <dt class="font-medium inline">{{ column.header }}: </dt>
-                        <dd class="inline">{{ $any(item)[column.key] }}</dd>
+                        <dd class="inline">{{ getColumnValue(item, column) }}</dd>
                       }
                     }
                 </div>

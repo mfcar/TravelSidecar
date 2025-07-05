@@ -102,7 +102,7 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
     { field: 'lastModifiedAt', name: 'Last Modified Date', type: 'number' },
   ];
 
-  columns: ColumnConfig[] = [];
+  columns: ColumnConfig<JourneyCategory>[] = [];
 
   itemsCount = linkedSignal(() => Number(this.categoriesResource.value()?.items?.length || 0));
   activeFilters = computed(() => this.searchTerm().trim().length > 0);
@@ -119,10 +119,12 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<JourneyCategory>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<JourneyCategory>>('lastModifiedAtCell');
-  journeysCountAtStackCell = viewChild<TemplateRef<JourneyCategory>>('journeysCountAtStackCell');
-  nameAtCell = viewChild<TemplateRef<JourneyCategory>>('nameAtCell');
+  createdAtCell = viewChild<TemplateRef<{ $implicit: JourneyCategory }>>('createdAtCell');
+  lastModifiedAtCell = viewChild<TemplateRef<{ $implicit: JourneyCategory }>>('lastModifiedAtCell');
+  journeysCountAtStackCell = viewChild<TemplateRef<{ $implicit: JourneyCategory }>>(
+    'journeysCountAtStackCell',
+  );
+  nameAtCell = viewChild<TemplateRef<{ $implicit: JourneyCategory }>>('nameAtCell');
 
   // ─── Constructor ─────────────────────────────────────────────────────────────
   constructor() {
@@ -153,18 +155,35 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────
   ngOnInit(): void {
     this.columns = [
-      { key: 'name', header: 'Name', cellTemplate: this.nameAtCell() },
-      { key: 'description', header: 'Description', sortable: false },
+      {
+        key: 'name',
+        header: 'Name',
+        cellTemplate: this.nameAtCell(),
+        getValue: (item) => item.name,
+      },
+      {
+        key: 'description',
+        header: 'Description',
+        sortable: false,
+        getValue: (item) => item.description,
+      },
       {
         key: 'journeysCount',
         header: 'Journey Count',
         cellTemplate: this.journeysCountAtStackCell(),
+        getValue: (item) => item.journeysCount,
       },
-      { key: 'createdAt', header: 'Created At', cellTemplate: this.createdAtCell() },
+      {
+        key: 'createdAt',
+        header: 'Created At',
+        cellTemplate: this.createdAtCell(),
+        getValue: (item) => item.createdAt,
+      },
       {
         key: 'lastModifiedAt',
         header: 'Last Modified At',
         cellTemplate: this.lastModifiedAtCell(),
+        getValue: (item) => item.lastModifiedAt,
       },
     ];
 

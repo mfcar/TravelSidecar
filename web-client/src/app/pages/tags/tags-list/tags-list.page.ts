@@ -102,7 +102,7 @@ export class TagsListPage implements OnInit, OnDestroy {
     { field: 'lastModifiedAt', name: 'Last Modified Date', type: 'number' },
   ];
 
-  columns: ColumnConfig[] = [];
+  columns: ColumnConfig<TagResponse>[] = [];
 
   itemsCount = linkedSignal(() => Number(this.tagsResource.value()?.items?.length || 0));
   activeFilters = computed(() => this.searchTerm().trim().length > 0);
@@ -119,12 +119,14 @@ export class TagsListPage implements OnInit, OnDestroy {
   });
 
   // ─── Template References for Custom Cell Templates ───────────────────────────
-  createdAtCell = viewChild<TemplateRef<TagResponse>>('createdAtCell');
-  lastModifiedAtCell = viewChild<TemplateRef<TagResponse>>('lastModifiedAtCell');
-  colorAtCell = viewChild<TemplateRef<TagResponse>>('colorAtCell');
-  nameAtCell = viewChild<TemplateRef<TagResponse>>('nameAtCell');
-  journeysCountAtStackCell = viewChild<TemplateRef<TagResponse>>('journeysCountAtStackCell');
-  bucketListItemCountAtStackCell = viewChild<TemplateRef<TagResponse>>(
+  createdAtCell = viewChild<TemplateRef<{ $implicit: TagResponse }>>('createdAtCell');
+  lastModifiedAtCell = viewChild<TemplateRef<{ $implicit: TagResponse }>>('lastModifiedAtCell');
+  colorAtCell = viewChild<TemplateRef<{ $implicit: TagResponse }>>('colorAtCell');
+  nameAtCell = viewChild<TemplateRef<{ $implicit: TagResponse }>>('nameAtCell');
+  journeysCountAtStackCell = viewChild<TemplateRef<{ $implicit: TagResponse }>>(
+    'journeysCountAtStackCell',
+  );
+  bucketListItemCountAtStackCell = viewChild<TemplateRef<{ $implicit: TagResponse }>>(
     'bucketListItemCountAtStackCell',
   );
 
@@ -161,23 +163,37 @@ export class TagsListPage implements OnInit, OnDestroy {
         key: 'name',
         header: 'Name',
         cellTemplate: this.nameAtCell(),
+        getValue: (item) => item.name,
       },
-      { key: 'color', header: 'Color', cellTemplate: this.colorAtCell() },
+      {
+        key: 'color',
+        header: 'Color',
+        cellTemplate: this.colorAtCell(),
+        getValue: (item) => item.color,
+      },
       {
         key: 'journeysCount',
         header: 'Journeys',
         stackLabelTemplate: this.journeysCountAtStackCell(),
+        getValue: (item) => item.journeysCount,
       },
       {
         key: 'bucketListItemCount',
         header: 'Bucket List Items',
         stackLabelTemplate: this.bucketListItemCountAtStackCell(),
+        getValue: (item) => item.bucketListItemCount,
       },
-      { key: 'createdAt', header: 'Created At', cellTemplate: this.createdAtCell() },
+      {
+        key: 'createdAt',
+        header: 'Created At',
+        cellTemplate: this.createdAtCell(),
+        getValue: (item) => item.createdAt,
+      },
       {
         key: 'lastModifiedAt',
         header: 'Last Modified At',
         cellTemplate: this.lastModifiedAtCell(),
+        getValue: (item) => item.lastModifiedAt,
       },
     ];
 
