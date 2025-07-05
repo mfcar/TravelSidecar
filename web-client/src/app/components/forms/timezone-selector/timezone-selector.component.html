@@ -1,0 +1,123 @@
+<div class="space-y-1.5">
+  @if (label()) {
+    <label [for]="inputId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      {{ label() }}
+      @if (showRequiredIndicator() || isRequired) {
+        <span class="text-red-500">*</span>
+      }
+    </label>
+  }
+
+  <div class="relative">
+    <button
+      #trigger
+      type="button"
+      [id]="inputId"
+      [disabled]="isDisabled()"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-haspopup]="'listbox'"
+      [attr.aria-controls]="isOpen() ? listboxId : null"
+      [attr.aria-labelledby]="label() ? inputId : null"
+      [attr.aria-describedby]="hasError ? errorId : null"
+      (click)="toggle()"
+      (keydown)="onTriggerKeydown($event)"
+      class="relative w-full cursor-pointer rounded-md bg-white dark:bg-gray-800 border px-3 py-2 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-colors disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-gray-900"
+      [ngClass]="{
+        'border-gray-300 dark:border-gray-600': !hasError && !isOpen(),
+        'border-red-500': hasError && !isOpen(),
+        'border-sky-500 ring-2 ring-sky-500': isOpen()
+      }"
+    >
+      <span class="block truncate" [ngClass]="{ 'text-gray-400 dark:text-gray-500': !selectedTimezone() }">
+        @if (selectedTimezone()) {
+          {{ selectedTimezone()!.id }} ({{ selectedTimezone()!.gmtOffset }})
+        } @else {
+          {{ placeholder() }}
+        }
+      </span>
+      <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+        <fa-icon
+          [icon]="['fas', 'chevron-down']"
+          class="h-3 w-3 text-gray-400"
+          [ngClass]="{ 'rotate-180': isOpen() }"
+        />
+      </span>
+    </button>
+
+    @if (hasError) {
+      <p [id]="errorId" class="mt-1 text-sm text-red-600 dark:text-red-400">
+        {{ errorMessage }}
+      </p>
+    }
+  </div>
+</div>
+
+<!-- Dropdown template -->
+<ng-template #dropdownTpl>
+  <div class="rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
+    <!-- Search input -->
+    <div class="p-2 border-b border-gray-200 dark:border-gray-700">
+      <div class="relative">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <fa-icon [icon]="['fas', 'search']" class="h-3 w-3 text-gray-400" />
+        </div>
+        <input
+          #searchInput
+          type="text"
+          [id]="searchId"
+          [value]="searchText()"
+          (input)="updateSearchText($any($event.target).value)"
+          (keydown)="onSearchKeydown($event)"
+          class="block w-full rounded-md border-0 py-1.5 pl-9 pr-3 text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-500"
+          placeholder="Search timezones..."
+          autocomplete="off"
+          role="searchbox"
+          [attr.aria-controls]="listboxId"
+        />
+      </div>
+    </div>
+
+    <!-- Timezone list -->
+    <ul
+      [id]="listboxId"
+      role="listbox"
+      [attr.aria-labelledby]="label() ? inputId : null"
+      class="max-h-60 overflow-auto py-1"
+    >
+      @if (filteredTimezones().length === 0) {
+        <li class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+          No timezones found
+        </li>
+      } @else {
+        @for (timezone of filteredTimezones(); track timezone.id; let i = $index) {
+          <li
+            role="option"
+            [attr.aria-selected]="selectedTimezone()?.id === timezone.id"
+            [attr.data-highlighted]="isItemActive(i)"
+            (click)="selectItem(timezone)"
+            (mouseenter)="activeItemIndex.set(i)"
+            class="relative cursor-pointer select-none py-2 pl-3 pr-9 text-sm transition-colors"
+            [ngClass]="{
+              'bg-sky-50 dark:bg-sky-900/20 text-sky-900 dark:text-sky-100': isItemActive(i),
+              'text-gray-900 dark:text-gray-100': !isItemActive(i)
+            }"
+          >
+            <div class="flex justify-between">
+              <span class="block truncate" [ngClass]="{ 'font-medium': selectedTimezone()?.id === timezone.id }">
+                {{ timezone.id }}
+              </span>
+              <span class="text-gray-500 dark:text-gray-400 ml-2">
+                {{ timezone.gmtOffset }}
+              </span>
+            </div>
+            @if (selectedTimezone()?.id === timezone.id) {
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-sky-600 dark:text-sky-400">
+                <fa-icon [icon]="['fas', 'check']" class="h-4 w-4" />
+              </span>
+            }
+          </li>
+        }
+      }
+    </ul>
+  </div>
+</ng-template>
