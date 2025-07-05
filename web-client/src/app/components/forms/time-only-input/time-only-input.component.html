@@ -1,1 +1,50 @@
-<p>time-only-input works!</p>
+<div>
+  @if (label()) {
+    <label [for]="inputId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      {{ label() }}
+      @if (showRequiredIndicator() && isRequired) {
+        <span class="text-red-500">*</span>
+      }
+    </label>
+  }
+  <div class="mt-1 relative">
+    <input
+      [id]="inputId"
+      [type]="inputType()"
+      [step]="inputStep()"
+      [ngModel]="inputValue()"
+      (ngModelChange)="onInputChange($event)"
+      (blur)="onInputBlur()"
+      [disabled]="isDisabled()"
+      [placeholder]="placeholder()"
+      [tabindex]="tabIndex()"
+      [attr.aria-describedby]="helpText() ? helpTextId : hasError ? errorId : null"
+      [attr.aria-invalid]="hasError ? 'true' : null"
+      [ngClass]="{
+        'pr-10': hasError,
+        'text-red-900 dark:text-red-400 ring-red-300 dark:ring-red-600 placeholder:text-red-300 dark:placeholder:text-red-600 focus:ring-red-500 dark:focus:ring-red-400': hasError,
+        'text-gray-900 dark:text-gray-100 ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-sky-600 dark:focus:ring-sky-500': !hasError
+      }"
+      class="block w-full rounded-md border-0 py-1.5 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 bg-white dark:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:ring-gray-200 dark:disabled:ring-gray-700"
+    />
+    @if (hasError) {
+      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+        <fa-icon
+          icon="exclamation-circle"
+          class="h-5 w-5 text-red-500 dark:text-red-400"
+          [attr.aria-hidden]="true"
+        />
+      </div>
+    }
+  </div>
+  @if (helpText() && !hasError) {
+    <p [id]="helpTextId" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+      {{ helpText() }}
+    </p>
+  }
+  @if (hasError) {
+    <p [id]="errorId" class="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">
+      {{ errorMessage }}
+    </p>
+  }
+</div>

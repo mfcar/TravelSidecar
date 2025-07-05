@@ -3,9 +3,9 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { of } from 'rxjs';
 import { TagBadgeComponent } from '../../../components/badges/tag-badge/tag-badge.component';
 import { TagContainer } from '../../../components/containers/tag/tag-container.component';
+import { PaginationComponent } from '../../../components/ui/pagination/pagination.component';
 import { BucketListItemType } from '../../../models/bucket-list.model';
 import { TagService } from '../../../services/tag.service';
-import { PaginationComponent } from '../../../components/ui/pagination/pagination.component';
 import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe';
 
 @Component({

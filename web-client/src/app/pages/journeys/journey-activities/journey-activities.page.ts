@@ -248,6 +248,9 @@ export class JourneyActivitiesPage {
       maxWidth: '95vw',
       maxHeight: '90vh',
       panelClass: 'activity-modal-dialog',
+      restoreFocus: true,
+      autoFocus: true,
+      ariaModal: true,
     });
 
     dialogRef.closed.subscribe((result) => {
@@ -301,6 +304,9 @@ export class JourneyActivitiesPage {
       maxWidth: '95vw',
       maxHeight: '90vh',
       panelClass: 'activity-modal-dialog',
+      restoreFocus: true,
+      autoFocus: true,
+      ariaModal: true,
     });
 
     dialogRef.closed.subscribe((result) => {

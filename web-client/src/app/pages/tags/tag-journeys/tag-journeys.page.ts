@@ -4,8 +4,8 @@ import { RouterLink } from '@angular/router';
 import { of } from 'rxjs';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import { TagContainer } from '../../../components/containers/tag/tag-container.component';
-import { TagService } from '../../../services/tag.service';
 import { PaginationComponent } from '../../../components/ui/pagination/pagination.component';
+import { TagService } from '../../../services/tag.service';
 import { UserDateFormatPipe } from '../../../shared/pipes/user-date-format.pipe';
 
 @Component({

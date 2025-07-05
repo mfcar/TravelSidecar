@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   input,
   OnInit,
@@ -111,13 +110,7 @@ export class ActivityFormComponent implements OnInit {
   });
 
   constructor() {
-    // React to activity type changes
-    effect(() => {
-      const type = this.form?.get('activityType')?.value;
-      if (type) {
-        this.updateFieldValidators(type);
-      }
-    });
+    // Constructor is intentionally empty
   }
 
   ngOnInit(): void {
@@ -242,7 +235,6 @@ export class ActivityFormComponent implements OnInit {
 
     optionalFields.forEach((field) => {
       this.form.get(field)?.clearValidators();
-      this.form.get(field)?.updateValueAndValidity();
     });
 
     // Add validators based on type
@@ -256,9 +248,9 @@ export class ActivityFormComponent implements OnInit {
       this.form.get('airline')?.setValidators([Validators.required]);
     }
 
-    // Update validity
+    // Update validity without emitting events to prevent infinite loop
     Object.keys(this.form.controls).forEach((key) => {
-      this.form.get(key)?.updateValueAndValidity();
+      this.form.get(key)?.updateValueAndValidity({ emitEvent: false });
     });
   }
 
