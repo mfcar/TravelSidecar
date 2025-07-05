@@ -101,7 +101,7 @@ export class UsersListPage implements OnInit, OnDestroy {
     { field: 'lastActiveAt', name: 'Last Active Date', type: 'number' },
   ];
 
-  columns: ColumnConfig<User>[] = [];
+  columns: ColumnConfig[] = [];
 
   itemsCount = linkedSignal(() => Number(this.usersResource.value()?.items?.length || 0));
   activeFilters = computed(() => this.searchTerm().trim().length > 0);

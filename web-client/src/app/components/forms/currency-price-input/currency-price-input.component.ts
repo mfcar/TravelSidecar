@@ -98,8 +98,12 @@ export class CurrencyPriceInputComponent implements ControlValueAccessor, OnDest
   protected searchId = `currency-search-${this.uniqueId}`;
 
   // ControlValueAccessor callbacks
-  protected onChange: (value: CurrencyPriceValue) => void = () => {};
-  protected onTouched: () => void = () => {};
+  protected onChange: (value: CurrencyPriceValue) => void = () => {
+    // No-op function for ControlValueAccessor
+  };
+  protected onTouched: () => void = () => {
+    // No-op function for ControlValueAccessor
+  };
 
   // Position strategy
   protected positions: ConnectedPosition[] = STANDARD_DROPDOWN_POSITIONS;

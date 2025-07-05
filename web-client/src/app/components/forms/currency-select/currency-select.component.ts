@@ -78,9 +78,9 @@ export class CurrencySelectComponent implements ControlValueAccessor, OnDestroy 
   private destroy$ = new Subject<void>();
 
   // Timeouts
-  private _searchFocusTimeout: any;
-  private _scrollTimeout: any;
-  private _navigationTimeout: any;
+  private _searchFocusTimeout: ReturnType<typeof setTimeout> | null = null;
+  private _scrollTimeout: ReturnType<typeof setTimeout> | null = null;
+  private _navigationTimeout: ReturnType<typeof setTimeout> | null = null;
 
   // Filtered currencies
   protected filteredCurrencies$: Observable<Currency[]>;
@@ -89,7 +89,7 @@ export class CurrencySelectComponent implements ControlValueAccessor, OnDestroy 
   protected triggerEl = viewChild.required<ElementRef>('trigger');
   protected searchInput = viewChild<ElementRef>('searchInput');
   private viewContainerRef = inject(ViewContainerRef);
-  protected dropdownTpl = viewChild<TemplateRef<any>>('dropdownTpl');
+  protected dropdownTpl = viewChild<TemplateRef<unknown>>('dropdownTpl');
   protected overlayRef: OverlayRef | null = null;
   protected virtualScroll = viewChild<CdkVirtualScrollViewport>('virtualScroll');
 
@@ -99,8 +99,12 @@ export class CurrencySelectComponent implements ControlValueAccessor, OnDestroy 
   protected searchId = `currency-search-${this.uniqueId}`;
 
   // Callbacks for ControlValueAccessor
-  private onChange: (value: string | null) => void = () => {};
-  private onTouched: () => void = () => {};
+  private onChange: (value: string | null) => void = () => {
+    // No-op function for ControlValueAccessor
+  };
+  private onTouched: () => void = () => {
+    // No-op function for ControlValueAccessor
+  };
 
   constructor() {
     if (this.ngControl) {
@@ -378,11 +382,11 @@ export class CurrencySelectComponent implements ControlValueAccessor, OnDestroy 
     this.value.set(value);
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: string | null) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 

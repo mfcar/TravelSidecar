@@ -16,9 +16,9 @@ import { ColumnConfig } from '../table-list/table-list.view-mode';
   templateUrl: './grid-list.view-mode.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GridListViewMode<T extends Record<string, any>> {
+export class GridListViewMode<T> {
   items = input<T[]>([]);
-  columns = input<ColumnConfig<T>[]>([]);
+  columns = input<ColumnConfig[]>([]);
   selectedFields = input.required<Set<string>>();
   hasImage = input<boolean>(false);
   placeholderImage = input<string | undefined | null>(null);
@@ -39,14 +39,21 @@ export class GridListViewMode<T extends Record<string, any>> {
     this.editButtonClicked.emit(item);
   }
 
-  getCellTemplate(column: ColumnConfig<T>, item: T): TemplateRef<any> | null {
+  getCellTemplate(column: ColumnConfig): TemplateRef<unknown> | null {
     return column.gridLabelTemplate || column.stackLabelTemplate || column.cellTemplate || null;
   }
 
   hasValue(item: T, key: string): boolean {
+    // Type-safe property access for dynamic keys
+    const value = this.getItemProperty(item, key);
     if (key === 'tags') {
-      return Array.isArray(item[key]) && item[key].length > 0;
+      return Array.isArray(value) && value.length > 0;
     }
-    return item[key] !== null && item[key] !== undefined && item[key] !== '';
+    return value !== null && value !== undefined && value !== '';
+  }
+
+  private getItemProperty(item: T, key: string): unknown {
+    // Safe property access with proper typing
+    return (item as Record<string, unknown>)[key];
   }
 }

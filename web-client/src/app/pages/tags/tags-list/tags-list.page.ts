@@ -102,7 +102,7 @@ export class TagsListPage implements OnInit, OnDestroy {
     { field: 'lastModifiedAt', name: 'Last Modified Date', type: 'number' },
   ];
 
-  columns: ColumnConfig<TagResponse>[] = [];
+  columns: ColumnConfig[] = [];
 
   itemsCount = linkedSignal(() => Number(this.tagsResource.value()?.items?.length || 0));
   activeFilters = computed(() => this.searchTerm().trim().length > 0);

@@ -23,7 +23,6 @@ import { ButtonComponent } from '../../buttons/button/button.component';
 import { CurrencyPriceInputComponent } from '../../forms/currency-price-input/currency-price-input.component';
 import { DateOnlyInputComponent } from '../../forms/date-only-input/date-only-input.component';
 import { GenericSelectorInputComponent } from '../../forms/generic-selector-input/generic-selector-input.component';
-import { TagsSelectorInputComponent } from '../../forms/tags-selector-input/tags-selector-input.component';
 import { TextInputComponent } from '../../forms/text-input/text-input.component';
 import { TextareaInputComponent } from '../../forms/textarea-input/textarea-input.component';
 import { TimeOnlyInputComponent } from '../../forms/time-only-input/time-only-input.component';
@@ -48,7 +47,6 @@ export interface ActivityFormData {
     TimezoneSelectorComponent,
     GenericSelectorInputComponent,
     CurrencyPriceInputComponent,
-    TagsSelectorInputComponent,
     ButtonComponent,
   ],
   templateUrl: './activity-form.component.html',
@@ -62,7 +60,7 @@ export class ActivityFormComponent implements OnInit {
 
   // Outputs
   save = output<CreateUpdateActivityRequest>();
-  cancel = output<void>();
+  cancelled = output<void>();
 
   // Services
   private fb = inject(FormBuilder);
@@ -127,8 +125,8 @@ export class ActivityFormComponent implements OnInit {
     this.loadTags();
   }
 
-  getActivityTypeLabel = (type: any): string => type.name;
-  getActivityTypeValue = (type: any): number => type.type;
+  getActivityTypeLabel = (type: { name: string }): string => type.name;
+  getActivityTypeValue = (type: { type: number }): number => type.type;
 
   private initializeForm(): void {
     const activity = this.data().activity;
@@ -222,7 +220,9 @@ export class ActivityFormComponent implements OnInit {
     return timePart ? timePart.substring(0, 5) : null;
   }
 
-  private loadTypeSpecificData(activity: JourneyActivity): void {
+  private loadTypeSpecificData(_activity: JourneyActivity): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const activity = _activity;
     // This would parse the type-specific data from the activity
     // For now, we'll leave it empty as the backend handles this
   }
@@ -272,59 +272,60 @@ export class ActivityFormComponent implements OnInit {
 
     // Combine date and time
     let startDateTime: string | undefined;
-    if (formValue.startDate && formValue.startTime) {
-      startDateTime = `${formValue.startDate}T${formValue.startTime}:00`;
-    } else if (formValue.startDate) {
-      startDateTime = `${formValue.startDate}T00:00:00`;
+    if (formValue['startDate'] && formValue['startTime']) {
+      startDateTime = `${formValue['startDate']}T${formValue['startTime']}:00`;
+    } else if (formValue['startDate']) {
+      startDateTime = `${formValue['startDate']}T00:00:00`;
     }
 
     let endDateTime: string | undefined;
-    if (formValue.endDate && formValue.endTime) {
-      endDateTime = `${formValue.endDate}T${formValue.endTime}:00`;
-    } else if (formValue.endDate) {
-      endDateTime = `${formValue.endDate}T00:00:00`;
+    if (formValue['endDate'] && formValue['endTime']) {
+      endDateTime = `${formValue['endDate']}T${formValue['endTime']}:00`;
+    } else if (formValue['endDate']) {
+      endDateTime = `${formValue['endDate']}T00:00:00`;
     }
 
     // Build type-specific data
     const typeSpecificData = this.buildTypeSpecificData(formValue);
 
     const request: CreateUpdateActivityRequest = {
-      name: formValue.name,
-      description: formValue.description || undefined,
-      activityType: formValue.activityType,
+      name: formValue['name'],
+      description: formValue['description'] || undefined,
+      activityType: formValue['activityType'],
       startDateTime,
-      startTimezone: formValue.startTimezone || undefined,
+      startTimezone: formValue['startTimezone'] || undefined,
       endDateTime,
-      endTimezone: formValue.endTimezone || undefined,
-      dayNumber: formValue.dayNumber || undefined,
-      startLocation: formValue.startLocation || undefined,
-      endLocation: formValue.endLocation || undefined,
-      address: formValue.address || undefined,
-      phoneNumber: formValue.phoneNumber || undefined,
-      website: formValue.website || undefined,
-      cost: formValue.cost?.price || undefined,
-      currencyCode: formValue.cost?.currencyCode || undefined,
-      notes: formValue.notes || undefined,
+      endTimezone: formValue['endTimezone'] || undefined,
+      dayNumber: formValue['dayNumber'] || undefined,
+      startLocation: formValue['startLocation'] || undefined,
+      endLocation: formValue['endLocation'] || undefined,
+      address: formValue['address'] || undefined,
+      phoneNumber: formValue['phoneNumber'] || undefined,
+      website: formValue['website'] || undefined,
+      cost: formValue['cost']?.price || undefined,
+      currencyCode: formValue['cost']?.currencyCode || undefined,
+      notes: formValue['notes'] || undefined,
       typeSpecificData: Object.keys(typeSpecificData).length > 0 ? typeSpecificData : undefined,
     };
 
     this.save.emit(request);
   }
 
-  private buildTypeSpecificData(formValue: any): any {
-    const data: any = {};
+  private buildTypeSpecificData(formValue: Record<string, unknown>): Record<string, unknown> {
+    const data: Record<string, unknown> = {};
 
-    switch (formValue.activityType) {
+    switch (formValue['activityType']) {
       case ActivityType.Flight:
-        if (formValue.flightNumber) data.flightNumber = formValue.flightNumber;
-        if (formValue.airline) data.airline = formValue.airline;
-        if (formValue.seatNumber) data.seatNumber = formValue.seatNumber;
-        if (formValue.seatClass) data.seatClass = formValue.seatClass;
-        if (formValue.reservationCode) data.reservationCode = formValue.reservationCode;
-        if (formValue.departureGate) data.departureGate = formValue.departureGate;
-        if (formValue.arrivalGate) data.arrivalGate = formValue.arrivalGate;
-        if (formValue.departureTerminal) data.departureTerminal = formValue.departureTerminal;
-        if (formValue.arrivalTerminal) data.arrivalTerminal = formValue.arrivalTerminal;
+        if (formValue['flightNumber']) data['flightNumber'] = formValue['flightNumber'];
+        if (formValue['airline']) data['airline'] = formValue['airline'];
+        if (formValue['seatNumber']) data['seatNumber'] = formValue['seatNumber'];
+        if (formValue['seatClass']) data['seatClass'] = formValue['seatClass'];
+        if (formValue['reservationCode']) data['reservationCode'] = formValue['reservationCode'];
+        if (formValue['departureGate']) data['departureGate'] = formValue['departureGate'];
+        if (formValue['arrivalGate']) data['arrivalGate'] = formValue['arrivalGate'];
+        if (formValue['departureTerminal'])
+          data['departureTerminal'] = formValue['departureTerminal'];
+        if (formValue['arrivalTerminal']) data['arrivalTerminal'] = formValue['arrivalTerminal'];
         break;
 
       case ActivityType.Hotel:
@@ -332,34 +333,34 @@ export class ActivityFormComponent implements OnInit {
       case ActivityType.Vacation:
       case ActivityType.Camping:
       case ActivityType.Lodging:
-        if (formValue.reservationCode) data.reservationCode = formValue.reservationCode;
-        if (formValue.roomNumber) data.roomNumber = formValue.roomNumber;
-        if (formValue.roomType) data.roomType = formValue.roomType;
-        if (formValue.checkInTime) data.checkInTime = formValue.checkInTime;
-        if (formValue.checkOutTime) data.checkOutTime = formValue.checkOutTime;
-        if (formValue.numberOfGuests) data.numberOfGuests = formValue.numberOfGuests;
+        if (formValue['reservationCode']) data['reservationCode'] = formValue['reservationCode'];
+        if (formValue['roomNumber']) data['roomNumber'] = formValue['roomNumber'];
+        if (formValue['roomType']) data['roomType'] = formValue['roomType'];
+        if (formValue['checkInTime']) data['checkInTime'] = formValue['checkInTime'];
+        if (formValue['checkOutTime']) data['checkOutTime'] = formValue['checkOutTime'];
+        if (formValue['numberOfGuests']) data['numberOfGuests'] = formValue['numberOfGuests'];
         break;
 
       case ActivityType.Train:
       case ActivityType.Bus:
       case ActivityType.Ferry:
       case ActivityType.Cruise:
-        if (formValue.routeName) data.routeName = formValue.routeName;
-        if (formValue.transportNumber) data.transportNumber = formValue.transportNumber;
-        if (formValue.company) data.company = formValue.company;
-        if (formValue.departureStation) data.departureStation = formValue.departureStation;
-        if (formValue.arrivalStation) data.arrivalStation = formValue.arrivalStation;
-        if (formValue.reservationCode) data.reservationCode = formValue.reservationCode;
-        if (formValue.seatNumber) data.seatNumber = formValue.seatNumber;
-        if (formValue.seatClass) data.seatClass = formValue.seatClass;
-        if (formValue.coachNumber) data.coachNumber = formValue.coachNumber;
-        if (formValue.trainType) data.trainType = formValue.trainType;
+        if (formValue['routeName']) data['routeName'] = formValue['routeName'];
+        if (formValue['transportNumber']) data['transportNumber'] = formValue['transportNumber'];
+        if (formValue['company']) data['company'] = formValue['company'];
+        if (formValue['departureStation']) data['departureStation'] = formValue['departureStation'];
+        if (formValue['arrivalStation']) data['arrivalStation'] = formValue['arrivalStation'];
+        if (formValue['reservationCode']) data['reservationCode'] = formValue['reservationCode'];
+        if (formValue['seatNumber']) data['seatNumber'] = formValue['seatNumber'];
+        if (formValue['seatClass']) data['seatClass'] = formValue['seatClass'];
+        if (formValue['coachNumber']) data['coachNumber'] = formValue['coachNumber'];
+        if (formValue['trainType']) data['trainType'] = formValue['trainType'];
         break;
 
       case ActivityType.Car:
-        if (formValue.company) data.company = formValue.company;
-        if (formValue.reservationCode) data.reservationCode = formValue.reservationCode;
-        if (formValue.vehicleClass) data.vehicleClass = formValue.vehicleClass;
+        if (formValue['company']) data['company'] = formValue['company'];
+        if (formValue['reservationCode']) data['reservationCode'] = formValue['reservationCode'];
+        if (formValue['vehicleClass']) data['vehicleClass'] = formValue['vehicleClass'];
         break;
     }
 
@@ -367,7 +368,7 @@ export class ActivityFormComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.cancel.emit();
+    this.cancelled.emit();
   }
 
   get modalTitle(): string {

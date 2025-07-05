@@ -222,7 +222,7 @@ export class CreateUpdateBucketListItemComponent implements OnInit {
           error: (error) => this.handleError(error),
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       this.handleError(error);
     }
   }
@@ -263,9 +263,10 @@ export class CreateUpdateBucketListItemComponent implements OnInit {
     }
   }
 
-  private handleError(error: any): void {
+  private handleError(error: unknown): void {
     console.error('Error saving bucket list item', error);
-    this.errorMessage.set(`Error saving bucket list item: ${error.message || error}`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    this.errorMessage.set(`Error saving bucket list item: ${errorMessage}`);
     this.toastService.show({
       message: 'Error saving bucket list item',
       type: ToastType.ERROR,

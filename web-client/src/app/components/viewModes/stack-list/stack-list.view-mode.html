@@ -6,7 +6,7 @@
                     <div class="h-16 w-24 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 overflow-hidden">
                         <img 
                             class="h-full w-full object-cover" 
-                            [ngSrc]="item['imageUrl'] || placeholderImage()" 
+                            [ngSrc]="$any(item)['imageUrl'] || placeholderImage() || '/assets/placeholder.png'" 
                             [width]="240"
                             [height]="160"
                             priority="low"
@@ -26,10 +26,10 @@
                                 ? 'text-sm font-semibold leading-6 text-gray-900 dark:text-white' 
                                 : 'text-xs leading-5 text-gray-500 dark:text-gray-400' }}">
                             @if (column.cellTemplate || column.stackLabelTemplate || column.gridLabelTemplate) {
-                                <ng-container *ngTemplateOutlet="getCellTemplate(column, item); context: {$implicit: item}" />
+                                <ng-container *ngTemplateOutlet="getCellTemplate(column); context: {$implicit: item}" />
                             } @else {
-                                @if (item[column.key]) {
-                                    <p class="truncate">{{ item[column.key] }}</p>
+                                @if ($any(item)[column.key]) {
+                                    <p class="truncate">{{ $any(item)[column.key] }}</p>
                                 }
                             }
                         </div>

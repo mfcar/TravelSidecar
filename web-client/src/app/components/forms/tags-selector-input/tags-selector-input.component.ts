@@ -105,8 +105,12 @@ export class TagsSelectorInputComponent implements ControlValueAccessor, OnDestr
   protected searchId = `tags-search-${this.uniqueId}`;
 
   // ControlValueAccessor callbacks
-  protected onChange: (value: string[]) => void = () => {};
-  protected onTouched: () => void = () => {};
+  protected onChange: (value: string[]) => void = () => {
+    // No-op function for ControlValueAccessor
+  };
+  protected onTouched: () => void = () => {
+    // No-op function for ControlValueAccessor
+  };
 
   // Position strategy
   protected positions: ConnectedPosition[] = STANDARD_DROPDOWN_POSITIONS;

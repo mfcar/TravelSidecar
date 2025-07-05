@@ -20,16 +20,6 @@ import {
   UserTimeFormat,
 } from '../models/enums/user-preferences.enum';
 
-type PreferenceValue =
-  | string
-  | number
-  | boolean
-  | UserDateFormat
-  | UserTimeFormat
-  | UserThemeMode
-  | ListViewMode
-  | null;
-
 export interface UserPreferencesDto {
   preferredDateFormat: UserDateFormat;
   preferredTimeFormat: UserTimeFormat;
@@ -83,8 +73,8 @@ export class UserPreferencesService {
   private pageDebounceSubjects = new Map<string, Subject<ListPagePreferences>>();
 
   // Cache for generic (non-page) preferences
-  private genericPreferenceSubjects = new Map<string, BehaviorSubject<any>>();
-  private genericDebounceSubjects = new Map<string, Subject<any>>();
+  private genericPreferenceSubjects = new Map<string, BehaviorSubject<unknown>>();
+  private genericDebounceSubjects = new Map<string, Subject<unknown>>();
 
   // Backend sync
   private isInitialSetupComplete = new BehaviorSubject<boolean>(true);
@@ -196,9 +186,12 @@ export class UserPreferencesService {
     if (!this.genericPreferenceSubjects.has(key)) {
       const stored = this._loadFromStorage<T>(key);
       const value = stored !== null ? stored : defaultValue;
-      this.genericPreferenceSubjects.set(key, new BehaviorSubject<T>(value));
+      this.genericPreferenceSubjects.set(
+        key,
+        new BehaviorSubject<unknown>(value) as BehaviorSubject<unknown>,
+      );
     }
-    return this.genericPreferenceSubjects.get(key)!;
+    return this.genericPreferenceSubjects.get(key)! as BehaviorSubject<T>;
   }
 
   setPreference<T>(
@@ -208,10 +201,10 @@ export class UserPreferencesService {
   ): void {
     this._saveToStorage(key, value);
 
-    let subject = this.genericPreferenceSubjects.get(key);
+    let subject = this.genericPreferenceSubjects.get(key) as BehaviorSubject<T> | undefined;
     if (!subject) {
       subject = new BehaviorSubject<T>(value);
-      this.genericPreferenceSubjects.set(key, subject);
+      this.genericPreferenceSubjects.set(key, subject as BehaviorSubject<unknown>);
     } else {
       subject.next(value);
     }
@@ -236,7 +229,7 @@ export class UserPreferencesService {
   }
 
   // ─── Batch Update Method ────────────────────────────────────────────────
-  updateMultiplePreferences(preferences: Partial<Record<PreferenceKeys, any>>): void {
+  updateMultiplePreferences(preferences: Partial<Record<PreferenceKeys, unknown>>): void {
     Object.entries(preferences).forEach(([key, value]) => {
       const prefKey = key as PreferenceKeys;
       this._saveToStorage(prefKey, value);
@@ -244,7 +237,7 @@ export class UserPreferencesService {
       if (subject) {
         subject.next(value);
       } else {
-        this.genericPreferenceSubjects.set(prefKey, new BehaviorSubject<any>(value));
+        this.genericPreferenceSubjects.set(prefKey, new BehaviorSubject<unknown>(value));
       }
     });
 
@@ -393,74 +386,79 @@ export class UserPreferencesService {
           next: () => console.log(`Debounced update: preference ${key} saved on server.`),
           error: (err) => console.error(`Debounce update error for preference ${key}`, err),
         });
-      this.genericDebounceSubjects.set(key, subject);
+      this.genericDebounceSubjects.set(key, subject as Subject<unknown>);
     }
-    this.genericDebounceSubjects.get(key)!.next(value);
+    (this.genericDebounceSubjects.get(key)! as Subject<T>).next(value);
   }
 
-  private _createBasicPreferencesDto<T>(key: PreferenceKeys, value: T): any {
-    const dto: any = {};
+  private _createBasicPreferencesDto<T>(
+    key: PreferenceKeys,
+    value: T,
+  ): Partial<UserPreferencesDto> {
+    const dto: Partial<UserPreferencesDto> = {};
 
     switch (key) {
       case PreferenceKeys.DateFormat:
-        dto.preferredDateFormat = value;
+        dto.preferredDateFormat = value as UserDateFormat;
         break;
       case PreferenceKeys.TimeFormat:
-        dto.preferredTimeFormat = value;
+        dto.preferredTimeFormat = value as UserTimeFormat;
         break;
       case PreferenceKeys.FirstDayOfWeek:
-        dto.preferredFirstDayOfWeek = value;
+        dto.preferredFirstDayOfWeek = value as UserFirstDayOfWeek;
         break;
       case PreferenceKeys.Timezone:
-        dto.preferredTimezone = value;
+        dto.preferredTimezone = value as string;
         break;
       case PreferenceKeys.CurrencyCode:
-        dto.preferredCurrencyCode = value;
+        dto.preferredCurrencyCode = value as string;
         break;
       case PreferenceKeys.ThemeMode:
-        dto.preferredThemeMode = value;
+        dto.preferredThemeMode = value as UserThemeMode;
         break;
       case PreferenceKeys.ItemsPerPage:
-        dto.preferredItemsPerPage = value;
+        dto.preferredItemsPerPage = value as number;
         break;
       case PreferenceKeys.Language:
-        dto.preferredLanguage = value;
+        dto.preferredLanguage = value as string;
         break;
     }
 
     return dto;
   }
 
-  private _createBatchBasicPreferencesDto(preferences: Partial<Record<PreferenceKeys, any>>): any {
-    const dto: any = {};
+  private _createBatchBasicPreferencesDto(
+    preferences: Partial<Record<PreferenceKeys, unknown>>,
+  ): Partial<UserPreferencesDto> {
+    const dto: Partial<UserPreferencesDto> = {};
 
     Object.entries(preferences).forEach(([key, value]) => {
       const prefKey = key as PreferenceKeys;
 
       switch (prefKey) {
         case PreferenceKeys.DateFormat:
-          dto.preferredDateFormat = value;
+          dto.preferredDateFormat = value as UserDateFormat;
           break;
         case PreferenceKeys.TimeFormat:
-          dto.preferredTimeFormat = value;
+          dto.preferredTimeFormat = value as UserTimeFormat;
           break;
         case PreferenceKeys.FirstDayOfWeek:
-          dto.preferredFirstDayOfWeek = value;
+          dto.preferredFirstDayOfWeek = value as UserFirstDayOfWeek;
           break;
         case PreferenceKeys.Timezone:
-          dto.preferredTimezone = value;
+          dto.preferredTimezone = value as string;
           break;
         case PreferenceKeys.CurrencyCode:
-          dto.preferredCurrencyCode = value;
+          dto.preferredCurrencyCode = value as string;
           break;
         case PreferenceKeys.ThemeMode:
-          dto.preferredThemeMode = value;
+          dto.preferredThemeMode = value as UserThemeMode;
           break;
         case PreferenceKeys.ItemsPerPage:
-          dto.preferredItemsPerPage = value;
+          dto.preferredItemsPerPage = value as number;
           break;
         case PreferenceKeys.Language:
-          dto.preferredLanguage = value;
+          dto.preferredLanguage = value as string;
           break;
       }
     });

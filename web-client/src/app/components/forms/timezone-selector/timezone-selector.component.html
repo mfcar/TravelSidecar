@@ -92,9 +92,12 @@
         @for (timezone of filteredTimezones(); track timezone.id; let i = $index) {
           <li
             role="option"
+            tabindex="0"
             [attr.aria-selected]="selectedTimezone()?.id === timezone.id"
             [attr.data-highlighted]="isItemActive(i)"
             (click)="selectItem(timezone)"
+            (keydown.enter)="selectItem(timezone)"
+            (keydown.space)="selectItem(timezone)"
             (mouseenter)="activeItemIndex.set(i)"
             class="relative cursor-pointer select-none py-2 pl-3 pr-9 text-sm transition-colors"
             [ngClass]="{

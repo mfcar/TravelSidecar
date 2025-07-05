@@ -30,8 +30,8 @@ export class TextareaInputComponent implements ControlValueAccessor {
 
   private _injector = inject(Injector);
   private ngControl = inject(NgControl);
-  protected onTouched?: () => {};
-  protected onChange?: (value: string) => {};
+  protected onTouched?: () => void;
+  protected onChange?: (value: string) => void;
   protected isDisabled = false;
   private autosize = viewChild<CdkTextareaAutosize>('autosize');
 
@@ -59,11 +59,11 @@ export class TextareaInputComponent implements ControlValueAccessor {
     this.inputValue = value;
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: string) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 

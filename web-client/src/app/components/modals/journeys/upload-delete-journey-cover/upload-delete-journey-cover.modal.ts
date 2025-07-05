@@ -110,7 +110,7 @@ export class UploadDeleteJourneyCoverModal {
     this.errorMessage.set(null);
 
     this.journeyService.uploadJourneyImage(this.journey.id, file).subscribe({
-      next: (response) => {
+      next: () => {
         this.toastService.show({
           message: 'Journey image updated successfully',
           type: ToastType.SUCCESS,

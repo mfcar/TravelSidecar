@@ -3,12 +3,12 @@ import { ChangeDetectionStrategy, Component, input, output, TemplateRef } from '
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ButtonComponent } from '../../buttons/button/button.component';
 
-export interface ColumnConfig<T extends Record<string, any>> {
+export interface ColumnConfig {
   key: string;
   header: string;
-  cellTemplate?: TemplateRef<any>;
-  stackLabelTemplate?: TemplateRef<any>;
-  gridLabelTemplate?: TemplateRef<any>;
+  cellTemplate?: TemplateRef<unknown>;
+  stackLabelTemplate?: TemplateRef<unknown>;
+  gridLabelTemplate?: TemplateRef<unknown>;
   sortable?: boolean;
 }
 
@@ -18,9 +18,9 @@ export interface ColumnConfig<T extends Record<string, any>> {
   templateUrl: './table-list.view-mode.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TableListViewMode<T extends Record<string, any>> {
+export class TableListViewMode<T> {
   items = input<T[]>([]);
-  columns = input<ColumnConfig<T>[]>([]);
+  columns = input<ColumnConfig[]>([]);
   sortBy = input<string>('');
   sortDirection = input<'asc' | 'desc'>('asc');
   selectedFields = input.required<Set<string>>();
@@ -37,7 +37,7 @@ export class TableListViewMode<T extends Record<string, any>> {
     this.deleteButtonClicked.emit(item);
   }
 
-  onHeaderClicked(column: ColumnConfig<T>) {
+  onHeaderClicked(column: ColumnConfig) {
     if (column.sortable === false) {
       return;
     }
@@ -48,7 +48,7 @@ export class TableListViewMode<T extends Record<string, any>> {
     this.sortChanged.emit({ sortBy: column.key, sortDirection: newDirection });
   }
 
-  getSortAriaLabel(column: ColumnConfig<T>): string {
+  getSortAriaLabel(column: ColumnConfig): string {
     if (this.sortBy() === column.key) {
       return this.sortDirection() === 'asc'
         ? $localize`:@@sortDescendingAriaLabel:Sort ${column.header} descending`

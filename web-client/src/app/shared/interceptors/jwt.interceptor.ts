@@ -67,7 +67,15 @@ function handleUnauthorizedError(
       switchMap((response) => {
         isRefreshing = false;
 
-        jwtService.saveTokens(response.access_token, response.refresh_token, response.id_token);
+        if (!response) {
+          throw new Error('No response from refresh token');
+        }
+
+        jwtService.saveTokens(
+          response.access_token,
+          response.refresh_token || '',
+          response.id_token,
+        );
 
         refreshTokenSubject.next(response.access_token);
 

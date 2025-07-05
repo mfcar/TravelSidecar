@@ -103,7 +103,7 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
     { field: 'lastModifiedAt', name: 'Last Modified Date', type: 'number' },
   ];
 
-  columns: ColumnConfig<BucketListItem>[] = [];
+  columns: ColumnConfig[] = [];
 
   itemsCount = linkedSignal(() => Number(this.bucketListResource.value()?.items?.length || 0));
   activeFilters = computed(() => this.searchTerm().trim().length > 0);

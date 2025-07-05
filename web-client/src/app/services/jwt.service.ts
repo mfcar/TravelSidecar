@@ -52,7 +52,7 @@ export class JwtService {
     return true;
   }
 
-  public getUserInfo(): any {
+  public getUserInfo(): Record<string, unknown> | null {
     const idToken = this.getIdToken();
     if (idToken) {
       try {

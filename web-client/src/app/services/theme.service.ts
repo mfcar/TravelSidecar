@@ -97,7 +97,11 @@ export class ThemeService {
 
     if (theme === UserThemeMode.System) {
       const prefersDark = this.systemThemeMediaQueryList.matches;
-      prefersDark ? htmlEl.classList.add('dark') : htmlEl.classList.remove('dark');
+      if (prefersDark) {
+        htmlEl.classList.add('dark');
+      } else {
+        htmlEl.classList.remove('dark');
+      }
     } else if (theme === UserThemeMode.Dark) {
       htmlEl.classList.add('dark');
     } else {

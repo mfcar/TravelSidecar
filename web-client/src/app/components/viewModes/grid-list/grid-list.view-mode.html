@@ -6,7 +6,7 @@
             <div class="mx-auto w-full flex-shrink-0 rounded-xl flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 overflow-hidden aspect-[3/2]">
               <img 
                   class="h-full w-full object-cover" 
-                  [ngSrc]="item['imageUrl'] || placeholderImage()" 
+                  [ngSrc]="$any(item)['imageUrl'] || placeholderImage() || '/assets/placeholder.png'" 
                   [width]="600"
                   [height]="400"
                   priority="low"
@@ -19,9 +19,9 @@
             @if (column.key === primaryField()) {
               <h3 class="mt-6 text-sm font-medium text-gray-900 dark:text-white truncate px-4">
                 @if (column.gridLabelTemplate || column.stackLabelTemplate || column.cellTemplate) {
-                  <ng-container *ngTemplateOutlet="getCellTemplate(column, item); context: {$implicit: item}" />
+                  <ng-container *ngTemplateOutlet="getCellTemplate(column); context: {$implicit: item}" />
                 } @else {
-                  {{ item[column.key] }}
+                  {{ $any(item)[column.key] }}
                 }
               </h3>
             }
@@ -32,11 +32,11 @@
               @if (selectedFields().has(column.key) && column.key !== primaryField() && hasValue(item, column.key)) {
                 <div class="mt-2 text-xs text-gray-500 dark:text-gray-400 px-4 text-left">
                     @if (column.gridLabelTemplate || column.stackLabelTemplate || column.cellTemplate) {
-                      <ng-container *ngTemplateOutlet="getCellTemplate(column, item); context: {$implicit: item}" />
+                      <ng-container *ngTemplateOutlet="getCellTemplate(column); context: {$implicit: item}" />
                     } @else {
-                      @if (item[column.key]) {
+                      @if ($any(item)[column.key]) {
                         <dt class="font-medium inline">{{ column.header }}: </dt>
-                        <dd class="inline">{{ item[column.key] }}</dd>
+                        <dd class="inline">{{ $any(item)[column.key] }}</dd>
                       }
                     }
                 </div>

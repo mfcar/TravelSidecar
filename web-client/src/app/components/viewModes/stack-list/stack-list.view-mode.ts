@@ -10,9 +10,9 @@ import { ColumnConfig } from '../table-list/table-list.view-mode';
   templateUrl: './stack-list.view-mode.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StackListViewMode<T extends Record<string, any>> {
+export class StackListViewMode<T> {
   items = input<T[]>([]);
-  columns = input<ColumnConfig<T>[]>([]);
+  columns = input<ColumnConfig[]>([]);
   selectedFields = input.required<Set<string>>();
   hasImage = input<boolean>(false);
   placeholderImage = input<string | undefined | null>(null);
@@ -28,7 +28,7 @@ export class StackListViewMode<T extends Record<string, any>> {
     this.deleteButtonClicked.emit(item);
   }
 
-  getCellTemplate(column: ColumnConfig<T>, item: T): TemplateRef<any> | null {
+  getCellTemplate(column: ColumnConfig): TemplateRef<unknown> | null {
     return column.stackLabelTemplate || column.gridLabelTemplate || column.cellTemplate || null;
   }
 
@@ -43,6 +43,12 @@ export class StackListViewMode<T extends Record<string, any>> {
   }
 
   hasValue(item: T, key: string): boolean {
-    return item[key] !== null && item[key] !== undefined && item[key] !== '';
+    const value = this.getItemProperty(item, key);
+    return value !== null && value !== undefined && value !== '';
+  }
+
+  private getItemProperty(item: T, key: string): unknown {
+    // Safe property access with proper typing
+    return (item as Record<string, unknown>)[key];
   }
 }

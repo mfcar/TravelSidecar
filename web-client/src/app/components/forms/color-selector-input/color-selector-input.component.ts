@@ -41,8 +41,12 @@ export class ColorSelectorInputComponent implements ControlValueAccessor, OnDest
   private elementRef = inject(ElementRef);
 
   // Control value accessor
-  protected onChange: (value: string) => void = () => {};
-  protected onTouched: () => void = () => {};
+  protected onChange: (value: string) => void = () => {
+    // No-op function for ControlValueAccessor
+  };
+  protected onTouched: () => void = () => {
+    // No-op function for ControlValueAccessor
+  };
   protected isDisabled = false;
 
   // Unique IDs for accessibility
@@ -117,11 +121,11 @@ export class ColorSelectorInputComponent implements ControlValueAccessor, OnDest
     this.selectedColorName.set(value || null);
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: string) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 

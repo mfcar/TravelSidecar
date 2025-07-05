@@ -40,9 +40,9 @@
     >
       @if (selectedItems().length > 0) {
         <div class="flex flex-wrap gap-2 pr-7">
-          @for (item of selectedItems(); track item[itemValueKey()]) {
+          @for (item of selectedItems(); track getItemValue(item)) {
             <div class="flex items-center py-0.5">
-              {{ item[itemLabelKey()] }}
+              {{ getItemLabel(item) }}
             </div>
           }
         </div>
@@ -135,20 +135,20 @@
     >
       @if (filteredItems$ | async; as items) {
         @if (items.length) {
-          @for (item of items; track item[itemValueKey()]; let i = $index) {
+          @for (item of items; track getItemValue(item); let i = $index) {
             <div
               class="relative cursor-pointer select-none py-2 pl-3 pr-9 outline-none hover:bg-gray-100 dark:hover:bg-gray-600"
               [ngClass]="{
                 'bg-sky-600 text-white hover:bg-sky-700 dark:hover:bg-sky-700':
                   i === activeItemIndex(),
                 'text-gray-900 dark:text-white':
-                  i !== activeItemIndex() && !isItemSelected(item[itemValueKey()]),
+                  i !== activeItemIndex() && !isItemSelected(getItemValue(item)),
                 'text-sky-600 dark:text-sky-500':
-                  i !== activeItemIndex() && isItemSelected(item[itemValueKey()]),
+                  i !== activeItemIndex() && isItemSelected(getItemValue(item)),
               }"
               role="option"
               tabindex="0"
-              [attr.aria-selected]="isItemSelected(item[itemValueKey()])"
+              [attr.aria-selected]="isItemSelected(getItemValue(item))"
               (click)="toggleItem(item)"
               (keydown)="onOptionKeydown($event, item, i)"
               (focus)="onOptionFocus(i)"
@@ -159,15 +159,15 @@
                     <div
                       class="h-5 w-5 rounded border flex items-center justify-center"
                       [ngClass]="{
-                        'border-sky-600 bg-sky-600': isItemSelected(item[itemValueKey()]),
+                        'border-sky-600 bg-sky-600': isItemSelected(getItemValue(item)),
                         'border-gray-300 dark:border-gray-400': !isItemSelected(
-                          item[itemValueKey()]
+                          getItemValue(item)
                         ),
                         'bg-white dark:bg-gray-800':
-                          !isItemSelected(item[itemValueKey()]) && i !== activeItemIndex(),
+                          !isItemSelected(getItemValue(item)) && i !== activeItemIndex(),
                       }"
                     >
-                      @if (isItemSelected(item[itemValueKey()])) {
+                      @if (isItemSelected(getItemValue(item))) {
                         <fa-icon class="h-5 w-5 pl-1 text-white" [icon]="faCheck" />
                       }
                     </div>
@@ -178,9 +178,9 @@
                     class="truncate"
                     [ngClass]="{
                       'font-medium':
-                        isItemSelected(item[itemValueKey()]) && i !== activeItemIndex(),
+                        isItemSelected(getItemValue(item)) && i !== activeItemIndex(),
                     }"
-                    >{{ item[itemLabelKey()] }}</span
+                    >{{ getItemLabel(item) }}</span
                   >
 
                   @if (itemSecondaryTextKey() && getItemSecondaryText(item)) {
@@ -195,7 +195,7 @@
                   }
                 </div>
 
-                @if (!multiple() && isItemSelected(item[itemValueKey()])) {
+                @if (!multiple() && isItemSelected(getItemValue(item))) {
                   <span
                     class="absolute right-0 flex items-center pr-4"
                     [ngClass]="{

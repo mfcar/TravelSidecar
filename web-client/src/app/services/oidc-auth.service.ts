@@ -10,6 +10,15 @@ export interface OidcProvider {
   displayName: string;
 }
 
+interface OidcTokenResponse {
+  access_token: string;
+  refresh_token?: string;
+  id_token?: string;
+  expires_in?: number;
+  token_type?: string;
+  scope?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -34,17 +43,19 @@ export class OidcAuthService {
     window.location.href = url;
   }
 
-  public completeExternalLogin(token: string): Observable<any> {
-    return this.httpClient.post<any>(`${this.apiUrl}/connect/oidc/complete-login`, { token }).pipe(
-      tap((response) => {
-        if (response.access_token) {
-          this.jwtService.saveTokens(
-            response.access_token,
-            response.refresh_token,
-            response.id_token,
-          );
-        }
-      }),
-    );
+  public completeExternalLogin(token: string): Observable<OidcTokenResponse> {
+    return this.httpClient
+      .post<OidcTokenResponse>(`${this.apiUrl}/connect/oidc/complete-login`, { token })
+      .pipe(
+        tap((response) => {
+          if (response.access_token) {
+            this.jwtService.saveTokens(
+              response.access_token,
+              response.refresh_token,
+              response.id_token,
+            );
+          }
+        }),
+      );
   }
 }

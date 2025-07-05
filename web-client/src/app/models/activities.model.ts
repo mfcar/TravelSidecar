@@ -160,7 +160,7 @@ export interface CreateUpdateActivityRequest {
   cost?: number;
   currencyCode?: string;
   notes?: string;
-  typeSpecificData?: any;
+  typeSpecificData?: Record<string, unknown>;
 }
 
 export interface DayActivityCount {

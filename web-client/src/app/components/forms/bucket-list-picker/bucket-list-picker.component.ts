@@ -196,7 +196,7 @@ export class BucketListPickerComponent implements OnInit {
     });
   }
 
-  getTypeIcon(type: BucketListItemType): any {
+  getTypeIcon(type: BucketListItemType): [string, string] {
     const icons: Record<BucketListItemType, string> = {
       [BucketListItemType.Destination]: 'location-dot',
       [BucketListItemType.Activity]: 'person-running',
@@ -206,7 +206,7 @@ export class BucketListPickerComponent implements OnInit {
       [BucketListItemType.Event]: 'calendar-days',
       [BucketListItemType.Other]: 'ellipsis',
     };
-    return ['fas', icons[type] || 'ellipsis'] as any;
+    return ['fas', icons[type] || 'ellipsis'];
   }
 
   formatPrice(price?: number, currency?: string): string {

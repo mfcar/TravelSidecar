@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import {
   ChangePasswordRequest,
@@ -10,6 +10,30 @@ import {
 } from '../models/account.model';
 import { JwtService } from './jwt.service';
 import { UserPreferencesService } from './user-preferences.service';
+
+interface TokenResponse {
+  access_token: string;
+  refresh_token?: string;
+  expires_in?: number;
+  token_type?: string;
+  scope?: string;
+  id_token?: string;
+}
+
+interface UserInfo {
+  sub?: string;
+  name?: string;
+  preferred_username?: string;
+  username?: string;
+  email?: string;
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'?: string;
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'?: string;
+  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'?: string | string[];
+  role?: string | string[];
+  roles?: string | string[];
+  require_password_change?: string | boolean;
+  id?: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -30,13 +54,14 @@ export class AccountService {
     const userClaims = this.jwtService.getUserInfo();
     if (
       userClaims &&
-      (userClaims.require_password_change === 'true' || userClaims.require_password_change === true)
+      (userClaims['require_password_change'] === 'true' ||
+        userClaims['require_password_change'] === true)
     ) {
       this.requirePasswordChange.set(true);
     }
   }
 
-  public login(request: LoginRequest): Observable<any> {
+  public login(request: LoginRequest): Observable<TokenResponse> {
     const payload = new URLSearchParams();
     payload.set('grant_type', 'password');
     payload.set('username', request.emailUsername);
@@ -44,7 +69,7 @@ export class AccountService {
     payload.set('scope', 'api openid profile email offline_access');
 
     return this.httpClient
-      .post<any>(`${this.apiUrl}/connect/token`, payload.toString(), {
+      .post<TokenResponse>(`${this.apiUrl}/connect/token`, payload.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -53,13 +78,13 @@ export class AccountService {
         tap((response) => {
           this.jwtService.saveTokens(
             response.access_token,
-            response.refresh_token,
+            response.refresh_token || '',
             response.id_token,
           );
 
           this.checkPasswordChangeRequirement();
         }),
-        switchMap(() => this.loadUserPreferences()),
+        switchMap((response) => this.loadUserPreferences().pipe(map(() => response))),
       );
   }
 
@@ -86,29 +111,31 @@ export class AccountService {
     return this.jwtService.isAuthenticated();
   }
 
-  public getUserInfo(): any {
+  public getUserInfo(): UserInfo | null {
     const userInfo = this.jwtService.getUserInfo();
     if (!userInfo) return null;
 
-    const name =
-      userInfo.name ||
-      userInfo.preferred_username ||
-      userInfo.username ||
-      userInfo['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
-      userInfo.email ||
-      userInfo['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
-      userInfo.sub ||
-      'User';
+    const name = String(
+      userInfo['name'] ||
+        userInfo['preferred_username'] ||
+        userInfo['username'] ||
+        userInfo['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+        userInfo['email'] ||
+        userInfo['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
+        userInfo['sub'] ||
+        'User',
+    );
 
-    const email =
-      userInfo.email ||
-      userInfo['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
-      '';
+    const email = String(
+      userInfo['email'] ||
+        userInfo['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
+        '',
+    );
 
     return {
       name,
       email,
-      id: userInfo.sub || '',
+      id: String(userInfo['sub'] || ''),
       ...userInfo,
     };
   }
@@ -131,15 +158,15 @@ export class AccountService {
     return role === 'Admin';
   }
 
-  public changePassword(request: ChangePasswordRequest): Observable<any> {
-    return this.httpClient.post(`${this.apiUrl}/account/change-password`, request).pipe(
+  public changePassword(request: ChangePasswordRequest): Observable<void> {
+    return this.httpClient.post<void>(`${this.apiUrl}/account/change-password`, request).pipe(
       tap(() => {
         this.requirePasswordChange.set(false);
       }),
     );
   }
 
-  public refreshToken(): Observable<any> {
+  public refreshToken(): Observable<TokenResponse | null> {
     const refreshToken = this.jwtService.getRefreshToken();
 
     if (!refreshToken) {
@@ -151,7 +178,7 @@ export class AccountService {
     payload.set('refresh_token', refreshToken);
 
     return this.httpClient
-      .post<any>(`${this.apiUrl}/connect/token`, payload.toString(), {
+      .post<TokenResponse>(`${this.apiUrl}/connect/token`, payload.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -160,7 +187,7 @@ export class AccountService {
         tap((response) => {
           this.jwtService.saveTokens(
             response.access_token,
-            response.refresh_token,
+            response.refresh_token || '',
             response.id_token,
           );
         }),

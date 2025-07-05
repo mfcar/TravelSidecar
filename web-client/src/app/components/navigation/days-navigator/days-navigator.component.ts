@@ -114,7 +114,7 @@ export class DaysNavigatorComponent {
         days.push({
           date: currentDate,
           label: this.formatDateLabel(currentDate),
-          hasActivities: this.checkHasActivities(currentDate, activities),
+          hasActivities: this.checkHasActivities(currentDate),
           isInJourneyRange,
           isSelected: this.isDateSelected(currentDate),
           isToday: currentDate.getTime() === today.getTime(),
@@ -295,7 +295,7 @@ export class DaysNavigatorComponent {
     return false;
   }
 
-  private checkHasActivities(date: Date, activities: JourneyActivity[]): boolean {
+  private checkHasActivities(date: Date): boolean {
     const summary = this.activitySummary();
     const dateStr = this.formatDateKey(date);
     const count = summary.get(dateStr);

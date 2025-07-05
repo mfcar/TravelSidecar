@@ -209,7 +209,7 @@ export class TimezoneUtils {
       const timezoneName = parts.find((p) => p.type === 'timeZoneName')?.value;
 
       return timezoneName || timezone;
-    } catch (error) {
+    } catch {
       return timezone;
     }
   }
@@ -221,7 +221,7 @@ export class TimezoneUtils {
     try {
       Intl.DateTimeFormat(undefined, { timeZone: timezone });
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

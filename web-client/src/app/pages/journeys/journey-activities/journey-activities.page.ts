@@ -336,7 +336,7 @@ export class JourneyActivitiesPage {
         const itemIds = result.items.map((item) => item.id);
 
         this.bucketListService.copyToJourney(itemIds, journeyId, result.action).subscribe({
-          next: (response) => {
+          next: () => {
             this.toastService.showSuccess(
               `Successfully ${result.action === 'move' ? 'moved' : 'copied'} ${result.items.length} items to journey`,
             );

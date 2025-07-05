@@ -72,7 +72,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnDestro
   // References
   protected triggerEl = viewChild.required<ElementRef>('trigger');
   protected searchInput = viewChild<ElementRef>('searchInput');
-  protected dropdownTpl = viewChild<TemplateRef<any>>('dropdownTpl');
+  protected dropdownTpl = viewChild<TemplateRef<unknown>>('dropdownTpl');
   protected overlayRef: OverlayRef | null = null;
 
   private uniqueId = Math.random().toString(36).substring(2, 15);
@@ -82,8 +82,12 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnDestro
   protected errorId = `timezone-error-${this.uniqueId}`;
 
   // Callbacks for ControlValueAccessor
-  private onChange: (value: string | null) => void = () => {};
-  private onTouched: () => void = () => {};
+  private onChange: (value: string | null) => void = () => {
+    // No-op function for ControlValueAccessor
+  };
+  private onTouched: () => void = () => {
+    // No-op function for ControlValueAccessor
+  };
 
   constructor() {
     if (this.ngControl) {
@@ -271,11 +275,11 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnDestro
     this.value.set(value);
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: string | null) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 

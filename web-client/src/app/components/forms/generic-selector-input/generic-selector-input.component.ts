@@ -40,8 +40,6 @@ import {
 } from 'rxjs';
 import { STANDARD_DROPDOWN_POSITIONS } from '../../../shared/constants/overlay-positions';
 
-type SelectableItem = Record<string, any>;
-
 @Component({
   selector: 'ts-generic-selector-input',
   imports: [
@@ -56,9 +54,7 @@ type SelectableItem = Record<string, any>;
   templateUrl: './generic-selector-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GenericSelectorInputComponent<T extends SelectableItem = SelectableItem>
-  implements ControlValueAccessor, OnDestroy
-{
+export class GenericSelectorInputComponent<T = unknown> implements ControlValueAccessor, OnDestroy {
   // Configuration inputs
   public label = input<string>('Select item');
   public placeholder = input<string>('Select an option');
@@ -116,8 +112,12 @@ export class GenericSelectorInputComponent<T extends SelectableItem = Selectable
   protected searchId = `generic-search-${this.uniqueId}`;
 
   // ControlValueAccessor callbacks
-  protected onChange: (value: unknown) => void = () => {};
-  protected onTouched: () => void = () => {};
+  protected onChange: (value: unknown) => void = () => {
+    // No-op function for ControlValueAccessor
+  };
+  protected onTouched: () => void = () => {
+    // No-op function for ControlValueAccessor
+  };
 
   // Position strategy
   protected positions: ConnectedPosition[] = STANDARD_DROPDOWN_POSITIONS;
@@ -143,7 +143,7 @@ export class GenericSelectorInputComponent<T extends SelectableItem = Selectable
     this.allItems$.pipe(takeUntil(this.destroy$)).subscribe((items) => {
       this.pendingSelection.pipe(take(1)).subscribe((values) => {
         if (values && values.length > 0) {
-          const selectedItems = items.filter((item) => values.includes(item[this.itemValueKey()]));
+          const selectedItems = items.filter((item) => values.includes(this.getItemValue(item)));
 
           if (this.multiple()) {
             this.selectedValues.set(values);
@@ -167,22 +167,25 @@ export class GenericSelectorInputComponent<T extends SelectableItem = Selectable
         if (!search) return items;
 
         return items.filter((item: T) => {
-          const label = String(item[this.itemLabelKey()]).toLowerCase();
+          const label = String(this.getItemProperty(item, this.itemLabelKey())).toLowerCase();
 
           const secondaryTextKey = this.itemSecondaryTextKey();
-          if (secondaryTextKey && item[secondaryTextKey]) {
-            const secondaryText = String(item[secondaryTextKey]).toLowerCase();
-            return label.includes(search) || secondaryText.includes(search);
+          if (secondaryTextKey) {
+            const secondaryValue = this.getItemProperty(item, secondaryTextKey);
+            if (secondaryValue) {
+              const secondaryText = String(secondaryValue).toLowerCase();
+              return label.includes(search) || secondaryText.includes(search);
+            }
           }
 
           return label.includes(search);
         });
       }),
-      distinctUntilChanged(
-        (prev, curr) =>
-          prev.length === curr.length &&
-          prev[0]?.[this.itemValueKey()] === curr[0]?.[this.itemValueKey()],
-      ),
+      distinctUntilChanged((prev, curr) => {
+        if (prev.length !== curr.length) return false;
+        if (prev.length === 0) return true;
+        return this.getItemValue(prev[0]) === this.getItemValue(curr[0]);
+      }),
     );
   }
 
@@ -239,7 +242,7 @@ export class GenericSelectorInputComponent<T extends SelectableItem = Selectable
 
   toggleItem(item: T, event?: Event): void {
     event?.stopPropagation();
-    const value = item[this.itemValueKey()];
+    const value = this.getItemValue(item);
 
     if (this.multiple()) {
       const selectedValuesList = [...this.selectedValues()];
@@ -251,7 +254,7 @@ export class GenericSelectorInputComponent<T extends SelectableItem = Selectable
         this.selectedItems.set(updatedItems);
       } else {
         selectedValuesList.splice(index, 1);
-        const updatedItems = this.selectedItems().filter((i) => i[this.itemValueKey()] !== value);
+        const updatedItems = this.selectedItems().filter((i) => this.getItemValue(i) !== value);
         this.selectedItems.set(updatedItems);
       }
 
@@ -281,9 +284,7 @@ export class GenericSelectorInputComponent<T extends SelectableItem = Selectable
 
     if (this.multiple()) {
       const selectedValuesList = this.selectedValues().filter((v) => v !== value);
-      const selectedItemsList = this.selectedItems().filter(
-        (i) => i[this.itemValueKey()] !== value,
-      );
+      const selectedItemsList = this.selectedItems().filter((i) => this.getItemValue(i) !== value);
 
       this.selectedValues.set(selectedValuesList);
       this.selectedItems.set(selectedItemsList);
@@ -306,7 +307,7 @@ export class GenericSelectorInputComponent<T extends SelectableItem = Selectable
   }
 
   addNewlyCreatedItem(item: T): void {
-    const value = item[this.itemValueKey()];
+    const value = this.getItemValue(item);
 
     if (this.multiple()) {
       const selectedValues = [...this.selectedValues(), value];
@@ -410,11 +411,11 @@ export class GenericSelectorInputComponent<T extends SelectableItem = Selectable
       this.allItems$.pipe(take(1), takeUntil(this.destroy$)).subscribe((items) => {
         if (this.multiple()) {
           const selectedItems = items.filter(
-            (item) => Array.isArray(value) && value.includes(item[this.itemValueKey()]),
+            (item) => Array.isArray(value) && value.includes(this.getItemValue(item)),
           );
           this.selectedItems.set(selectedItems);
         } else {
-          const selectedItem = items.find((item) => item[this.itemValueKey()] === value);
+          const selectedItem = items.find((item) => this.getItemValue(item) === value);
           this.selectedItems.set(selectedItem ? [selectedItem] : []);
         }
       });
@@ -455,7 +456,9 @@ export class GenericSelectorInputComponent<T extends SelectableItem = Selectable
 
   getItemSecondaryText(item: T): string | null {
     const key = this.itemSecondaryTextKey();
-    return key ? String(item[key] || '') || null : null;
+    if (!key) return null;
+    const value = this.getItemProperty(item, key);
+    return value ? String(value) : null;
   }
 
   ngOnDestroy(): void {
@@ -467,5 +470,17 @@ export class GenericSelectorInputComponent<T extends SelectableItem = Selectable
     if (this.scrollTimeout) {
       window.clearTimeout(this.scrollTimeout);
     }
+  }
+
+  getItemValue(item: T): unknown {
+    return this.getItemProperty(item, this.itemValueKey());
+  }
+
+  getItemLabel(item: T): string {
+    return String(this.getItemProperty(item, this.itemLabelKey()));
+  }
+
+  private getItemProperty(item: T, key: string): unknown {
+    return (item as Record<string, unknown>)[key];
   }
 }
