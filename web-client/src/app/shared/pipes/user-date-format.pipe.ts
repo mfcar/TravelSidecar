@@ -1,5 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { inject, Pipe, PipeTransform } from '@angular/core';
+import {
+  dateFormatToAngularFormat,
+  timeFormatToAngularFormat,
+  UserDateFormat,
+  UserTimeFormat,
+} from '../../models/enums/user-preferences.enum';
 import { PreferenceKeys, UserPreferencesService } from '../../services/user-preferences.service';
 
 @Pipe({
@@ -13,25 +19,40 @@ export class UserDateFormatPipe implements PipeTransform {
   transform(
     value: Date | string,
     formatType: 'date' | 'time' | 'datetime' = 'datetime',
+    useTimezone = true,
   ): string | null {
     if (!value) return null;
 
-    const datePref = this.prefsService.getPreference(PreferenceKeys.DateFormat, 'mediumDate').value;
-    const timePref = this.prefsService.getPreference(PreferenceKeys.TimeFormat, 'mediumTime').value;
-    let format: string;
+    const dateFormatEnum = this.prefsService.getPreference(
+      PreferenceKeys.DateFormat,
+      UserDateFormat.DD_MM_YYYY,
+    ).value as UserDateFormat;
+    const timeFormatEnum = this.prefsService.getPreference(
+      PreferenceKeys.TimeFormat,
+      UserTimeFormat.HH_MM_24,
+    ).value as UserTimeFormat;
 
+    const dateFormat = dateFormatToAngularFormat(dateFormatEnum);
+    const timeFormat = timeFormatToAngularFormat(timeFormatEnum);
+
+    let format: string;
     switch (formatType) {
       case 'date':
-        format = datePref;
+        format = dateFormat;
         break;
       case 'time':
-        format = timePref;
+        format = timeFormat;
         break;
       case 'datetime':
       default:
-        format = `${datePref} ${timePref}`;
+        format = `${dateFormat} ${timeFormat}`;
     }
 
-    return this.datePipe.transform(value, format);
+    let timezone: string | undefined;
+    if (useTimezone) {
+      timezone = this.prefsService.getPreference(PreferenceKeys.Timezone, 'UTC').value as string;
+    }
+
+    return this.datePipe.transform(value, format, timezone);
   }
 }

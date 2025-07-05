@@ -2,9 +2,9 @@ export interface User {
   id: string;
   email: string;
   username: string;
-  createdAt: string;
-  lastModifiedAt: string;
-  lastActiveAt?: string;
+  createdAt: Date;
+  lastModifiedAt: Date;
+  lastActiveAt?: Date;
 }
 
 export interface UserFilterRequest {

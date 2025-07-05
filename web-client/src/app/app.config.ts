@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import {
   ApplicationConfig,
   inject,
@@ -20,6 +21,7 @@ import { jwtInterceptor } from './shared/interceptors/jwt.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    DatePipe,
     provideExperimentalZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules)),
     provideHttpClient(withFetch(), withInterceptors([jwtInterceptor])),

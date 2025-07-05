@@ -27,7 +27,7 @@ export interface BucketListItem {
   originalCurrencyCode?: string;
   imageId?: string;
   tags?: Tag[];
-  createdAt: string;
+  createdAt: Date;
 }
 
 export interface BucketListItemFilterRequest {
