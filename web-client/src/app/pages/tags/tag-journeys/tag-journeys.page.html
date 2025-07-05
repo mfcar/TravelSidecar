@@ -1,0 +1,61 @@
+<div class="mt-4">
+  @if(journeysResource.isLoading() && journeys().length === 0) {
+    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+      Loading journeys...
+    </div>
+  } @else if(journeys().length === 0) {
+    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+      No journeys found with this tag.
+    </div>
+  } @else {
+    <ul class="divide-y divide-gray-200 dark:divide-gray-800" role="list">
+      @for (journey of journeys(); track journey.id) {
+        <li class="py-4">
+          <div class="flex items-center space-x-4">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <a class="hover:underline" [routerLink]="['/journeys', journey.id]">
+                  {{ journey.name }}
+                </a>
+              </p>
+              @if (journey.description) {
+                <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                  {{ journey.description }}
+                </p>
+              }
+              <div class="flex items-center mt-1">
+                @if (journey.startDate) {
+                  <span class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ journey.startDate | userDateFormat:'date' }}
+                    @if (journey.endDate) {
+                      <span> - {{ journey.endDate | userDateFormat:'date' }}</span>
+                    }
+                  </span>
+                }
+              </div>
+            </div>
+            <div>
+              <ts-button
+                label="View"
+                variant="secondary"
+                size="sm"
+                [routerLink]="['/journeys', journey.id]"
+              />
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+    
+    @if(totalPages() > 1) {
+      <div class="mt-6">
+        <ts-pagination
+          [currentPage]="currentPage()"
+          [totalItems]="journeysResource.value()?.totalCount || 0"
+          [itemsPerPage]="pageSize()"
+          (pageChange)="onPageChange($event)"
+        />
+      </div>
+    }
+  }
+</div>

@@ -1,4 +1,4 @@
-using Api.Data.Entities;
+using Api.DTOs.BucketListItems;
 using Api.DTOs.Journeys;
 
 namespace Api.DTOs.Tags;
@@ -13,5 +13,5 @@ public class CreateUpdateTagResponse
     public int JourneysCount { get; set; }
     public int BucketListItemCount { get; set; }
     public List<JourneyResponse> JourneysList { get; set; } = [];
-    public List<BucketListItem> BucketListItemsList { get; set; } = [];
+    public List<BucketListItemResponse> BucketListItemsList { get; set; } = [];
 }

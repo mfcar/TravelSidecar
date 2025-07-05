@@ -154,6 +154,8 @@ public static class EndpointExtensions
         tagsEndpoints.MapGet("/{tagId:guid}", TagEndpoints.GetTagByTagIdAsync);
         tagsEndpoints.MapPut("/{tagId:guid}", TagEndpoints.UpdateTagAsync);
         tagsEndpoints.MapDelete("/{tagId:guid}", TagEndpoints.DeleteTagAsync);
+        tagsEndpoints.MapGet("/{tagId:guid}/journeys", TagEndpoints.GetJourneysByTagIdAsync);
+        tagsEndpoints.MapGet("/{tagId:guid}/bucket-list-items", TagEndpoints.GetBucketListItemsByTagIdAsync);
 
         var usersEndpoints = apiGroup.MapGroup(Routes.Users.Base)
             .WithTags("Users")

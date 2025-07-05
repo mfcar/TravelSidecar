@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
+import { BucketListItemResponse } from '../models/bucket-list.model';
+import { JourneyResponse } from '../models/journeys.model';
 import { PaginatedResult } from '../models/pagination.model';
 import { CreateUpdateTagRequest, TagFilterRequest, TagResponse } from '../models/tags.model';
 
@@ -38,5 +40,33 @@ export class TagService {
     return this.httpClient.put<void>(`${this.apiUrl}/${id}`, request, {
       withCredentials: true,
     });
+  }
+
+  getJourneysByTag(
+    tagId: string,
+    page = 1,
+    pageSize = 25,
+  ): Observable<PaginatedResult<JourneyResponse>> {
+    return this.httpClient.get<PaginatedResult<JourneyResponse>>(
+      `${this.apiUrl}/${tagId}/journeys`,
+      {
+        params: { page: page.toString(), pageSize: pageSize.toString() },
+        withCredentials: true,
+      },
+    );
+  }
+
+  getBucketListItemsByTag(
+    tagId: string,
+    page = 1,
+    pageSize = 25,
+  ): Observable<PaginatedResult<BucketListItemResponse>> {
+    return this.httpClient.get<PaginatedResult<BucketListItemResponse>>(
+      `${this.apiUrl}/${tagId}/bucket-list-items`,
+      {
+        params: { page: page.toString(), pageSize: pageSize.toString() },
+        withCredentials: true,
+      },
+    );
   }
 }

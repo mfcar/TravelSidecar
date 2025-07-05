@@ -1,4 +1,5 @@
 using Api.Data.Context;
+using Api.DTOs.BucketListItems;
 using Api.DTOs.Journeys;
 using Api.DTOs.Tags;
 using Api.Services;
@@ -23,8 +24,8 @@ public static partial class TagEndpoints
 
         var tag = await context.Tags
             .AsNoTracking()
-            .Include(t => t.Journeys)
-            .Include(t => t.BucketListItems)
+            .Include(t => t.Journeys.Where(j => !j.IsDeleted))
+            .Include(t => t.BucketListItems.Where(b => !b.IsDeleted))
             .FirstOrDefaultAsync(t => t.Id == tagId && t.UserId == user.Id, ct);
 
         if (tag == null)
@@ -51,6 +52,25 @@ public static partial class TagEndpoints
                 CreatedAt = j.CreatedAt.ToDateTimeOffset(),
                 LastModifiedAt = j.LastModifiedAt.ToDateTimeOffset(),
                 CategoryId = j.JourneyCategoryId
+            }).ToList(),
+            BucketListItemsList = tag.BucketListItems.Select(b => new BucketListItemResponse
+            {
+                Id = b.Id,
+                Name = b.Name,
+                Description = b.Description,
+                Type = b.Type,
+                BucketListId = b.BucketListId,
+                StartDate = b.StartDate?.ToDateOnly(),
+                StartTimeUtc = b.StartTimeUtc,
+                StartTimeZoneId = b.StartTimeZoneId,
+                EndDate = b.EndDate?.ToDateOnly(),
+                EndTimeUtc = b.EndTimeUtc,
+                EndTimeZoneId = b.EndTimeZoneId,
+                OriginalPrice = b.OriginalPrice,
+                OriginalCurrencyCode = b.OriginalCurrencyCode,
+                ImageId = b.ImageId,
+                CreatedAt = b.CreatedAt.ToDateTimeOffset(),
+                UpdatedAt = b.UpdatedAt.ToDateTimeOffset()
             }).ToList()
         };
 

@@ -29,5 +29,5 @@ public class BucketListItemResponse
     public List<TagDto>? Tags { get; set; }
     
     public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset? UpdatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 }

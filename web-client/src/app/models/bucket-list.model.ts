@@ -30,6 +30,26 @@ export interface BucketListItem {
   createdAt: Date;
 }
 
+export interface BucketListItemResponse {
+  id: string;
+  name: string;
+  description?: string;
+  type: BucketListItemType;
+  bucketListId?: string;
+  startDate?: string;
+  startTimeUtc?: string;
+  startTimeZoneId?: string;
+  endDate?: string;
+  endTimeUtc?: string;
+  endTimeZoneId?: string;
+  originalPrice?: number;
+  originalCurrencyCode?: string;
+  imageId?: string;
+  tags?: Tag[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface BucketListItemFilterRequest {
   page?: number;
   pageSize?: number;

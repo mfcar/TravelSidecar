@@ -1,0 +1,66 @@
+<div class="mt-4">
+  @if(bucketListResource.isLoading() && bucketListItems().length === 0) {
+    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+      Loading bucket list items...
+    </div>
+  } @else if(bucketListItems().length === 0) {
+    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+      No bucket list items found with this tag.
+    </div>
+  } @else {
+    <ul class="divide-y divide-gray-200 dark:divide-gray-800" role="list">
+      @for (item of bucketListItems(); track item.id) {
+        <li class="py-4">
+          <div class="flex items-start space-x-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center">
+                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  {{ item.name }}
+                </p>
+                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                  <i class="fas fa-{{ getBucketListItemTypeIcon(item.type) }} mr-1"></i>
+                  {{ getBucketListItemTypeLabel(item.type) }}
+                </span>
+              </div>
+              @if (item.description) {
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {{ item.description }}
+                </p>
+              }
+              <div class="mt-2 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                @if (item.startDate) {
+                  <span>
+                    Planned for {{ item.startDate | userDateFormat:'date' }}
+                    @if (item.endDate) {
+                      <span> - {{ item.endDate | userDateFormat:'date' }}</span>
+                    }
+                  </span>
+                } @else {
+                  <span>Created {{ item.createdAt | userDateFormat:'date' }}</span>
+                }
+              </div>
+              @if (item.tags && item.tags.length > 0) {
+                <div class="mt-2 flex flex-wrap gap-1">
+                  @for (tag of item.tags; track tag.id) {
+                    <ts-tag-badge [label]="tag.name" [color]="tag.color!" [clickable]="false" [tagId]="tag.id" />
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+    
+    @if(totalPages() > 1) {
+      <div class="mt-6">
+        <ts-pagination
+          [currentPage]="currentPage()"
+          [totalItems]="bucketListResource.value()?.totalCount || 0"
+          [itemsPerPage]="pageSize()"
+          (pageChange)="onPageChange($event)"
+        />
+      </div>
+    }
+  }
+</div>

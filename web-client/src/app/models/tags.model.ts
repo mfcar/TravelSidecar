@@ -1,3 +1,4 @@
+import { BucketListItem } from './bucket-list.model';
 import { Journey } from './journeys.model';
 
 export interface CreateUpdateTagRequest {
@@ -14,6 +15,7 @@ export interface TagResponse {
   journeysCount: number;
   bucketListItemCount: number;
   journeysList: Journey[];
+  bucketListItemsList: BucketListItem[];
 }
 
 export interface Tag {

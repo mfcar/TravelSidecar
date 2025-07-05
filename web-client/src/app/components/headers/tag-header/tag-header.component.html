@@ -1,0 +1,37 @@
+<ts-page-header [title]="'Tag: ' + tag().name">
+  <div class="flex items-center mt-2" page-header-information>
+    <ts-tag-badge [label]="tag().name" [color]="tag().color" />
+    <span class="ml-4 text-sm text-gray-500 dark:text-gray-400">
+      Created {{ tag().createdAt | userDateFormat:'date' }}
+    </span>
+  </div>
+
+  <!-- Edit button -->
+  <span page-header-button>
+    <ts-button
+      label="Edit Tag"
+      variant="secondary"
+      size="lg"
+      icon="pencil"
+      (buttonAction)="onEditClick()"
+    />
+  </span>
+</ts-page-header>
+
+<div class="mt-8">
+  <ts-stat-group title="Statistics">
+    <ts-stat
+      class="overflow-hidden rounded-lg shadow"
+      title="Total Journeys"
+      icon="plane-departure"
+      [value]="tag().journeysCount"
+    />
+
+    <ts-stat
+      class="overflow-hidden rounded-lg shadow"
+      title="Bucket List Items"
+      icon="clipboard-list"
+      [value]="tag().bucketListItemCount"
+    />
+  </ts-stat-group>
+</div>

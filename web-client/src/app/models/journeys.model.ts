@@ -20,6 +20,19 @@ export interface Journey {
   bannerImage?: string;
 }
 
+export interface JourneyResponse {
+  id: string;
+  name: string;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
+  categoryId?: string;
+  categoryName?: string;
+  createdAt: Date;
+  lastModifiedAt: Date;
+  tags?: Tag[];
+}
+
 export interface JourneyImage {
   id: string;
   journeyId: string;
