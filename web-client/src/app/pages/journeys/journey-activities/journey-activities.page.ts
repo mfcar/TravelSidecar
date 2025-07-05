@@ -1,3 +1,4 @@
+import { Dialog } from '@angular/cdk/dialog';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,7 +11,6 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { of } from 'rxjs';
-import { Dialog } from '@angular/cdk/dialog';
 import {
   ActivitiesViewMode,
   ActivitiesViewToggleComponent,
@@ -19,22 +19,22 @@ import {
   DayActivitiesListComponent,
   JourneyActivity,
 } from '../../../components/activities/day-activities-list/day-activities-list.component';
+import { ButtonComponent } from '../../../components/buttons/button/button.component';
+import {
+  BucketListPickerComponent,
+  BucketListPickerConfig,
+  BucketListPickerResult,
+} from '../../../components/forms/bucket-list-picker/bucket-list-picker.component';
 import {
   DayNavigatorMode,
   DaysNavigatorComponent,
 } from '../../../components/navigation/days-navigator/days-navigator.component';
 import { UserFirstDayOfWeek } from '../../../models/enums/user-preferences.enum';
+import { BucketListService } from '../../../services/bucket-list.service';
 import { JourneyActivityService } from '../../../services/journey-activity.service';
 import { JourneyService } from '../../../services/journey.service';
-import { UserPreferencesService } from '../../../services/user-preferences.service';
-import { 
-  BucketListPickerComponent,
-  BucketListPickerConfig,
-  BucketListPickerResult
-} from '../../../components/forms/bucket-list-picker/bucket-list-picker.component';
-import { ButtonComponent } from '../../../components/buttons/button/button.component';
-import { BucketListService } from '../../../services/bucket-list.service';
 import { ToastService } from '../../../services/toast.service';
+import { UserPreferencesService } from '../../../services/user-preferences.service';
 
 @Component({
   selector: 'ts-journey-activities',
@@ -229,7 +229,7 @@ export class JourneyActivitiesPage {
     const config: BucketListPickerConfig = {
       mode: 'copy',
       allowMultiple: true,
-      journeyId: journeyId
+      journeyId: journeyId,
     };
 
     const dialogRef = this.dialog.open<BucketListPickerResult>(BucketListPickerComponent, {
@@ -242,14 +242,14 @@ export class JourneyActivitiesPage {
 
     dialogRef.closed.subscribe((result) => {
       if (result) {
-        const itemIds = result.items.map(item => item.id);
-        
+        const itemIds = result.items.map((item) => item.id);
+
         this.bucketListService.copyToJourney(itemIds, journeyId, result.action).subscribe({
           next: (response) => {
             this.toastService.showSuccess(
-              `Successfully ${result.action === 'move' ? 'moved' : 'copied'} ${result.items.length} items to journey`
+              `Successfully ${result.action === 'move' ? 'moved' : 'copied'} ${result.items.length} items to journey`,
             );
-            
+
             // Refresh activities
             this.activitiesResource.reload();
             this.dayActivitiesResource.reload();
@@ -257,9 +257,9 @@ export class JourneyActivitiesPage {
           error: (error) => {
             console.error('Error copying/moving items:', error);
             this.toastService.showError(
-              `Failed to ${result.action} items to journey. Please try again.`
+              `Failed to ${result.action} items to journey. Please try again.`,
             );
-          }
+          },
         });
       }
     });

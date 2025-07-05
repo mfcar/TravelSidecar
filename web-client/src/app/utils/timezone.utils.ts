@@ -23,7 +23,7 @@ export class TimezoneUtils {
     dateTimeString: string | undefined,
     timezone: string | undefined,
     userTimezone: string,
-    options: TimezoneFormatOptions = {}
+    options: TimezoneFormatOptions = {},
   ): FormattedDateTime | null {
     if (!dateTimeString || !timezone) {
       return null;
@@ -35,43 +35,43 @@ export class TimezoneUtils {
       timeFormat = UserTimeFormat.HH_MM_12,
       showTimezone = true,
       showDate = true,
-      showTime = true
+      showTime = true,
     } = options;
 
     try {
       // Parse the ISO datetime string
       const date = new Date(dateTimeString);
-      
+
       // Format in the activity's local timezone
       const localFormatter = new Intl.DateTimeFormat(locale, {
         timeZone: timezone,
         ...(showDate && this.getDateFormatOptions(dateFormat)),
         ...(showTime && this.getTimeFormatOptions(timeFormat)),
-        ...(showTimezone && { timeZoneName: 'short' })
+        ...(showTimezone && { timeZoneName: 'short' }),
       });
-      
+
       const localTime = localFormatter.format(date);
-      
+
       // Check if user timezone is different
       const isDifferentTimezone = timezone !== userTimezone;
       let userTime: string | undefined;
-      
+
       if (isDifferentTimezone) {
         // Format in user's timezone
         const userFormatter = new Intl.DateTimeFormat(locale, {
           timeZone: userTimezone,
           ...(showDate && this.getDateFormatOptions(dateFormat)),
           ...(showTime && this.getTimeFormatOptions(timeFormat)),
-          ...(showTimezone && { timeZoneName: 'short' })
+          ...(showTimezone && { timeZoneName: 'short' }),
         });
-        
+
         userTime = userFormatter.format(date);
       }
-      
+
       return {
         localTime,
         userTime,
-        isDifferentTimezone
+        isDifferentTimezone,
       };
     } catch (error) {
       console.error('Error formatting datetime with timezone:', error);
@@ -87,14 +87,14 @@ export class TimezoneUtils {
     timezone: string | undefined,
     userTimezone: string,
     timeFormat: UserTimeFormat = UserTimeFormat.HH_MM_12,
-    locale: string = 'en-US'
+    locale = 'en-US',
   ): FormattedDateTime | null {
     return this.formatDateTime(dateTimeString, timezone, userTimezone, {
       locale,
       timeFormat,
       showDate: false,
       showTime: true,
-      showTimezone: false
+      showTimezone: false,
     });
   }
 
@@ -148,10 +148,10 @@ export class TimezoneUtils {
       const [datePart, timePart] = localDateTime.split('T');
       const [year, month, day] = datePart.split('-').map(Number);
       const [hour, minute, second = 0] = timePart.split(':').map(Number);
-      
+
       // Use Intl.DateTimeFormat to get the offset for this timezone at this date/time
       const date = new Date(year, month - 1, day, hour, minute, second);
-      
+
       // Format with timezone to get offset
       const formatter = new Intl.DateTimeFormat('en-US', {
         timeZone: timezone,
@@ -162,13 +162,13 @@ export class TimezoneUtils {
         minute: '2-digit',
         second: '2-digit',
         hour12: false,
-        timeZoneName: 'longOffset'
+        timeZoneName: 'longOffset',
       });
-      
+
       // Parse the formatted parts to reconstruct with offset
       const parts = formatter.formatToParts(date);
-      const offset = parts.find(p => p.type === 'timeZoneName')?.value || '+00:00';
-      
+      const offset = parts.find((p) => p.type === 'timeZoneName')?.value || '+00:00';
+
       // Return ISO string with timezone offset
       return `${localDateTime}${offset.replace('GMT', '')}`;
     } catch (error) {
@@ -186,11 +186,11 @@ export class TimezoneUtils {
     endDateTime: string | undefined,
     endTimezone: string | undefined,
     userTimezone: string,
-    options: TimezoneFormatOptions = {}
+    options: TimezoneFormatOptions = {},
   ): { start: FormattedDateTime | null; end: FormattedDateTime | null } {
     return {
       start: this.formatDateTime(startDateTime, startTimezone, userTimezone, options),
-      end: this.formatDateTime(endDateTime, endTimezone, userTimezone, options)
+      end: this.formatDateTime(endDateTime, endTimezone, userTimezone, options),
     };
   }
 
@@ -202,12 +202,12 @@ export class TimezoneUtils {
       const now = new Date();
       const formatter = new Intl.DateTimeFormat('en-US', {
         timeZone: timezone,
-        timeZoneName: 'long'
+        timeZoneName: 'long',
       });
-      
+
       const parts = formatter.formatToParts(now);
-      const timezoneName = parts.find(p => p.type === 'timeZoneName')?.value;
-      
+      const timezoneName = parts.find((p) => p.type === 'timeZoneName')?.value;
+
       return timezoneName || timezone;
     } catch (error) {
       return timezone;

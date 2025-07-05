@@ -19,8 +19,8 @@ import {
 import { BucketListService } from '../../../services/bucket-list.service';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { ButtonComponent } from '../../buttons/button/button.component';
-import { LoadingIndicatorComponent } from '../../ui/loading-indicator/loading-indicator.component';
 import { BaseModalComponent } from '../../modals/base-modal/base-modal.component';
+import { LoadingIndicatorComponent } from '../../ui/loading-indicator/loading-indicator.component';
 import { TextInputComponent } from '../text-input/text-input.component';
 
 export interface BucketListPickerConfig {
@@ -69,16 +69,14 @@ export class BucketListPickerComponent implements OnInit {
 
   // Computed
   modalTitle = computed(() => {
-    const action = this.dialogData.mode === 'move' 
-      ? 'Move to Journey' 
-      : 'Copy to Journey';
+    const action = this.dialogData.mode === 'move' ? 'Move to Journey' : 'Copy to Journey';
     return `Select Bucket List Items - ${action}`;
   });
 
   filteredItems = computed(() => {
     const items = this.items();
     const excludeIds = this.dialogData.excludeItemIds || [];
-    return items.filter(item => !excludeIds.includes(item.id));
+    return items.filter((item) => !excludeIds.includes(item.id));
   });
 
   selectedCount = computed(() => this.selectedItems().size);
@@ -110,9 +108,10 @@ export class BucketListPickerComponent implements OnInit {
       page: this.currentPage(),
       pageSize: this.pageSize,
       searchTerm: this.searchTerm() || undefined,
-      types: this.selectedType() !== 'all' 
-        ? [this.selectedType() as BucketListItemType] 
-        : this.dialogData.filterTypes,
+      types:
+        this.selectedType() !== 'all'
+          ? [this.selectedType() as BucketListItemType]
+          : this.dialogData.filterTypes,
     };
 
     this.isLoading.set(true);
@@ -125,7 +124,7 @@ export class BucketListPickerComponent implements OnInit {
             this.items.set(result.items);
           } else {
             // Append for infinite scroll
-            this.items.update(items => [...items, ...result.items]);
+            this.items.update((items) => [...items, ...result.items]);
           }
           this.totalItems.set(result.totalCount);
         },
@@ -177,7 +176,7 @@ export class BucketListPickerComponent implements OnInit {
     const element = event.target as HTMLElement;
     if (element.scrollTop + element.clientHeight >= element.scrollHeight - 100) {
       if (this.items().length < this.totalItems() && !this.isLoading()) {
-        this.currentPage.update(p => p + 1);
+        this.currentPage.update((p) => p + 1);
         this.loadItems(false);
       }
     }
@@ -189,8 +188,8 @@ export class BucketListPickerComponent implements OnInit {
 
   confirm() {
     const selectedIds = Array.from(this.selectedItems());
-    const selectedItems = this.items().filter(item => selectedIds.includes(item.id));
-    
+    const selectedItems = this.items().filter((item) => selectedIds.includes(item.id));
+
     this.dialogRef.close({
       items: selectedItems,
       action: this.dialogData.mode,
@@ -212,7 +211,7 @@ export class BucketListPickerComponent implements OnInit {
 
   formatPrice(price?: number, currency?: string): string {
     if (!price || !currency) return '';
-    
+
     try {
       return new Intl.NumberFormat(undefined, {
         style: 'currency',
@@ -226,7 +225,7 @@ export class BucketListPickerComponent implements OnInit {
   // Keyboard navigation
   handleKeyDown(event: KeyboardEvent, index: number) {
     const items = this.filteredItems();
-    
+
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
@@ -249,9 +248,7 @@ export class BucketListPickerComponent implements OnInit {
   }
 
   private focusItem(index: number) {
-    const element = document.querySelector(
-      `[data-item-index="${index}"]`
-    ) as HTMLElement;
+    const element = document.querySelector(`[data-item-index="${index}"]`) as HTMLElement;
     element?.focus();
   }
 
@@ -264,7 +261,7 @@ export class BucketListPickerComponent implements OnInit {
   }
 
   getTypeLabel(type: BucketListItemType): string {
-    const option = this.typeOptions.find(t => t.value === type);
+    const option = this.typeOptions.find((t) => t.value === type);
     return option?.label || 'Other';
   }
 }

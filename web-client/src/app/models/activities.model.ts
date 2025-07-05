@@ -1,5 +1,3 @@
-import { FileMetadata } from './file.model';
-
 export enum ActivityType {
   // Transportation
   Flight = 1,
@@ -9,14 +7,14 @@ export enum ActivityType {
   Ferry = 5,
   Cruise = 6,
   Transportation = 7,
-  
+
   // Accommodation
   Hotel = 20,
   Hostel = 21,
   Vacation = 22,
   Camping = 23,
   Lodging = 24,
-  
+
   // Food & Drink
   Restaurant = 40,
   Cafe = 41,
@@ -24,7 +22,7 @@ export enum ActivityType {
   Brewery = 43,
   Winery = 44,
   Bakery = 45,
-  
+
   // Activities
   Sightseeing = 60,
   Museum = 61,
@@ -36,7 +34,7 @@ export enum ActivityType {
   Park = 67,
   AmusementPark = 68,
   Shopping = 69,
-  
+
   // Services
   ATM = 80,
   Bank = 81,
@@ -44,13 +42,13 @@ export enum ActivityType {
   Laundry = 83,
   GasStation = 84,
   EVCharger = 85,
-  
+
   // Other
   Fitness = 100,
   Library = 101,
   Stadium = 102,
   Nightlife = 103,
-  Other = 104
+  Other = 104,
 }
 
 export interface ActivityAttachment {
@@ -180,7 +178,12 @@ export interface CalendarSummaryResponse {
   daysWithActivitiesIndexed?: DayActivityCountIndexed[];
 }
 
-export type JourneyActivity = ActivityBase | FlightActivity | LodgingActivity | TransportActivity | CarRentalActivity;
+export type JourneyActivity =
+  | ActivityBase
+  | FlightActivity
+  | LodgingActivity
+  | TransportActivity
+  | CarRentalActivity;
 
 export interface ActivityDay {
   date: Date;

@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import {
-  JourneyActivity,
-  ActivityOrderItem,
-  CreateUpdateActivityRequest,
-  CalendarSummaryResponse,
   ActivityDay,
+  ActivityOrderItem,
+  CalendarSummaryResponse,
+  CreateUpdateActivityRequest,
+  JourneyActivity,
 } from '../models/activities.model';
 import { Journey } from '../models/journeys.model';
 
@@ -21,10 +21,13 @@ export class JourneyActivityService {
   /**
    * Get all activities for a specific journey
    */
-  getJourneyActivities(journeyId: string, sortMode: 'time' | 'manual' = 'manual'): Observable<JourneyActivity[]> {
+  getJourneyActivities(
+    journeyId: string,
+    sortMode: 'time' | 'manual' = 'manual',
+  ): Observable<JourneyActivity[]> {
     return this.httpClient.get<JourneyActivity[]>(
       `${this.apiUrl}/${journeyId}/activities?sort=${sortMode}`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -34,20 +37,20 @@ export class JourneyActivityService {
   getActivitiesForDay(
     journeyId: string,
     day: Date | number,
-    sortMode: 'time' | 'manual' = 'manual'
+    sortMode: 'time' | 'manual' = 'manual',
   ): Observable<JourneyActivity[]> {
     if (typeof day === 'number') {
       // Day number (for journeys without dates)
       return this.httpClient.get<JourneyActivity[]>(
         `${this.apiUrl}/${journeyId}/activities/day/${day}?sort=${sortMode}`,
-        { withCredentials: true }
+        { withCredentials: true },
       );
     } else {
       // Specific date (for dated journeys)
       const dateStr = day.toISOString().split('T')[0];
       return this.httpClient.get<JourneyActivity[]>(
         `${this.apiUrl}/${journeyId}/activities/date/${dateStr}?sort=${sortMode}`,
-        { withCredentials: true }
+        { withCredentials: true },
       );
     }
   }
@@ -58,7 +61,7 @@ export class JourneyActivityService {
   getCalendarSummary(journeyId: string): Observable<CalendarSummaryResponse> {
     return this.httpClient.get<CalendarSummaryResponse>(
       `${this.apiUrl}/${journeyId}/activities/calendar-summary`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -69,7 +72,7 @@ export class JourneyActivityService {
     journeyId: string,
     journey?: Journey,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ): Observable<ActivityDay[]> {
     return this.getCalendarSummary(journeyId).pipe(
       map((summary) => {
@@ -78,35 +81,39 @@ export class JourneyActivityService {
         if (summary.daysWithActivities && startDate && endDate) {
           // For dated journeys with date range
           const current = new Date(startDate);
-          
+
           while (current <= endDate) {
             const dateStr = current.toISOString().split('T')[0];
-            const dayData = summary.daysWithActivities.find(d => d.date === dateStr);
-            
+            const dayData = summary.daysWithActivities.find((d) => d.date === dateStr);
+
             days.push({
               date: new Date(current),
-              hasActivities: dayData ? dayData.activityCount > 0 : false
+              hasActivities: dayData ? dayData.activityCount > 0 : false,
             });
-            
+
             current.setDate(current.getDate() + 1);
           }
         } else if (summary.daysWithActivities) {
           // For dated journeys without specific range
-          days.push(...summary.daysWithActivities.map(d => ({
-            date: new Date(d.date),
-            hasActivities: d.activityCount > 0
-          })));
+          days.push(
+            ...summary.daysWithActivities.map((d) => ({
+              date: new Date(d.date),
+              hasActivities: d.activityCount > 0,
+            })),
+          );
         } else if (summary.daysWithActivitiesIndexed) {
           // For undated journeys
-          days.push(...summary.daysWithActivitiesIndexed.map(d => ({
-            date: new Date(), // Placeholder date
-            hasActivities: d.activityCount > 0,
-            dayNumber: d.dayNumber
-          })));
+          days.push(
+            ...summary.daysWithActivitiesIndexed.map((d) => ({
+              date: new Date(), // Placeholder date
+              hasActivities: d.activityCount > 0,
+              dayNumber: d.dayNumber,
+            })),
+          );
         }
 
         return days;
-      })
+      }),
     );
   }
 
@@ -116,7 +123,7 @@ export class JourneyActivityService {
   getActivitySummary(
     journeyId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Observable<Map<string, number>> {
     return this.getCalendarSummary(journeyId).pipe(
       map((summary) => {
@@ -134,7 +141,7 @@ export class JourneyActivityService {
         }
 
         return result;
-      })
+      }),
     );
   }
 
@@ -144,18 +151,21 @@ export class JourneyActivityService {
   getActivityById(journeyId: string, activityId: string): Observable<JourneyActivity> {
     return this.httpClient.get<JourneyActivity>(
       `${this.apiUrl}/${journeyId}/activities/${activityId}`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
   /**
    * Create a new activity
    */
-  createActivity(journeyId: string, request: CreateUpdateActivityRequest): Observable<JourneyActivity> {
+  createActivity(
+    journeyId: string,
+    request: CreateUpdateActivityRequest,
+  ): Observable<JourneyActivity> {
     return this.httpClient.post<JourneyActivity>(
       `${this.apiUrl}/${journeyId}/activities`,
       request,
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -165,12 +175,12 @@ export class JourneyActivityService {
   updateActivity(
     journeyId: string,
     activityId: string,
-    request: CreateUpdateActivityRequest
+    request: CreateUpdateActivityRequest,
   ): Observable<JourneyActivity> {
     return this.httpClient.put<JourneyActivity>(
       `${this.apiUrl}/${journeyId}/activities/${activityId}`,
       request,
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -178,10 +188,9 @@ export class JourneyActivityService {
    * Delete an activity
    */
   deleteActivity(journeyId: string, activityId: string): Observable<boolean> {
-    return this.httpClient.delete<boolean>(
-      `${this.apiUrl}/${journeyId}/activities/${activityId}`,
-      { withCredentials: true }
-    );
+    return this.httpClient.delete<boolean>(`${this.apiUrl}/${journeyId}/activities/${activityId}`, {
+      withCredentials: true,
+    });
   }
 
   /**
@@ -191,7 +200,7 @@ export class JourneyActivityService {
     return this.httpClient.put<boolean>(
       `${this.apiUrl}/${journeyId}/activities/reorder`,
       activities,
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -202,12 +211,12 @@ export class JourneyActivityService {
     journeyId: string,
     bucketListItemId: string,
     action: 'move' | 'duplicate',
-    additionalData?: Partial<CreateUpdateActivityRequest>
+    additionalData?: Partial<CreateUpdateActivityRequest>,
   ): Observable<JourneyActivity> {
     return this.httpClient.post<JourneyActivity>(
       `${this.apiUrl}/${journeyId}/activities/from-bucket-list/${bucketListItemId}?action=${action}`,
       additionalData || {},
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
