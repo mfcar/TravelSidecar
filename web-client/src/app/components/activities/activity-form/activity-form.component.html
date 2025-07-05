@@ -1,0 +1,335 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+  @if (errorMessage()) {
+    <ts-alert type="error" [message]="errorMessage()!" />
+  }
+
+  <!-- Basic Information -->
+  <div class="space-y-4">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Basic Information</h3>
+
+    <ts-generic-selector-input
+      formControlName="activityType"
+      label="Activity Type"
+      [options]="activityTypes()"
+      [getOptionLabel]="(type: any) => type.name"
+      [getOptionValue]="(type: any) => type.type"
+      [showRequiredIndicator]="true"
+      placeholder="Select activity type"
+    />
+
+    <ts-text-input
+      formControlName="name"
+      label="Activity Name"
+      placeholder="Enter activity name"
+      [showRequiredIndicator]="true"
+    />
+
+    <ts-textarea-input
+      formControlName="description"
+      label="Description"
+      placeholder="Enter activity description"
+      [rows]="3"
+    />
+  </div>
+
+  <!-- Date & Time -->
+  <div class="space-y-4">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Date & Time</h3>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <ts-date-only-input
+        formControlName="startDate"
+        label="Start Date"
+        placeholder="Select date"
+      />
+
+      <ts-time-only-input
+        formControlName="startTime"
+        label="Start Time"
+        placeholder="Select time"
+      />
+
+      <ts-timezone-selector
+        formControlName="startTimezone"
+        label="Start Timezone"
+        placeholder="Select timezone"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <ts-date-only-input
+        formControlName="endDate"
+        label="End Date"
+        placeholder="Select date"
+      />
+
+      <ts-time-only-input
+        formControlName="endTime"
+        label="End Time"
+        placeholder="Select time"
+      />
+
+      <ts-timezone-selector
+        formControlName="endTimezone"
+        label="End Timezone"
+        placeholder="Select timezone"
+      />
+    </div>
+
+    @if (showCheckInOutTimes()) {
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ts-time-only-input
+          formControlName="checkInTime"
+          label="Check-in Time"
+          placeholder="e.g., 15:00"
+        />
+
+        <ts-time-only-input
+          formControlName="checkOutTime"
+          label="Check-out Time"
+          placeholder="e.g., 11:00"
+        />
+      </div>
+    }
+  </div>
+
+  <!-- Location -->
+  <div class="space-y-4">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Location</h3>
+
+    @if (showLocationFields()) {
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ts-text-input
+          formControlName="startLocation"
+          label="Start Location"
+          placeholder="Enter start location"
+          [showRequiredIndicator]="true"
+        />
+
+        <ts-text-input
+          formControlName="endLocation"
+          label="End Location"
+          placeholder="Enter end location"
+          [showRequiredIndicator]="true"
+        />
+      </div>
+    } @else {
+      <ts-text-input
+        formControlName="address"
+        label="Address"
+        placeholder="Enter address"
+      />
+    }
+  </div>
+
+  <!-- Type-Specific Fields -->
+  @if (showFlightFields()) {
+    <div class="space-y-4">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Flight Details</h3>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ts-text-input
+          formControlName="flightNumber"
+          label="Flight Number"
+          placeholder="e.g., AA123"
+          [showRequiredIndicator]="true"
+        />
+
+        <ts-text-input
+          formControlName="airline"
+          label="Airline"
+          placeholder="e.g., American Airlines"
+          [showRequiredIndicator]="true"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ts-text-input
+          formControlName="seatNumber"
+          label="Seat Number"
+          placeholder="e.g., 12A"
+        />
+
+        <ts-text-input
+          formControlName="seatClass"
+          label="Class"
+          placeholder="e.g., Economy"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ts-text-input
+          formControlName="departureTerminal"
+          label="Departure Terminal"
+          placeholder="e.g., Terminal 2"
+        />
+
+        <ts-text-input
+          formControlName="departureGate"
+          label="Departure Gate"
+          placeholder="e.g., B15"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ts-text-input
+          formControlName="arrivalTerminal"
+          label="Arrival Terminal"
+          placeholder="e.g., Terminal 1"
+        />
+
+        <ts-text-input
+          formControlName="arrivalGate"
+          label="Arrival Gate"
+          placeholder="e.g., C23"
+        />
+      </div>
+    </div>
+  }
+
+  @if (showTransportFields()) {
+    <div class="space-y-4">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Transport Details</h3>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ts-text-input
+          formControlName="transportNumber"
+          label="Transport Number"
+          placeholder="e.g., THA9312"
+        />
+
+        <ts-text-input
+          formControlName="company"
+          label="Company"
+          placeholder="e.g., Thalys"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ts-text-input
+          formControlName="departureStation"
+          label="Departure Station"
+          placeholder="e.g., Paris Nord"
+        />
+
+        <ts-text-input
+          formControlName="arrivalStation"
+          label="Arrival Station"
+          placeholder="e.g., Amsterdam Centraal"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <ts-text-input
+          formControlName="seatNumber"
+          label="Seat Number"
+          placeholder="e.g., 14B"
+        />
+
+        <ts-text-input
+          formControlName="coachNumber"
+          label="Coach/Car Number"
+          placeholder="e.g., 3"
+        />
+
+        <ts-text-input
+          formControlName="seatClass"
+          label="Class"
+          placeholder="e.g., First"
+        />
+      </div>
+    </div>
+  }
+
+  @if (showCheckInOutTimes()) {
+    <div class="space-y-4">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Accommodation Details</h3>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ts-text-input
+          formControlName="roomNumber"
+          label="Room Number"
+          placeholder="e.g., 405"
+        />
+
+        <ts-text-input
+          formControlName="roomType"
+          label="Room Type"
+          placeholder="e.g., Double"
+        />
+      </div>
+
+      <ts-text-input
+        formControlName="numberOfGuests"
+        type="number"
+        label="Number of Guests"
+        placeholder="e.g., 2"
+      />
+    </div>
+  }
+
+  <!-- Contact & Cost -->
+  <div class="space-y-4">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Contact & Cost</h3>
+
+    @if (showReservationCode()) {
+      <ts-text-input
+        formControlName="reservationCode"
+        label="Reservation/Confirmation Code"
+        placeholder="e.g., ABC123"
+      />
+    }
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <ts-text-input
+        formControlName="phoneNumber"
+        label="Phone Number"
+        placeholder="e.g., +1 234-567-8900"
+      />
+
+      <ts-text-input
+        formControlName="website"
+        label="Website"
+        placeholder="e.g., https://example.com"
+      />
+    </div>
+
+    <ts-currency-price-input
+      formControlName="cost"
+      label="Cost"
+      placeholder="Enter cost"
+    />
+  </div>
+
+  <!-- Notes -->
+  <div class="space-y-4">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Additional Information</h3>
+
+    <ts-textarea-input
+      formControlName="notes"
+      label="Notes"
+      placeholder="Add any additional notes..."
+      [rows]="4"
+    />
+  </div>
+
+  <!-- Form Actions -->
+  <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+    <ts-button
+      type="button"
+      variant="ghost"
+      (click)="onCancel()"
+      [disabled]="isLoading()"
+    >
+      Cancel
+    </ts-button>
+
+    <ts-button
+      type="submit"
+      [disabled]="form.invalid || isLoading()"
+      [isLoading]="isLoading()"
+    >
+      {{ isUpdateMode() ? 'Update' : 'Create' }} Activity
+    </ts-button>
+  </div>
+</form>
