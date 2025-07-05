@@ -108,10 +108,9 @@ export class JourneyActivitiesPage {
     request: () => ({
       journeyId: this.journeyId(),
       day: this.selectedDay(),
-      journey: this.journey(),
     }),
     loader: ({ request }) => {
-      if (!request.journeyId) {
+      if (!request.journeyId || !request.day) {
         return of([]);
       }
       return this.journeyActivityService.getActivitiesForDay(request.journeyId, request.day);
@@ -122,12 +121,16 @@ export class JourneyActivitiesPage {
     return this.dayActivitiesResource.value() || [];
   });
 
+  private hasInitializedSelectedDay = false;
+
   constructor() {
     this.loadUserPreferences();
 
+    // Only set initial selected day once when journey first loads
     effect(() => {
       const journey = this.journey();
-      if (journey) {
+      if (journey && !this.hasInitializedSelectedDay) {
+        this.hasInitializedSelectedDay = true;
         this.setInitialSelectedDay();
       }
     });

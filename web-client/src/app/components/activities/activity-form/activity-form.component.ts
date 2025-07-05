@@ -69,6 +69,7 @@ export class ActivityFormComponent implements OnInit {
   // Form
   form!: FormGroup;
   isUpdateMode = signal(false);
+  selectedActivityType = signal<ActivityType>(ActivityType.Other);
 
   // Data
   tags = signal<Tag[]>([]);
@@ -77,17 +78,17 @@ export class ActivityFormComponent implements OnInit {
 
   // Dynamic field visibility
   showLocationFields = computed(() => {
-    const type = this.form?.get('activityType')?.value as ActivityType;
+    const type = this.selectedActivityType();
     return ActivityTypeUtils.hasLocationFields(type);
   });
 
   showReservationCode = computed(() => {
-    const type = this.form?.get('activityType')?.value as ActivityType;
+    const type = this.selectedActivityType();
     return ActivityTypeUtils.hasReservationCode(type);
   });
 
   showCheckInOutTimes = computed(() => {
-    const type = this.form?.get('activityType')?.value as ActivityType;
+    const type = this.selectedActivityType();
     return [
       ActivityType.Hotel,
       ActivityType.Hostel,
@@ -98,12 +99,12 @@ export class ActivityFormComponent implements OnInit {
   });
 
   showFlightFields = computed(() => {
-    const type = this.form?.get('activityType')?.value as ActivityType;
+    const type = this.selectedActivityType();
     return type === ActivityType.Flight;
   });
 
   showTransportFields = computed(() => {
-    const type = this.form?.get('activityType')?.value as ActivityType;
+    const type = this.selectedActivityType();
     return [ActivityType.Train, ActivityType.Bus, ActivityType.Ferry, ActivityType.Cruise].includes(
       type,
     );
@@ -128,11 +129,15 @@ export class ActivityFormComponent implements OnInit {
     // Detect user's timezone as default
     const userTimezone = this.timezoneService.getUserTimezone();
 
+    // Set initial activity type
+    const initialActivityType = activity?.activityType || ActivityType.Other;
+    this.selectedActivityType.set(initialActivityType);
+
     this.form = this.fb.group({
       // Basic fields
       name: [activity?.name || '', [Validators.required, Validators.maxLength(200)]],
       description: [activity?.description || '', Validators.maxLength(500)],
-      activityType: [activity?.activityType || ActivityType.Other, Validators.required],
+      activityType: [initialActivityType, Validators.required],
       dayNumber: [activity?.dayNumber || this.data().dayNumber],
 
       // Date/Time fields
@@ -190,8 +195,9 @@ export class ActivityFormComponent implements OnInit {
       this.loadTypeSpecificData(activity);
     }
 
-    // Subscribe to activity type changes
+    // Subscribe to activity type changes and sync with signal
     this.form.get('activityType')?.valueChanges.subscribe((type) => {
+      this.selectedActivityType.set(type);
       this.updateFieldValidators(type);
     });
   }
