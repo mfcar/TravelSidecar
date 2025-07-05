@@ -11,7 +11,7 @@ import {
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UserFirstDayOfWeek } from '../../../../models/enums/user-preferences.enum';
 import { Journey } from '../../../../models/journeys.model';
-import { JourneyActivity } from '../../../activities/day-activities-list/day-activities-list.component';
+import { JourneyActivity } from '../../../../models/activities.model';
 
 export interface CalendarDay {
   date: Date;

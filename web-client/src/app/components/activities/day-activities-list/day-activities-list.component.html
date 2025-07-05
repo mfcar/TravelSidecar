@@ -94,11 +94,11 @@
                   </div>
                 }
                 
-                @if (activity.location) {
+                @if (activity.address || activity.startLocation) {
                   <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                     <fa-icon [icon]="['fas', 'map-marker-alt']" class="h-3 w-3 text-gray-500" />
                     <span class="font-medium">Location:</span>
-                    <span>{{ activity.location }}</span>
+                    <span>{{ activity.address || activity.startLocation }}</span>
                   </div>
                 }
                 
@@ -113,7 +113,7 @@
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                   <fa-icon [icon]="['fas', 'calendar']" class="h-3 w-3 text-gray-500" />
                   <span class="font-medium">Created:</span>
-                  <span>{{ activity.createdAt.toLocaleDateString() }}</span>
+                  <span>{{ formatDate(activity.createdAt) }}</span>
                 </div>
               </div>
               
@@ -138,10 +138,10 @@
                 </div>
               }
               
-              @if (activity.location) {
+              @if (activity.address || activity.startLocation) {
                 <div class="flex items-center gap-1">
                   <fa-icon [icon]="['fas', 'map-marker-alt']" class="h-3 w-3" />
-                  <span class="truncate">{{ activity.location }}</span>
+                  <span class="truncate">{{ activity.address || activity.startLocation }}</span>
                 </div>
               }
               

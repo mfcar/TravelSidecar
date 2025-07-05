@@ -28,11 +28,15 @@ export class DayActivitiesListComponent {
     this.editActivity.emit(activity);
   }
 
-  onDeleteActivity(activityId: string): void {
-    this.deleteActivity.emit(activityId);
+  onDeleteActivity(activityId: string | undefined): void {
+    if (activityId) {
+      this.deleteActivity.emit(activityId);
+    }
   }
 
-  onToggleActivityDetails(activityId: string): void {
+  onToggleActivityDetails(activityId: string | undefined): void {
+    if (!activityId) return;
+    
     if (this.expandedActivityId() === activityId) {
       this.expandedActivityId.set(null);
     } else {
@@ -40,8 +44,8 @@ export class DayActivitiesListComponent {
     }
   }
 
-  isActivityExpanded(activityId: string): boolean {
-    return this.expandedActivityId() === activityId;
+  isActivityExpanded(activityId: string | undefined): boolean {
+    return !!activityId && this.expandedActivityId() === activityId;
   }
 
   formatTime(dateTime?: string): string {
@@ -65,6 +69,16 @@ export class DayActivitiesListComponent {
       style: 'currency',
       currency: currency,
     }).format(cost);
+  }
+
+  formatDate(dateString?: string): string {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString();
+    } catch {
+      return '';
+    }
   }
 
   readonly ActivitiesViewMode = ActivitiesViewMode;

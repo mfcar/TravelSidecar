@@ -15,10 +15,8 @@ import {
   ActivitiesViewMode,
   ActivitiesViewToggleComponent,
 } from '../../../components/activities/activities-view-toggle/activities-view-toggle.component';
-import {
-  DayActivitiesListComponent,
-  JourneyActivity,
-} from '../../../components/activities/day-activities-list/day-activities-list.component';
+import { DayActivitiesListComponent } from '../../../components/activities/day-activities-list/day-activities-list.component';
+import { JourneyActivity } from '../../../models/activities.model';
 import { ButtonComponent } from '../../../components/buttons/button/button.component';
 import {
   BucketListPickerComponent,
@@ -87,7 +85,7 @@ export class JourneyActivitiesPage {
       if (!request.journeyId) {
         return of([]);
       }
-      return this.journeyActivityService.getJourneyActivities(request.journeyId, request.journey);
+      return this.journeyActivityService.getJourneyActivities(request.journeyId);
     },
   });
 
@@ -103,8 +101,7 @@ export class JourneyActivitiesPage {
       }
       return this.journeyActivityService.getActivitiesForDay(
         request.journeyId,
-        request.day,
-        request.journey,
+        request.day
       );
     },
   });
