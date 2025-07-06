@@ -1,0 +1,32 @@
+# MCP (Model Context Protocol) files - development tools only
+.mcp/
+mcp-server.js
+mcp-server.json
+claude-code-mcp-config.json
+setup-mcp.sh
+MCP-DOCS-README.md
+
+# Claude AI planning documents - local development only
+.claude/
+
+# Dev Container local environment variables
+.devcontainer/.env
+
+# Node.js dependencies for MCP
+node_modules/
+package-lock.json
+*.log
+
+# IDE and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.cache

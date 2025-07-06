@@ -1,0 +1,128 @@
+{
+  "name": "TravelSidecar Development",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace",
+  
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "editor.tabSize": 2,
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "eslint.validate": ["javascript", "typescript"],
+        "dotnet.defaultSolution": "server/TravelSidecarServer.sln"
+      },
+      
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        // C# and .NET
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "kreativ-software.csharpextensions",
+        
+        // Angular and TypeScript
+        "angular.ng-template",
+        "johnpapa.angular2",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        
+        // Database
+        "ms-azuretools.vscode-postgresql",
+        
+        // Docker
+        "ms-azuretools.vscode-docker",
+        
+        // Git
+        "eamodio.gitlens",
+        "donjayamanne.githistory",
+        
+        // General
+        "editorconfig.editorconfig",
+        "christian-kohler.path-intellisense",
+        "formulahendry.auto-rename-tag",
+        "streetsidesoftware.code-spell-checker"
+      ]
+    }
+  },
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "configureZshAsDefaultShell": true,
+      "username": "vscode",
+      "userUid": "1000",
+      "userGid": "1000",
+      "upgradePackages": true
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest",
+      "ppa": false
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "installDirectlyFromGitHubRelease": true,
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    }
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [
+    4200,    // Angular dev server
+    5300,    // .NET API HTTP
+    5301,    // .NET API HTTPS
+    55000,   // PostgreSQL
+    9000,    // MinIO API
+    9001     // MinIO Console
+  ],
+
+  // Port labels
+  "portsAttributes": {
+    "4200": {
+      "label": "Angular",
+      "onAutoForward": "notify"
+    },
+    "5300": {
+      "label": ".NET API (HTTP)",
+      "onAutoForward": "notify"
+    },
+    "5301": {
+      "label": ".NET API (HTTPS)",
+      "onAutoForward": "notify"
+    },
+    "55000": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    },
+    "9000": {
+      "label": "MinIO API",
+      "onAutoForward": "silent"
+    },
+    "9001": {
+      "label": "MinIO Console",
+      "onAutoForward": "notify"
+    }
+  },
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  
+  // Connect as a non-root user. More info: https://containers.dev/tips/non-root.
+  "remoteUser": "vscode",
+  
+  // Environment variables
+  "containerEnv": {
+    "ASPNETCORE_ENVIRONMENT": "Development",
+    "DOTNET_NOLOGO": "true",
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "true"
+  }
+}
