@@ -5,7 +5,6 @@ import {
   Component,
   computed,
   DestroyRef,
-  effect,
   inject,
   linkedSignal,
   OnDestroy,
@@ -79,9 +78,10 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
   selectedSortOrder = signal<'asc' | 'desc'>('asc');
   selectedViewMode = signal<ListViewMode>(ListViewMode.Table);
   selectedFields = signal<Set<string>>(new Set(['name', 'description', 'journeysCount']));
-  displayedItems = signal<JourneyCategory[]>([]);
+  // Replace signals with computed for derived state
+  displayedItems = computed(() => this.categoriesResource.value()?.items || []);
   pageSize = signal<number>(25);
-  totalCount = signal<number>(0);
+  totalCount = computed(() => this.categoriesResource.value()?.totalCount || 0);
   private filterInput$ = new Subject<string>();
 
   // ─── UI Options & Configurations ──────────────────────────────────────────────
@@ -142,14 +142,6 @@ export class JourneyCategoriesListPage implements OnInit, OnDestroy {
     });
 
     this.initFilterDebounce();
-
-    effect(() => {
-      const resource = this.categoriesResource.value();
-      if (resource && !this.categoriesResource.isLoading()) {
-        this.displayedItems.set(resource.items || []);
-        this.totalCount.set(resource.totalCount || 0);
-      }
-    });
   }
 
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────

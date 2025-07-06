@@ -1,13 +1,5 @@
 import { NgClass } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { JourneyActivity } from '../../../../models/activities.model';
 import { UserFirstDayOfWeek } from '../../../../models/enums/user-preferences.enum';
@@ -40,19 +32,29 @@ export class ActivityCalendarViewComponent {
 
   dayChange = output<Date>();
 
-  currentMonth = signal(new Date());
+  // Use a signal for manual month navigation
+  manualMonth = signal<Date | null>(null);
 
-  constructor() {
-    this.initializeCalendarMonth();
+  // Compute current month based on manual navigation or selected day
+  currentMonth = computed(() => {
+    const manual = this.manualMonth();
+    if (manual) {
+      return manual;
+    }
 
-    effect(() => {
-      const selected = this.selectedDay();
-      if (selected instanceof Date) {
-        const newMonth = new Date(selected.getFullYear(), selected.getMonth(), 1);
-        this.currentMonth.set(newMonth);
-      }
-    });
-  }
+    const selected = this.selectedDay();
+    const j = this.journey();
+
+    if (selected instanceof Date) {
+      return new Date(selected.getFullYear(), selected.getMonth(), 1);
+    } else if (j?.startDate) {
+      const startDate = new Date(j.startDate);
+      return new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    } else {
+      const today = new Date();
+      return new Date(today.getFullYear(), today.getMonth(), 1);
+    }
+  });
 
   hasJourneyDates = computed(() => {
     const j = this.journey();
@@ -115,45 +117,31 @@ export class ActivityCalendarViewComponent {
   });
 
   onPreviousMonth(): void {
-    this.currentMonth.update((current) => {
-      const newMonth = new Date(current);
-      newMonth.setMonth(newMonth.getMonth() - 1);
-      return newMonth;
-    });
+    const current = this.currentMonth();
+    const newMonth = new Date(current);
+    newMonth.setMonth(newMonth.getMonth() - 1);
+    this.manualMonth.set(newMonth);
   }
 
   onNextMonth(): void {
-    this.currentMonth.update((current) => {
-      const newMonth = new Date(current);
-      newMonth.setMonth(newMonth.getMonth() + 1);
-      return newMonth;
-    });
+    const current = this.currentMonth();
+    const newMonth = new Date(current);
+    newMonth.setMonth(newMonth.getMonth() + 1);
+    this.manualMonth.set(newMonth);
   }
 
   onDayClick(day: CalendarDay): void {
+    // Clear manual month when a day is selected so the calendar follows the selected day again
+    this.manualMonth.set(null);
     this.dayChange.emit(day.date);
   }
 
   goToToday(): void {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    this.currentMonth.set(new Date(today.getFullYear(), today.getMonth(), 1));
+    // Clear manual month to follow the selected day
+    this.manualMonth.set(null);
     this.dayChange.emit(today);
-  }
-
-  private initializeCalendarMonth(): void {
-    const selected = this.selectedDay();
-    const j = this.journey();
-
-    if (selected instanceof Date) {
-      this.currentMonth.set(new Date(selected.getFullYear(), selected.getMonth(), 1));
-    } else if (j?.startDate) {
-      const startDate = new Date(j.startDate);
-      this.currentMonth.set(new Date(startDate.getFullYear(), startDate.getMonth(), 1));
-    } else {
-      const today = new Date();
-      this.currentMonth.set(new Date(today.getFullYear(), today.getMonth(), 1));
-    }
   }
 
   private isSameDay(date1: Date, date2: Date): boolean {

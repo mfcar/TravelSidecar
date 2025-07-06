@@ -1,16 +1,9 @@
 import { Dialog } from '@angular/cdk/dialog';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { of } from 'rxjs';
+import { filter, of, take, tap } from 'rxjs';
 import {
   ActivitiesViewMode,
   ActivitiesViewToggleComponent,
@@ -80,9 +73,21 @@ export class JourneyActivitiesPage {
   activitiesViewMode = signal<ActivitiesViewMode>(ActivitiesViewMode.ByTime);
   firstDayOfWeek = signal<UserFirstDayOfWeek>(UserFirstDayOfWeek.Monday);
 
-  allActivities = signal<JourneyActivity[]>([]);
-  isLoadingActivities = signal<boolean>(false);
-  activitySummary = signal<Map<string, number>>(new Map());
+  // Replace signals with computed for derived state
+  allActivities = computed(() => this.activitiesResource.value() || []);
+  isLoadingActivities = computed(() => this.dayActivitiesResource.isLoading());
+  activitySummary = computed(() => {
+    const summary = this.calendarSummaryResource.value();
+    if (!summary) return new Map<string, number>();
+
+    const summaryMap = new Map<string, number>();
+    if (summary.daysWithActivities) {
+      summary.daysWithActivities.forEach((day) => {
+        summaryMap.set(day.date, day.activityCount);
+      });
+    }
+    return summaryMap;
+  });
 
   activitiesResource = rxResource({
     request: () => ({ journeyId: this.journeyId(), journey: this.journey() }),
@@ -121,43 +126,18 @@ export class JourneyActivitiesPage {
     return this.dayActivitiesResource.value() || [];
   });
 
-  private hasInitializedSelectedDay = false;
-
   constructor() {
     this.loadUserPreferences();
 
-    // Only set initial selected day once when journey first loads
-    effect(() => {
-      const journey = this.journey();
-      if (journey && !this.hasInitializedSelectedDay) {
-        this.hasInitializedSelectedDay = true;
-        this.setInitialSelectedDay();
-      }
-    });
+    // Initialize selected day after journey loads
+    // Using toSignal to convert the observable to a signal for reactive initialization
+    const journeyLoaded$ = toObservable(this.journey).pipe(
+      filter((journey) => !!journey),
+      take(1),
+      tap(() => this.setInitialSelectedDay()),
+    );
 
-    effect(() => {
-      const activities = this.activitiesResource.value();
-      if (activities && Array.isArray(activities)) {
-        this.allActivities.set(activities);
-      }
-    });
-
-    effect(() => {
-      this.isLoadingActivities.set(this.dayActivitiesResource.isLoading());
-    });
-
-    effect(() => {
-      const summary = this.calendarSummaryResource.value();
-      if (summary) {
-        const summaryMap = new Map<string, number>();
-        if (summary.daysWithActivities) {
-          summary.daysWithActivities.forEach((day) => {
-            summaryMap.set(day.date, day.activityCount);
-          });
-        }
-        this.activitySummary.set(summaryMap);
-      }
-    });
+    toSignal(journeyLoaded$, { initialValue: null });
   }
 
   private loadUserPreferences(): void {

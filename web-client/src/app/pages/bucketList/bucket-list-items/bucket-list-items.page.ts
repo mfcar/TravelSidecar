@@ -5,7 +5,6 @@ import {
   Component,
   computed,
   DestroyRef,
-  effect,
   inject,
   linkedSignal,
   OnDestroy,
@@ -77,9 +76,10 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
   selectedSortOrder = signal<'asc' | 'desc'>('asc');
   selectedViewMode = signal<ListViewMode>(ListViewMode.Table);
   selectedFields = signal<Set<string>>(new Set(['name', 'description', 'startDate']));
-  displayedItems = signal<BucketListItem[]>([]);
+  // Replace signals with computed for derived state
+  displayedItems = computed(() => this.bucketListResource.value()?.items || []);
   pageSize = signal<number>(25);
-  totalCount = signal<number>(0);
+  totalCount = computed(() => this.bucketListResource.value()?.totalCount || 0);
   private filterInput$ = new Subject<string>();
 
   // ─── UI Options & Configurations ──────────────────────────────────────────────
@@ -147,14 +147,6 @@ export class BucketListItemsPage implements OnInit, OnDestroy {
     });
 
     this.initFilterDebounce();
-
-    effect(() => {
-      const resource = this.bucketListResource.value();
-      if (resource && !this.bucketListResource.isLoading()) {
-        this.displayedItems.set(resource.items || []);
-        this.totalCount.set(resource.totalCount || 0);
-      }
-    });
   }
 
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────

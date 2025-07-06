@@ -5,7 +5,6 @@ import { AsyncPipe, NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  effect,
   ElementRef,
   HostListener,
   inject,
@@ -15,6 +14,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -30,11 +30,9 @@ import {
   distinctUntilChanged,
   map,
   Observable,
-  of,
   ReplaySubject,
   shareReplay,
   Subject,
-  switchMap,
   take,
   takeUntil,
 } from 'rxjs';
@@ -89,7 +87,6 @@ export class GenericSelectorInputComponent<T = unknown> implements ControlValueA
   protected selectedItems = signal<T[]>([]);
   protected searchText = signal<string>('');
   protected activeItemIndex = signal<number>(-1);
-  private refreshTrigger = new BehaviorSubject<boolean>(true);
   protected allItems$: Observable<T[]>;
   protected filteredItems$: Observable<T[]>;
   private pendingSelection = new ReplaySubject<unknown[]>(1);
@@ -130,15 +127,8 @@ export class GenericSelectorInputComponent<T = unknown> implements ControlValueA
       this.ngControl.valueAccessor = this;
     }
 
-    effect(() => {
-      this.refreshTrigger.next(true);
-    });
-
-    this.allItems$ = this.refreshTrigger.pipe(
-      switchMap(() => of(this.items())),
-      shareReplay(1),
-      takeUntil(this.destroy$),
-    );
+    // Convert items signal to observable
+    this.allItems$ = toObservable(this.items).pipe(shareReplay(1), takeUntil(this.destroy$));
 
     this.allItems$.pipe(takeUntil(this.destroy$)).subscribe((items) => {
       this.pendingSelection.pipe(take(1)).subscribe((values) => {
@@ -300,10 +290,6 @@ export class GenericSelectorInputComponent<T = unknown> implements ControlValueA
     event?.preventDefault();
     event?.stopPropagation();
     this.createButtonClicked.emit();
-  }
-
-  refreshItems(): void {
-    this.refreshTrigger.next(true);
   }
 
   addNewlyCreatedItem(item: T): void {

@@ -5,7 +5,6 @@ import {
   Component,
   computed,
   DestroyRef,
-  effect,
   inject,
   linkedSignal,
   OnDestroy,
@@ -77,9 +76,10 @@ export class UsersListPage implements OnInit, OnDestroy {
   selectedSortOrder = signal<'asc' | 'desc'>('asc');
   selectedViewMode = signal<ListViewMode>(ListViewMode.Table);
   selectedFields = signal<Set<string>>(new Set(['username', 'email', 'lastActiveAt']));
-  displayedItems = signal<User[]>([]);
+  // Replace signals with computed for derived state
+  displayedItems = computed(() => this.usersResource.value()?.items || []);
   pageSize = signal<number>(25);
-  totalCount = signal<number>(0);
+  totalCount = computed(() => this.usersResource.value()?.totalCount || 0);
   private filterInput$ = new Subject<string>();
 
   // ─── UI Options & Configurations ──────────────────────────────────────────────
@@ -140,14 +140,6 @@ export class UsersListPage implements OnInit, OnDestroy {
     });
 
     this.initFilterDebounce();
-
-    effect(() => {
-      const resource = this.usersResource.value();
-      if (resource && !this.usersResource.isLoading()) {
-        this.displayedItems.set(resource.items || []);
-        this.totalCount.set(resource.totalCount || 0);
-      }
-    });
   }
 
   // ─── Angular Lifecycle Hooks ───────────────────────────────────────────────────

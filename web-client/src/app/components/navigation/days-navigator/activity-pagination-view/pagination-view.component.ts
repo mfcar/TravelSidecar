@@ -1,13 +1,5 @@
 import { NgClass } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { JourneyActivity } from '../../../../models/activities.model';
 import { UserFirstDayOfWeek } from '../../../../models/enums/user-preferences.enum';
@@ -43,28 +35,6 @@ export class ActivityPaginationViewComponent {
 
   currentPageStartIndex = signal(0);
   itemsPerPage = 7;
-
-  constructor() {
-    effect(() => {
-      const selected = this.selectedDay();
-      const days = this.allDays();
-
-      if (selected) {
-        let targetIndex = -1;
-
-        if (selected instanceof Date) {
-          targetIndex = days.findIndex((day) => day.date && this.isSameDay(day.date, selected));
-        } else if (typeof selected === 'number') {
-          targetIndex = days.findIndex((day) => day.dayIndex === selected);
-        }
-
-        if (targetIndex >= 0) {
-          const pageStart = Math.floor(targetIndex / this.itemsPerPage) * this.itemsPerPage;
-          this.currentPageStartIndex.set(pageStart);
-        }
-      }
-    });
-  }
 
   hasJourneyDates = computed(() => {
     const j = this.journey();
