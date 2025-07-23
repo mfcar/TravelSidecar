@@ -25,10 +25,10 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" Version="9.0.4" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="9.0.4" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="6.2.0" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="6.2.0" />
-    <PackageVersion Include="OpenIddict.Quartz" Version="6.2.0" />
-    <PackageVersion Include="OpenIddict.Server.AspNetCore" Version="6.2.0" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.0.0" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.0.0" />
+    <PackageVersion Include="OpenIddict.Quartz" Version="7.0.0" />
+    <PackageVersion Include="OpenIddict.Server.AspNetCore" Version="7.0.0" />
     <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.14.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Thread" Version="4.0.0" />
