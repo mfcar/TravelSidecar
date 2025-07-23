@@ -4,6 +4,7 @@
     <!-- Days Navigator -->
     <div class="border-b border-gray-200 dark:border-gray-700 p-4">
       <ts-days-navigator
+        #daysNavigator
         [journey]="journey() || null"
         [selectedDay]="selectedDay()"
         [viewMode]="dayNavigatorMode()"
@@ -12,6 +13,8 @@
         [firstDayOfWeek]="firstDayOfWeek()"
         (dayChange)="onDayChange($event)"
         (viewModeChange)="onDayNavigatorModeChange($event)"
+        (pageChange)="onPageChange($event)"
+        (monthChange)="onMonthChange($event)"
       />
     </div>
 

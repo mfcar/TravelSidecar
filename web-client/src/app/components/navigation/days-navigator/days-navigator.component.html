@@ -95,11 +95,13 @@
 
   @if (viewMode() === DayNavigatorMode.Calendar) {
     <ts-activity-calendar-view
+      #calendarView
       [journey]="journey()"
       [selectedDay]="selectedDay()"
       [activities]="activities()"
       [firstDayOfWeek]="firstDayOfWeek()"
       (dayChange)="onCalendarDayChange($event)"
+      (monthChange)="onCalendarMonthChange($event)"
     />
   }
 

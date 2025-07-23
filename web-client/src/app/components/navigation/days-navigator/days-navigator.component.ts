@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal, viewChild } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { JourneyActivity } from '../../../models/activities.model';
 import { UserFirstDayOfWeek } from '../../../models/enums/user-preferences.enum';
@@ -42,8 +42,12 @@ export class DaysNavigatorComponent {
   activitySummary = input<Map<string, number>>(new Map());
   firstDayOfWeek = input<UserFirstDayOfWeek>(UserFirstDayOfWeek.Monday);
 
+  calendarView = viewChild<ActivityCalendarViewComponent>('calendarView');
+
   dayChange = output<Date | number>();
   viewModeChange = output<DayNavigatorMode>();
+  pageChange = output<number>(); // Emits when pagination page changes
+  monthChange = output<Date>(); // Emits when calendar month changes
 
   currentPageStartIndex = signal(0);
   currentCalendarMonth = signal(new Date());
@@ -187,6 +191,35 @@ export class DaysNavigatorComponent {
     return Math.min(start + this.itemsPerPage, total);
   });
 
+  // Get the visible date range for the current view
+  getVisibleDateRange(): { startDate: Date; endDate: Date } | null {
+    const viewMode = this.viewMode();
+    const journey = this.journey();
+
+    if (viewMode === DayNavigatorMode.Calendar) {
+      // Calendar view: get first and last day of the current month
+      const month = this.currentCalendarMonth();
+      const startDate = new Date(month.getFullYear(), month.getMonth(), 1);
+      const endDate = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+      return { startDate, endDate };
+    } else {
+      // Pagination view: get the range of visible days
+      const visibleDays = this.visibleDays();
+      if (visibleDays.length === 0) return null;
+
+      // For dated journeys
+      if (journey?.startDate && visibleDays[0]?.date) {
+        const startDate = new Date(visibleDays[0].date);
+        const lastDay = visibleDays[visibleDays.length - 1];
+        const endDate = lastDay?.date ? new Date(lastDay.date) : new Date(startDate);
+        return { startDate, endDate };
+      }
+
+      // For undated journeys, we can't determine a date range
+      return null;
+    }
+  }
+
   onDayClick(day: DayInfo): void {
     const value = day.date || day.dayIndex!;
     this.dayChange.emit(value);
@@ -199,6 +232,7 @@ export class DaysNavigatorComponent {
       const currentStart = this.currentPageStartIndex();
       if (currentStart > 0) {
         this.currentPageStartIndex.update((current) => Math.max(0, current - this.itemsPerPage));
+        this.pageChange.emit(this.currentPageStartIndex());
       } else {
         console.log('At beginning of pagination - could extend range');
       }
@@ -213,6 +247,7 @@ export class DaysNavigatorComponent {
       const total = this.allDays().length;
       if (start + this.itemsPerPage < total) {
         this.currentPageStartIndex.update((current) => current + this.itemsPerPage);
+        this.pageChange.emit(this.currentPageStartIndex());
       } else {
         console.log('At end of pagination - could extend range');
       }
@@ -225,6 +260,7 @@ export class DaysNavigatorComponent {
       newMonth.setMonth(newMonth.getMonth() - 1);
       return newMonth;
     });
+    this.monthChange.emit(this.currentCalendarMonth());
   }
 
   onNextMonth(): void {
@@ -233,6 +269,7 @@ export class DaysNavigatorComponent {
       newMonth.setMonth(newMonth.getMonth() + 1);
       return newMonth;
     });
+    this.monthChange.emit(this.currentCalendarMonth());
   }
 
   onToggleViewMode(mode: DayNavigatorMode): void {
@@ -245,6 +282,11 @@ export class DaysNavigatorComponent {
     this.dayChange.emit(date);
   }
 
+  onCalendarMonthChange(month: Date): void {
+    this.currentCalendarMonth.set(month);
+    this.monthChange.emit(month);
+  }
+
   onPaginationDayChange(value: Date | number): void {
     this.dayChange.emit(value);
   }
@@ -253,6 +295,11 @@ export class DaysNavigatorComponent {
     if (this.hasJourneyDates()) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      // Clear manual month in calendar view if it's active
+      const calendar = this.calendarView();
+      if (calendar) {
+        calendar.clearManualMonth();
+      }
       this.dayChange.emit(today);
     }
   }
@@ -260,6 +307,11 @@ export class DaysNavigatorComponent {
   goToJourneyStart(): void {
     const j = this.journey();
     if (j?.startDate) {
+      // Clear manual month in calendar view if it's active
+      const calendar = this.calendarView();
+      if (calendar) {
+        calendar.clearManualMonth();
+      }
       this.dayChange.emit(new Date(j.startDate));
     } else {
       this.dayChange.emit(1);
@@ -269,6 +321,11 @@ export class DaysNavigatorComponent {
   goToJourneyEnd(): void {
     const j = this.journey();
     if (j?.endDate) {
+      // Clear manual month in calendar view if it's active
+      const calendar = this.calendarView();
+      if (calendar) {
+        calendar.clearManualMonth();
+      }
       this.dayChange.emit(new Date(j.endDate));
     } else {
       this.dayChange.emit(this.totalDays());

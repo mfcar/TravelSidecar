@@ -31,6 +31,7 @@ export class ActivityCalendarViewComponent {
   firstDayOfWeek = input<UserFirstDayOfWeek>(UserFirstDayOfWeek.Monday);
 
   dayChange = output<Date>();
+  monthChange = output<Date>();
 
   // Use a signal for manual month navigation
   manualMonth = signal<Date | null>(null);
@@ -121,6 +122,7 @@ export class ActivityCalendarViewComponent {
     const newMonth = new Date(current);
     newMonth.setMonth(newMonth.getMonth() - 1);
     this.manualMonth.set(newMonth);
+    this.monthChange.emit(newMonth);
   }
 
   onNextMonth(): void {
@@ -128,6 +130,7 @@ export class ActivityCalendarViewComponent {
     const newMonth = new Date(current);
     newMonth.setMonth(newMonth.getMonth() + 1);
     this.manualMonth.set(newMonth);
+    this.monthChange.emit(newMonth);
   }
 
   onDayClick(day: CalendarDay): void {
@@ -142,6 +145,10 @@ export class ActivityCalendarViewComponent {
     // Clear manual month to follow the selected day
     this.manualMonth.set(null);
     this.dayChange.emit(today);
+  }
+
+  clearManualMonth(): void {
+    this.manualMonth.set(null);
   }
 
   private isSameDay(date1: Date, date2: Date): boolean {

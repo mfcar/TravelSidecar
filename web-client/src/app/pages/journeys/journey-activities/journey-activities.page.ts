@@ -1,5 +1,12 @@
 import { Dialog } from '@angular/cdk/dialog';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -57,6 +64,8 @@ export class JourneyActivitiesPage {
   private bucketListService = inject(BucketListService);
   private toastService = inject(ToastService);
 
+  daysNavigator = viewChild<DaysNavigatorComponent>('daysNavigator');
+
   journeyId = computed(() => this.route.parent?.snapshot.paramMap.get('id'));
 
   journeyResource = rxResource({
@@ -72,11 +81,22 @@ export class JourneyActivitiesPage {
   dayNavigatorMode = signal<DayNavigatorMode>(DayNavigatorMode.Pagination);
   activitiesViewMode = signal<ActivitiesViewMode>(ActivitiesViewMode.ByTime);
   firstDayOfWeek = signal<UserFirstDayOfWeek>(UserFirstDayOfWeek.Monday);
+  visibleDateRange = signal<{ startDate: Date; endDate: Date } | null>(null);
 
   // Replace signals with computed for derived state
   allActivities = computed(() => this.activitiesResource.value() || []);
   isLoadingActivities = computed(() => this.dayActivitiesResource.isLoading());
   activitySummary = computed(() => {
+    // Use visible range summary if we have a visible date range
+    const visibleRange = this.visibleDateRange();
+    if (visibleRange) {
+      const rangeSummary = this.visibleRangeSummaryResource.value();
+      if (rangeSummary) {
+        return rangeSummary;
+      }
+    }
+
+    // Fall back to full calendar summary
     const summary = this.calendarSummaryResource.value();
     if (!summary) return new Map<string, number>();
 
@@ -106,6 +126,24 @@ export class JourneyActivitiesPage {
         return of({ daysWithActivities: [], daysWithActivitiesIndexed: [] });
       }
       return this.journeyActivityService.getCalendarSummary(request);
+    },
+  });
+
+  // Resource to fetch activity summary for visible date range
+  visibleRangeSummaryResource = rxResource({
+    request: () => ({
+      journeyId: this.journeyId(),
+      range: this.visibleDateRange(),
+    }),
+    loader: ({ request }) => {
+      if (!request.journeyId || !request.range) {
+        return of(new Map<string, number>());
+      }
+      return this.journeyActivityService.getActivitySummary(
+        request.journeyId,
+        request.range.startDate,
+        request.range.endDate,
+      );
     },
   });
 
@@ -184,6 +222,9 @@ export class JourneyActivitiesPage {
     } else {
       this.selectedDay.set(1);
     }
+
+    // Update visible range after setting initial day
+    setTimeout(() => this.updateVisibleRange(), 0);
   }
 
   private getFirstActivityDate(): Date | null {
@@ -207,12 +248,32 @@ export class JourneyActivitiesPage {
     this.dayNavigatorMode.set(mode);
     localStorage.setItem('journey_dayNavigatorMode', mode);
     console.log('Day navigator mode changed to:', mode);
+    // Update visible range when view mode changes
+    setTimeout(() => this.updateVisibleRange(), 0);
   }
 
   onActivitiesViewModeChange(mode: ActivitiesViewMode): void {
     this.activitiesViewMode.set(mode);
     localStorage.setItem('journey_activitiesViewMode', mode);
     console.log('Activities view mode changed to:', mode);
+  }
+
+  onPageChange(pageIndex: number): void {
+    console.log('Page changed to:', pageIndex);
+    this.updateVisibleRange();
+  }
+
+  onMonthChange(month: Date): void {
+    console.log('Month changed to:', month);
+    this.updateVisibleRange();
+  }
+
+  private updateVisibleRange(): void {
+    const navigator = this.daysNavigator();
+    if (navigator) {
+      const range = navigator.getVisibleDateRange();
+      this.visibleDateRange.set(range);
+    }
   }
 
   onEditActivity(activity: JourneyActivity): void {
@@ -242,6 +303,7 @@ export class JourneyActivitiesPage {
         this.activitiesResource.reload();
         this.dayActivitiesResource.reload();
         this.calendarSummaryResource.reload();
+        this.visibleRangeSummaryResource.reload();
       }
     });
   }
@@ -298,6 +360,7 @@ export class JourneyActivitiesPage {
         this.activitiesResource.reload();
         this.dayActivitiesResource.reload();
         this.calendarSummaryResource.reload();
+        this.visibleRangeSummaryResource.reload();
       }
     });
   }
@@ -333,6 +396,8 @@ export class JourneyActivitiesPage {
             // Refresh activities
             this.activitiesResource.reload();
             this.dayActivitiesResource.reload();
+            this.calendarSummaryResource.reload();
+            this.visibleRangeSummaryResource.reload();
           },
           error: (error) => {
             console.error('Error copying/moving items:', error);
