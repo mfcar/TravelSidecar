@@ -30,6 +30,7 @@ import {
   DayNavigatorMode,
   DaysNavigatorComponent,
 } from '../../../components/navigation/days-navigator/days-navigator.component';
+import { CollapsibleSectionComponent } from '../../../components/ui/collapsible-section/collapsible-section.component';
 import { JourneyActivity } from '../../../models/activities.model';
 import { UserFirstDayOfWeek } from '../../../models/enums/user-preferences.enum';
 import { BucketListService } from '../../../services/bucket-list.service';
@@ -46,6 +47,7 @@ import { UserPreferencesService } from '../../../services/user-preferences.servi
     ActivitiesViewToggleComponent,
     DayActivitiesListComponent,
     ButtonComponent,
+    CollapsibleSectionComponent,
   ],
   templateUrl: './journey-activities.page.html',
   styles: `
@@ -65,6 +67,7 @@ export class JourneyActivitiesPage {
   private toastService = inject(ToastService);
 
   daysNavigator = viewChild<DaysNavigatorComponent>('daysNavigator');
+  activitiesScrollContainer = viewChild<HTMLElement>('activitiesScrollContainer');
 
   journeyId = computed(() => this.route.parent?.snapshot.paramMap.get('id'));
 
@@ -82,6 +85,10 @@ export class JourneyActivitiesPage {
   activitiesViewMode = signal<ActivitiesViewMode>(ActivitiesViewMode.ByTime);
   firstDayOfWeek = signal<UserFirstDayOfWeek>(UserFirstDayOfWeek.Monday);
   visibleDateRange = signal<{ startDate: Date; endDate: Date } | null>(null);
+  
+  // Scroll state for indicators
+  scrolledTop = signal(false);
+  scrolledBottom = signal(false);
 
   // Replace signals with computed for derived state
   allActivities = computed(() => this.activitiesResource.value() || []);
@@ -408,5 +415,59 @@ export class JourneyActivitiesPage {
         });
       }
     });
+  }
+
+  // New methods for enhanced UI
+  getSelectedDayLabel(): string {
+    const selected = this.selectedDay();
+    const journey = this.journey();
+    
+    if (selected instanceof Date) {
+      return selected.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    } else if (journey && !journey.startDate) {
+      return `Day ${selected}`;
+    }
+    
+    return '';
+  }
+
+  isMobileViewport(): boolean {
+    return window.innerWidth < 1024; // lg breakpoint
+  }
+
+  onCalendarExpandedChange(expanded: boolean): void {
+    // Optional: Add any logic needed when calendar is expanded/collapsed
+    console.log('Calendar expanded:', expanded);
+  }
+
+  hasScrolledTop(): boolean {
+    return this.scrolledTop();
+  }
+
+  hasScrolledBottom(): boolean {
+    return this.scrolledBottom();
+  }
+
+  onActivitiesScroll(event: Event): void {
+    const element = event.target as HTMLElement;
+    const scrollTop = element.scrollTop;
+    const scrollHeight = element.scrollHeight;
+    const clientHeight = element.clientHeight;
+    
+    // Check if scrolled from top
+    this.scrolledTop.set(scrollTop > 10);
+    
+    // Check if scrolled to bottom (with 10px threshold)
+    this.scrolledBottom.set(scrollTop + clientHeight < scrollHeight - 10);
+  }
+
+  onAddActivityBetween(context: any): void {
+    // Context can contain information about where to insert the activity
+    // For now, just open the add activity modal
+    this.openAddActivityModal();
   }
 }

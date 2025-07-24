@@ -1,26 +1,37 @@
 <div class="flex flex-col lg:flex-row h-screen-minus-navbar gap-4">
   <!-- Activities Panel -->
   <div class="w-full lg:w-96 flex flex-col bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
-    <!-- Days Navigator -->
-    <div class="border-b border-gray-200 dark:border-gray-700 p-4">
-      <ts-days-navigator
-        #daysNavigator
-        [journey]="journey() || null"
-        [selectedDay]="selectedDay()"
-        [viewMode]="dayNavigatorMode()"
-        [activities]="allActivities()"
-        [activitySummary]="activitySummary()"
-        [firstDayOfWeek]="firstDayOfWeek()"
-        (dayChange)="onDayChange($event)"
-        (viewModeChange)="onDayNavigatorModeChange($event)"
-        (pageChange)="onPageChange($event)"
-        (monthChange)="onMonthChange($event)"
-      />
-    </div>
+    <!-- Collapsible Days Navigator -->
+    <ts-collapsible-section
+      [title]="'Days'"
+      [subtitle]="getSelectedDayLabel()"
+      [isExpandedInitial]="!isMobileViewport()"
+      [showIcon]="true"
+      [showToggleIcon]="true"
+      [alwaysShowSubtitle]="false"
+      [storageKey]="'journey-calendar-collapsed'"
+      (expandedChange)="onCalendarExpandedChange($event)"
+    >
+      <div class="space-y-4">
+        <ts-days-navigator
+          #daysNavigator
+          [journey]="journey() || null"
+          [selectedDay]="selectedDay()"
+          [viewMode]="dayNavigatorMode()"
+          [activities]="allActivities()"
+          [activitySummary]="activitySummary()"
+          [firstDayOfWeek]="firstDayOfWeek()"
+          (dayChange)="onDayChange($event)"
+          (viewModeChange)="onDayNavigatorModeChange($event)"
+          (pageChange)="onPageChange($event)"
+          (monthChange)="onMonthChange($event)"
+        />
+      </div>
+    </ts-collapsible-section>
 
-    <!-- Activities View Toggle -->
-    <div class="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-      <div class="flex items-center justify-between">
+    <!-- Sticky Header with Activities Controls -->
+    <div class="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 shadow-sm">
+      <div class="flex items-center justify-between gap-3">
         <ts-activities-view-toggle
           [viewMode]="activitiesViewMode()"
           (viewModeChange)="onActivitiesViewModeChange($event)"
@@ -46,9 +57,20 @@
       </div>
     </div>
 
-    <!-- Activities List -->
-    <div class="flex-1 min-h-0 overflow-hidden">
-      <div class="h-full p-4 overflow-y-auto">
+    <!-- Activities List with Scroll Indicators -->
+    <div class="flex-1 min-h-0 relative overflow-hidden">
+      <!-- Top scroll shadow -->
+      <div 
+        class="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-white dark:from-gray-900 to-transparent pointer-events-none z-10 transition-opacity duration-200"
+        [class.opacity-0]="!hasScrolledTop()"
+      ></div>
+      
+      <!-- Activities list container -->
+      <div 
+        #activitiesScrollContainer
+        class="h-full overflow-y-auto px-4 py-4"
+        (scroll)="onActivitiesScroll($event)"
+      >
         <ts-day-activities-list
           [activities]="currentDayActivities()"
           [viewMode]="activitiesViewMode()"
@@ -56,8 +78,15 @@
           (editActivity)="onEditActivity($event)"
           (deleteActivity)="onDeleteActivity($event)"
           (reorderActivities)="onReorderActivities($event)"
+          (addActivityBetween)="onAddActivityBetween($event)"
         />
       </div>
+      
+      <!-- Bottom scroll shadow -->
+      <div 
+        class="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-gray-900 to-transparent pointer-events-none z-10 transition-opacity duration-200"
+        [class.opacity-0]="!hasScrolledBottom()"
+      ></div>
     </div>
   </div>
 

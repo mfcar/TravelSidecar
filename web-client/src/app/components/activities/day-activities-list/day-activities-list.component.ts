@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { ActivityDividerComponent } from '../activity-divider/activity-divider.component';
 import { JourneyActivity } from '../../../models/activities.model';
 
 export enum ActivitiesViewMode {
@@ -9,7 +10,7 @@ export enum ActivitiesViewMode {
 
 @Component({
   selector: 'ts-day-activities-list',
-  imports: [FontAwesomeModule],
+  imports: [FontAwesomeModule, ActivityDividerComponent],
   templateUrl: './day-activities-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -21,6 +22,7 @@ export class DayActivitiesListComponent {
   editActivity = output<JourneyActivity>();
   deleteActivity = output<string>();
   reorderActivities = output<JourneyActivity[]>();
+  addActivityBetween = output<{ afterActivityId?: string; beforeActivityId?: string }>();
 
   expandedActivityId = signal<string | null>(null);
 
@@ -82,4 +84,8 @@ export class DayActivitiesListComponent {
   }
 
   readonly ActivitiesViewMode = ActivitiesViewMode;
+
+  onAddActivityBetween(afterActivityId?: string, beforeActivityId?: string): void {
+    this.addActivityBetween.emit({ afterActivityId, beforeActivityId });
+  }
 }

@@ -13,9 +13,17 @@
       <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Add your first activity to get started</p>
     </div>
   } @else {
-    <div class="space-y-2 overflow-y-auto">
-      @for (activity of activities(); track activity.id) {
-        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200">
+    <div class="overflow-y-auto">
+      <!-- Add activity divider before first activity -->
+      @if (activities().length > 0) {
+        <ts-activity-divider 
+          [label]="'Add first activity'"
+          (addActivity)="onAddActivityBetween(undefined, activities()[0].id)"
+        />
+      }
+      
+      @for (activity of activities(); track activity.id; let i = $index) {
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 mb-2">
           <!-- Main activity card - clickable to expand -->
           <button 
             type="button"
@@ -162,6 +170,20 @@
             }
           }
         </div>
+        
+        <!-- Add activity divider after each activity -->
+        @if (i < activities().length - 1) {
+          <ts-activity-divider 
+            [label]="'Add activity'"
+            (addActivity)="onAddActivityBetween(activity.id, activities()[i + 1].id)"
+          />
+        } @else {
+          <!-- Divider after last activity -->
+          <ts-activity-divider 
+            [label]="'Add activity at end'"
+            (addActivity)="onAddActivityBetween(activity.id, undefined)"
+          />
+        }
       }
     </div>
   }
